@@ -10,6 +10,7 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { toast } from "material-react-toastify";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -17,15 +18,26 @@ const Login = () => {
   const [error, setError] = useState("");
   const { login } = useAuth();
 
+  const showToast = (message) => {
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       await login({ username, password });
-      window.alert("Login successful!");
     } catch (err) {
       setError("Invalid username or password");
-      window.alert("Login failed! Please try again.");
+      showToast("Unable to log in. Please try again.");
       console.error(err);
     }
   };

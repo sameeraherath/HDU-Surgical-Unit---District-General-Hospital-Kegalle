@@ -12,14 +12,13 @@ import {
   DialogActions,
   TextField,
   MenuItem,
-  Snackbar,
-  Alert,
   AppBar,
   Toolbar,
   IconButton,
 } from "@mui/material";
 import BedCard from "../components/BedCard";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { toast } from "material-react-toastify";
 
 const NurseDashboard = () => {
   const [beds, setBeds] = useState([]);
@@ -37,10 +36,31 @@ const NurseDashboard = () => {
     contactDetails: "",
     frequencyMeasure: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const navigate = useNavigate();
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const showToast = (message, type) => {
+    if (type === "success") {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+    if (type === "error") {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
 
   useEffect(() => {
     fetchBeds();
@@ -75,12 +95,13 @@ const NurseDashboard = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      showToast("Patient successfully removed from the bed.", "success");
       fetchBeds();
-      setSnackbarMessage("Bed deassigned successfully.");
-      setSnackbarOpen(true);
     } catch (err) {
-      setSnackbarMessage("Error deassigning bed.");
-      setSnackbarOpen(true);
+      showToast(
+        "Failed to remove the patient from the bed. Please try again.",
+        "error"
+      );
       console.error(err);
     }
   };
@@ -107,10 +128,10 @@ const NurseDashboard = () => {
 
     if (missingFields.length > 0) {
       const missingFieldsMessage = missingFields.join("\n");
-      setSnackbarMessage(
-        `Please fill in the following required fields:\n\n${missingFieldsMessage}`
+      showToast(
+        `Please fill in the following required fields:\n\n${missingFieldsMessage}`,
+        "error"
       );
-      setSnackbarOpen(true);
       return false;
     }
 
@@ -133,29 +154,21 @@ const NurseDashboard = () => {
         body: JSON.stringify({ patientData: dataToSubmit }),
       });
 
-      console.log("🚀 ~ handleSubmit ~ response:", response);
-
       if (!response.ok) {
         throw new Error("Failed to assign bed.");
       }
 
-      setSnackbarMessage("Bed assigned successfully.");
-      setSnackbarOpen(true);
+      showToast("Bed assigned successfully.", "success");
       setOpen(false);
       await fetchBeds();
     } catch (error) {
+      showToast("Error assigning bed.", "error");
       console.log("🚀 ~ handleSubmit ~ error:", error);
-      setSnackbarMessage("Error assigning bed.");
-      setSnackbarOpen(true);
     }
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
   };
 
   const handleLogoutClick = () => {
@@ -198,9 +211,19 @@ const NurseDashboard = () => {
         </Toolbar>
       </AppBar>
 
-      <Grid2 container spacing={3} style={{ marginTop: "20px" }}>
+      <Grid2
+        container
+        spacing={2}
+        style={{
+          marginTop: "20px",
+          height: "50vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         {beds.slice(0, 10).map((bed) => (
-          <Grid2 key={bed.id}>
+          <Grid2 key={bed.id} xs={6} sm={6} md={3}>
             <BedCard
               bed={bed}
               assignBed={handleAssignBed}
@@ -210,144 +233,188 @@ const NurseDashboard = () => {
         ))}
       </Grid2>
 
-      <Dialog open={open && !!selectedBed} onClose={handleClose}>
-        <DialogTitle>Assign patient to {selectedBed?.bedNumber}</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Full Name"
-            name="fullName"
-            fullWidth
-            value={formData.fullName}
-            margin="dense"
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            label="Age"
-            name="age"
-            type="number"
-            fullWidth
-            value={formData.age}
-            margin="dense"
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            label="Birth Date"
-            name="birthDate"
-            type="date"
-            fullWidth
-            value={formData.birthDate}
-            margin="dense"
-            onChange={handleChange}
-            required
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-          <TextField
-            select
-            label="Sex"
-            name="sex"
-            fullWidth
-            value={formData.sex}
-            margin="dense"
-            onChange={handleChange}
-            required
-          >
-            <MenuItem value="Male">Male</MenuItem>
-            <MenuItem value="Female">Female</MenuItem>
-          </TextField>
-          <TextField
-            label="Condition"
-            name="condition"
-            multiline
-            rows={3}
-            fullWidth
-            value={formData.condition}
-            margin="dense"
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            label="Admit Date & Time"
-            name="admitDateTime"
-            type="datetime-local"
-            fullWidth
-            value={formData.admitDateTime}
-            margin="dense"
-            onChange={handleChange}
-            required
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-          <TextField
-            label="Contact Details"
-            name="contactDetails"
-            fullWidth
-            value={formData.contactDetails}
-            margin="dense"
-            onChange={handleChange}
-            required
-          />
-          <TextField
-            select
-            label="Frequency Measure"
-            name="frequencyMeasure"
-            fullWidth
-            value={formData.frequencyMeasure}
-            margin="dense"
-            onChange={handleChange}
-            required
-          >
-            <MenuItem value="Red">Red</MenuItem>
-            <MenuItem value="Green">Green</MenuItem>
-            <MenuItem value="Blue">Blue</MenuItem>
-            <MenuItem value="Yellow">Yellow</MenuItem>
-            <MenuItem value="Brown">Brown</MenuItem>
-          </TextField>
+      <Dialog
+        open={open && !!selectedBed}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{ bgcolor: "primary.main", color: "white", textAlign: "center" }}
+        >
+          Assign Patient to {selectedBed?.bedNumber}
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Grid2 container spacing={2}>
+            <Grid2 item xs={12}>
+              <TextField
+                label="Full Name"
+                name="fullName"
+                fullWidth
+                value={formData.fullName}
+                onChange={handleChange}
+                required
+                sx={{ borderRadius: 3, marginTop: 2, marginBottom: 2 }}
+              />
+            </Grid2>
+            <Grid2 item xs={6}>
+              <TextField
+                label="Age"
+                name="age"
+                type="number"
+                fullWidth
+                value={formData.age}
+                onChange={handleChange}
+                required
+              />
+            </Grid2>
+            <Grid2 item xs={6}>
+              <TextField
+                label="Birth Date"
+                name="birthDate"
+                type="date"
+                fullWidth
+                value={formData.birthDate}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+                required
+              />
+            </Grid2>
+            <Grid2 item xs={6}>
+              <TextField
+                select
+                label="Sex"
+                name="sex"
+                fullWidth
+                value={formData.sex}
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+              </TextField>
+            </Grid2>
+            <Grid2 item xs={6}>
+              <TextField
+                label="Contact Details"
+                name="contactDetails"
+                fullWidth
+                value={formData.contactDetails}
+                onChange={handleChange}
+                required
+              />
+            </Grid2>
+            <Grid2 item xs={12}>
+              <TextField
+                label="Condition"
+                name="condition"
+                multiline
+                rows={3}
+                fullWidth
+                value={formData.condition}
+                onChange={handleChange}
+                required
+              />
+            </Grid2>
+            <Grid2 item xs={6}>
+              <TextField
+                label="Admit Date & Time"
+                name="admitDateTime"
+                type="datetime-local"
+                fullWidth
+                value={formData.admitDateTime}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+                required
+              />
+            </Grid2>
+            <Grid2 item xs={6}>
+              <TextField
+                select
+                label="Frequency Measure"
+                name="frequencyMeasure"
+                fullWidth
+                value={formData.frequencyMeasure}
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value="Red">Red</MenuItem>
+                <MenuItem value="Green">Green</MenuItem>
+                <MenuItem value="Blue">Blue</MenuItem>
+                <MenuItem value="Yellow">Yellow</MenuItem>
+                <MenuItem value="Brown">Brown</MenuItem>
+              </TextField>
+            </Grid2>
+          </Grid2>
         </DialogContent>
-
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            onClick={handleSubmit}
-            color="primary"
-            variant="contained"
-            sx={{ textTransform: "none" }}
-          >
+        <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} color="primary" variant="contained">
             Submit
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
+      <Dialog
+        open={logoutDialogOpen}
+        onClose={closeLogoutDialog}
+        maxWidth="sm"
+        fullWidth
       >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={error ? "error" : "success"}
+        <DialogTitle
+          sx={{
+            bgcolor: "primary.light",
+            color: "text.primary",
+            textAlign: "center",
+            padding: "16px",
+          }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-
-      <Dialog open={logoutDialogOpen} onClose={closeLogoutDialog}>
-        <DialogTitle>Confirm Logout</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to log out?</Typography>
+          <Typography variant="h6" fontWeight="600">
+            Confirm Logout
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", padding: "4px" }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              fontWeight: "400",
+              marginTop: "20px",
+            }}
+          >
+            Are you sure you want to log out?
+          </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={closeLogoutDialog}>No</Button>
-          <Button onClick={confirmLogout} color="primary" variant="contained">
-            Yes
+        <DialogActions sx={{ justifyContent: "center", padding: "16px 24px" }}>
+          <Button
+            onClick={closeLogoutDialog}
+            variant="outlined"
+            color="primary"
+            sx={{
+              marginRight: 2,
+              padding: "8px 20px",
+              fontWeight: "600",
+              borderColor: "primary.main",
+            }}
+          >
+            No
+          </Button>
+          <Button
+            onClick={confirmLogout}
+            variant="contained"
+            color="error"
+            sx={{
+              padding: "8px 20px",
+              fontWeight: "600",
+              backgroundColor: "#ff6f61",
+              "&:hover": {
+                backgroundColor: "#ff3d2d",
+              },
+            }}
+          >
+            Yes, Log Out
           </Button>
         </DialogActions>
       </Dialog>

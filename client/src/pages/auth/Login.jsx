@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../../context/useAuth";
 import {
   Button,
@@ -6,16 +6,15 @@ import {
   Typography,
   Container,
   Paper,
-  Box,
   Link as MuiLink,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { toast } from "material-react-toastify";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const { login } = useAuth();
 
   const showToast = (message) => {
@@ -26,20 +25,23 @@ const Login = () => {
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-      progress: undefined,
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  const LoginSchema = Yup.object().shape({
+    username: Yup.string().required("Username is required"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      await login({ username, password });
+      await login(values);
     } catch (err) {
-      setError("Invalid username or password");
+      setErrors({ general: "Invalid username or password" });
       showToast("Unable to log in. Please try again.");
       console.error(err);
     }
+    setSubmitting(false);
   };
 
   return (
@@ -52,65 +54,72 @@ const Login = () => {
         alignItems: "center",
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          p: 4,
-          borderRadius: "16px",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-      >
+      <Paper elevation={3} sx={{ p: 4, borderRadius: "16px", width: "100%" }}>
         <Typography variant="h5" align="center" gutterBottom>
           Login
         </Typography>
-        {error && (
-          <Typography color="error" align="center" gutterBottom>
-            {error}
-          </Typography>
-        )}
-        <Box component="form" onSubmit={handleSubmit}>
-          <TextField
-            label="Username"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            sx={{
-              borderRadius: "8px",
-              mb: 2,
-            }}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            sx={{
-              borderRadius: "8px",
-              mb: 2,
-            }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{
-              mt: 2,
-              borderRadius: "8px",
-              padding: "12px",
-            }}
-          >
-            Login
-          </Button>
-        </Box>
+
+        <Formik
+          initialValues={{ username: "", password: "" }}
+          validationSchema={LoginSchema}
+          onSubmit={handleSubmit}
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            isSubmitting,
+          }) => (
+            <Form>
+              {errors.general && (
+                <Typography color="error" align="center" gutterBottom>
+                  {errors.general}
+                </Typography>
+              )}
+
+              <TextField
+                label="Username"
+                name="username"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={values.username}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.username && Boolean(errors.username)}
+                helperText={touched.username && errors.username}
+              />
+
+              <TextField
+                label="Password"
+                name="password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.password && Boolean(errors.password)}
+                helperText={touched.password && errors.password}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2, borderRadius: "8px", padding: "12px" }}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <CircularProgress size={24} /> : "Login"}
+              </Button>
+            </Form>
+          )}
+        </Formik>
+
         <Typography align="center" sx={{ mt: 2 }}>
           Not registered yet?{" "}
           <MuiLink component={Link} to="/register" underline="hover">

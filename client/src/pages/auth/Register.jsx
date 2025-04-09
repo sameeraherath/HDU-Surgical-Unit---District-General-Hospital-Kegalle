@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { MuiTelInput } from "mui-tel-input";
+import { CircularProgress } from "@mui/material";
 import { toast } from "material-react-toastify";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -46,7 +47,7 @@ const Register = () => {
       });
     }
   };
-  
+
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
@@ -113,7 +114,7 @@ const Register = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, handleChange, setFieldValue }) => (
+          {({ values, handleChange, setFieldValue, isSubmitting }) => (
             <Form>
               <FormControl fullWidth margin="normal" sx={{ borderRadius: 3 }}>
                 <InputLabel>Role</InputLabel>
@@ -321,7 +322,11 @@ const Register = () => {
                   ":hover": { boxShadow: 4 },
                 }}
               >
-                Register
+                {isSubmitting ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Register"
+                )}
               </Button>
             </Form>
           )}

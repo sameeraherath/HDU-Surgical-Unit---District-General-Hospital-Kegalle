@@ -46,7 +46,7 @@ const Register = () => {
       });
     }
   };
-
+  
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
@@ -59,26 +59,25 @@ const Register = () => {
       .email("Invalid email address")
       .required("Email is required"),
     sex: Yup.string().required("Sex is required"),
+    role: Yup.string().required("Role is required"),
     nameWithInitials: Yup.string().when("role", {
       is: (role) =>
-        role === "House Officer" ||
-        role === "Medical Officer" ||
-        role === "Consultant",
-      then: Yup.string().required("Name with initials is required"),
+        ["House Officer", "Medical Officer", "Consultant"].includes(role),
+      then: (schema) => schema.required("Name with initials is required"),
+      otherwise: (schema) => schema.notRequired(),
     }),
     speciality: Yup.string().when("role", {
       is: (role) =>
-        role === "House Officer" ||
-        role === "Medical Officer" ||
-        role === "Consultant",
-      then: Yup.string().required("Speciality is required"),
+        ["House Officer", "Medical Officer", "Consultant"].includes(role),
+      then: (schema) => schema.required("Speciality is required"),
+      otherwise: (schema) => schema.notRequired(),
     }),
     grade: Yup.string().when("role", {
       is: "Nurse",
-      then: Yup.string().required("Grade is required"),
+      then: (schema) => schema.required("Grade is required"),
+      otherwise: (schema) => schema.notRequired(),
     }),
   });
-
   const handleSubmit = async (values) => {
     try {
       await register(values);

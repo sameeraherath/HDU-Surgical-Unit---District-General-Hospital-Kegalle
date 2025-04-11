@@ -7,11 +7,11 @@ import MedicalOfficerDashboard from "../pages/MedicalOfficerDashboard";
 import NurseDashboard from "../pages/NurseDashboard";
 import LandingPage from "../pages/LandingPage";
 import ConsultantDashboard from "../pages/ConsultantDashboard";
-import { useAuth } from "../context/useAuth";
+import { useSelector } from "react-redux";
 
 const ProtectedRoute = ({ role, children }) => {
-  const { role: userRole } = useAuth();
-  if (!userRole || userRole !== role) {
+  const user = useSelector((state) => state.auth.user);
+  if (!user || user.role !== role) {
     return <Navigate to="/login" />;
   }
   return children;

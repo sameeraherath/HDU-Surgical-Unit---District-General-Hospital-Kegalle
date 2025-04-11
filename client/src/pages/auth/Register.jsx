@@ -1,4 +1,4 @@
-import { useAuth } from "../../context/useAuth";
+import React from "react";
 import {
   Button,
   TextField,
@@ -18,33 +18,37 @@ import { CircularProgress } from "@mui/material";
 import { toast } from "material-react-toastify";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../../features/auth/authSlice";
+
+const nurseGrades = [
+  "Student Nurse (Trainee Nurse)",
+  "Registered Nurse (RN)",
+  "Grade II Nursing Officer (Staff Nurse)",
+  "Grade I Nursing Officer (Senior Staff Nurse)",
+  "Supra Grade Nursing Officer (Supervisory Nurse)",
+  "Nursing Sister (Ward Sister / In-Charge Nurse)",
+  "Matron / Chief Nursing Officer (CNO)",
+  "Director of Nursing Services",
+  "Public Health Nursing Officer (PHNO)",
+  "Midwife / Nurse Midwife",
+  "School Health Nurse",
+  "Occupational Health Nurse",
+  "ICU / Critical Care Nurse",
+];
 
 const Register = () => {
-  const { register } = useAuth();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const showToast = (message, type) => {
-    if (type === "success") {
-      toast.success(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-    if (type === "error") {
-      toast.error(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+  const handleSubmit = async (values) => {
+    try {
+      await dispatch(registerUser(values)).unwrap();
+      toast.success("Registration successful");
+      navigate("/login");
+    } catch (err) {
+      toast.error("Registration failed. Please try again.");
+      console.error(err);
     }
   };
 
@@ -79,16 +83,6 @@ const Register = () => {
       otherwise: (schema) => schema.notRequired(),
     }),
   });
-  const handleSubmit = async (values) => {
-    try {
-      await register(values);
-      showToast("Registration successful", "success");
-      navigate("/login");
-    } catch (err) {
-      console.log("🚀 ~ handleSubmit ~ err:", err);
-      showToast("Registration failed. Please try again.", "error");
-    }
-  };
 
   return (
     <Container maxWidth="xs">
@@ -134,10 +128,9 @@ const Register = () => {
               <Field
                 as={TextField}
                 label="Username"
-                variant="outlined"
+                name="username"
                 fullWidth
                 margin="normal"
-                name="username"
                 required
                 sx={{ borderRadius: 3 }}
                 helperText={<ErrorMessage name="username" />}
@@ -148,10 +141,9 @@ const Register = () => {
                 as={TextField}
                 label="Password"
                 type="password"
-                variant="outlined"
+                name="password"
                 fullWidth
                 margin="normal"
-                name="password"
                 required
                 sx={{ borderRadius: 3 }}
                 helperText={<ErrorMessage name="password" />}
@@ -161,10 +153,9 @@ const Register = () => {
               <Field
                 as={TextField}
                 label="Registration Number"
-                variant="outlined"
+                name="registrationNumber"
                 fullWidth
                 margin="normal"
-                name="registrationNumber"
                 required
                 sx={{ borderRadius: 3 }}
                 helperText={<ErrorMessage name="registrationNumber" />}
@@ -200,10 +191,9 @@ const Register = () => {
               <Field
                 as={TextField}
                 label="Email"
-                variant="outlined"
+                name="email"
                 fullWidth
                 margin="normal"
-                name="email"
                 required
                 sx={{ borderRadius: 3 }}
                 helperText={<ErrorMessage name="email" />}
@@ -225,17 +215,16 @@ const Register = () => {
                 </Select>
               </FormControl>
 
-              {values.role === "House Officer" ||
-              values.role === "Medical Officer" ||
-              values.role === "Consultant" ? (
+              {(values.role === "House Officer" ||
+                values.role === "Medical Officer" ||
+                values.role === "Consultant") && (
                 <>
                   <Field
                     as={TextField}
                     label="Name With Initials"
-                    variant="outlined"
+                    name="nameWithInitials"
                     fullWidth
                     margin="normal"
-                    name="nameWithInitials"
                     required
                     sx={{ borderRadius: 3 }}
                     helperText={<ErrorMessage name="nameWithInitials" />}
@@ -245,17 +234,16 @@ const Register = () => {
                   <Field
                     as={TextField}
                     label="Speciality"
-                    variant="outlined"
+                    name="speciality"
                     fullWidth
                     margin="normal"
-                    name="speciality"
                     required
                     sx={{ borderRadius: 3 }}
                     helperText={<ErrorMessage name="speciality" />}
                     error={Boolean(<ErrorMessage name="speciality" />)}
                   />
                 </>
-              ) : null}
+              )}
 
               {values.role === "Nurse" && (
                 <FormControl fullWidth margin="normal">
@@ -267,45 +255,11 @@ const Register = () => {
                     label="Grade"
                     required
                   >
-                    <MenuItem value="Student Nurse (Trainee Nurse)">
-                      Student Nurse (Trainee Nurse)
-                    </MenuItem>
-                    <MenuItem value="Registered Nurse (RN)">
-                      Registered Nurse (RN)
-                    </MenuItem>
-                    <MenuItem value="Grade II Nursing Officer (Staff Nurse)">
-                      Grade II Nursing Officer (Staff Nurse)
-                    </MenuItem>
-                    <MenuItem value="Grade I Nursing Officer (Senior Staff Nurse)">
-                      Grade I Nursing Officer (Senior Staff Nurse)
-                    </MenuItem>
-                    <MenuItem value="Supra Grade Nursing Officer (Supervisory Nurse)">
-                      Supra Grade Nursing Officer (Supervisory Nurse)
-                    </MenuItem>
-                    <MenuItem value="Nursing Sister (Ward Sister / In-Charge Nurse)">
-                      Nursing Sister (Ward Sister / In-Charge Nurse)
-                    </MenuItem>
-                    <MenuItem value="Matron / Chief Nursing Officer (CNO)">
-                      Matron / Chief Nursing Officer (CNO)
-                    </MenuItem>
-                    <MenuItem value="Director of Nursing Services">
-                      Director of Nursing Services
-                    </MenuItem>
-                    <MenuItem value="Public Health Nursing Officer (PHNO)">
-                      Public Health Nursing Officer (PHNO)
-                    </MenuItem>
-                    <MenuItem value="Midwife / Nurse Midwife">
-                      Midwife / Nurse Midwife
-                    </MenuItem>
-                    <MenuItem value="School Health Nurse">
-                      School Health Nurse
-                    </MenuItem>
-                    <MenuItem value="Occupational Health Nurse">
-                      Occupational Health Nurse
-                    </MenuItem>
-                    <MenuItem value="ICU / Critical Care Nurse">
-                      ICU / Critical Care Nurse
-                    </MenuItem>
+                    {nurseGrades.map((grade) => (
+                      <MenuItem key={grade} value={grade}>
+                        {grade}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               )}
@@ -321,12 +275,9 @@ const Register = () => {
                   boxShadow: 2,
                   ":hover": { boxShadow: 4 },
                 }}
+                disabled={isSubmitting}
               >
-                {isSubmitting ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Register"
-                )}
+                {isSubmitting ? <CircularProgress size={24} /> : "Register"}
               </Button>
             </Form>
           )}

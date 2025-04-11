@@ -1,5 +1,4 @@
 import React from "react";
-import { useAuth } from "../../context/useAuth";
 import {
   Button,
   TextField,
@@ -8,14 +7,18 @@ import {
   Paper,
   Link as MuiLink,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../features/auth/authSlice";
 import { toast } from "material-react-toastify";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CircularProgress from "@mui/material/CircularProgress";
 
 const Login = () => {
-  const { login } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.auth);
 
   const showToast = (message) => {
     toast.error(message, {
@@ -33,13 +36,23 @@ const Login = () => {
     password: Yup.string().required("Password is required"),
   });
 
+  const redirectToDashboard = (role) => {
+    const roleRoutes = {
+      Nurse: "/nurse-dashboard",
+      "House Officer": "/house-officer-dashboard",
+      "Medical Officer": "/medical-officer-dashboard",
+      Consultant: "/consultant-dashboard",
+    };
+    return roleRoutes[role] || "/";
+  };
+
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      await login(values);
-    } catch (err) {
+      const result = await dispatch(loginUser(values)).unwrap();
+      navigate(redirectToDashboard(result.role));
+    } catch {
       setErrors({ general: "Invalid username or password" });
       showToast("Unable to log in. Please try again.");
-      console.error(err);
     }
     setSubmitting(false);
   };
@@ -112,9 +125,13 @@ const Login = () => {
                 color="primary"
                 fullWidth
                 sx={{ mt: 2, borderRadius: "8px", padding: "12px" }}
-                disabled={isSubmitting}
+                disabled={isSubmitting || loading}
               >
-                {isSubmitting ? <CircularProgress size={24} /> : "Login"}
+                {isSubmitting || loading ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  "Login"
+                )}
               </Button>
             </Form>
           )}

@@ -1,18 +1,19 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 import AppRoutes from "./routes/routes";
-import { ToastContainer, toast } from "material-react-toastify";
+import { ToastContainer } from "material-react-toastify";
 import "material-react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <Provider store={store}>
+      <BrowserRouter>
         <AppRoutes />
-      </AuthProvider>
-      <ToastContainer />
-    </BrowserRouter>
+        <ToastContainer />
+      </BrowserRouter>
+    </Provider>
   );
 }
 

@@ -1,296 +1,371 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  Button,
-  TextField,
-  Typography,
-  Container,
+  Grid,
   Paper,
-  Box,
+  Typography,
+  TextField,
+  Button,
   MenuItem,
   Select,
   InputLabel,
   FormControl,
+  InputAdornment,
+  IconButton,
+  Box,
+  Avatar,
+  CircularProgress,
   Link as MuiLink,
+  Backdrop,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
 import { MuiTelInput } from "mui-tel-input";
-import { CircularProgress } from "@mui/material";
-import { toast } from "material-react-toastify";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { useDispatch } from "react-redux";
-import { registerUser } from "../../features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "../../features/loaderSlice";
+import { Visibility, VisibilityOff, PersonAdd } from "@mui/icons-material";
+import { useRegistrationForm } from "../../hooks/useRegistrationForm";
+import { Link } from "react-router-dom";
 
-const nurseGrades = [
-  "Student Nurse (Trainee Nurse)",
-  "Registered Nurse (RN)",
-  "Grade II Nursing Officer (Staff Nurse)",
-  "Grade I Nursing Officer (Senior Staff Nurse)",
-  "Supra Grade Nursing Officer (Supervisory Nurse)",
-  "Nursing Sister (Ward Sister / In-Charge Nurse)",
-  "Matron / Chief Nursing Officer (CNO)",
-  "Director of Nursing Services",
-  "Public Health Nursing Officer (PHNO)",
-  "Midwife / Nurse Midwife",
-  "School Health Nurse",
-  "Occupational Health Nurse",
-  "ICU / Critical Care Nurse",
-];
+
+const roundedField = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    minHeight: "56px",
+  },
+  "& .MuiInputBase-root": {
+    borderRadius: "12px",
+    minHeight: "56px",
+  },
+};
 
 const Register = () => {
+  const { formik, nurseGrades } = useRegistrationForm();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const globalLoading = useSelector((state) => state.loader.isLoading);
+  const { values, handleChange, errors, touched, setFieldValue } = formik;
 
-  const handleSubmit = async (values) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = () => setShowPassword((prev) => !prev);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    dispatch(setLoading(true));
     try {
-      await dispatch(registerUser(values)).unwrap();
-      toast.success("Registration successful");
-      navigate("/login");
-    } catch (err) {
-      toast.error("Registration failed. Please try again.");
-      console.error(err);
+      await formik.handleSubmit(event);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
-  const validationSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
-    password: Yup.string().required("Password is required"),
-    registrationNumber: Yup.string().required(
-      "Registration Number is required"
-    ),
-    ward: Yup.string().required("Ward is required"),
-    mobileNumber: Yup.string().required("Mobile number is required"),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    sex: Yup.string().required("Sex is required"),
-    role: Yup.string().required("Role is required"),
-    nameWithInitials: Yup.string().when("role", {
-      is: (role) =>
-        ["House Officer", "Medical Officer", "Consultant"].includes(role),
-      then: (schema) => schema.required("Name with initials is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    speciality: Yup.string().when("role", {
-      is: (role) =>
-        ["House Officer", "Medical Officer", "Consultant"].includes(role),
-      then: (schema) => schema.required("Speciality is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-    grade: Yup.string().when("role", {
-      is: "Nurse",
-      then: (schema) => schema.required("Grade is required"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-  });
-
   return (
-    <Container maxWidth="xs">
-      <Paper elevation={3} sx={{ p: 4, mt: 8, borderRadius: 3 }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          Register
-        </Typography>
+    <>
+      {/* Global Backdrop Loader */}
+      <Backdrop open={globalLoading} sx={{ zIndex: 1201, color: "#fff" }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
-        <Formik
-          initialValues={{
-            username: "",
-            password: "",
-            nameWithInitials: "",
-            registrationNumber: "",
-            speciality: "",
-            ward: "",
-            mobileNumber: "",
-            email: "",
-            sex: "",
-            grade: "",
-            role: "Consultant",
+      <Box
+        sx={{
+          width: "100%",
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          background: "linear-gradient(135deg, #f5f7fa, #c3cfe2)",
+          overflowY: "auto",
+          px: 2,
+          py: 6,
+        }}
+      >
+        <Paper
+          elevation={8}
+          sx={{
+            width: "100%",
+            maxWidth: 1000,
+            borderRadius: 4,
+            p: { xs: 2, sm: 4 },
+            mx: "auto",
           }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
         >
-          {({ values, handleChange, setFieldValue, isSubmitting }) => (
-            <Form>
-              <FormControl fullWidth margin="normal" sx={{ borderRadius: 3 }}>
-                <InputLabel>Role</InputLabel>
-                <Select
-                  value={values.role}
-                  onChange={(e) => setFieldValue("role", e.target.value)}
-                  label="Role"
-                  sx={{ borderRadius: 3 }}
-                >
-                  <MenuItem value="Consultant">Consultant</MenuItem>
-                  <MenuItem value="Medical Officer">Medical Officer</MenuItem>
-                  <MenuItem value="House Officer">House Officer</MenuItem>
-                  <MenuItem value="Nurse">Nurse</MenuItem>
-                </Select>
-              </FormControl>
+          {/* Header */}
+          <Box textAlign="center" mb={3}>
+            <Avatar sx={{ bgcolor: "primary.main", mx: "auto", mb: 1 }}>
+              <PersonAdd />
+            </Avatar>
+            <Typography
+              variant="h4"
+              align="center"
+              gutterBottom
+              sx={{ fontWeight: "bold", fontSize: "28px" }}
+            >
+              Register Account
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              align="center"
+              gutterBottom
+              sx={{ fontSize: "16px", color: "text.secondary" }}
+            >
+              Please fill in the form to create an account
+            </Typography>
+          </Box>
 
-              <Field
-                as={TextField}
-                label="Username"
-                name="username"
-                fullWidth
-                margin="normal"
-                required
-                sx={{ borderRadius: 3 }}
-                helperText={<ErrorMessage name="username" />}
-                error={Boolean(<ErrorMessage name="username" />)}
-              />
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              {/* Left Column */}
+              <Grid item xs={12} sm={6}>
+                <Grid container spacing={2} direction="column">
+                  <Grid item>
+                    <FormControl fullWidth sx={roundedField} size="small">
+                      <InputLabel>Role</InputLabel>
+                      <Select
+                        name="role"
+                        value={values.role}
+                        onChange={handleChange}
+                        label="Role"
+                      >
+                        <MenuItem value="Consultant">Consultant</MenuItem>
+                        <MenuItem value="Medical Officer">
+                          Medical Officer
+                        </MenuItem>
+                        <MenuItem value="House Officer">House Officer</MenuItem>
+                        <MenuItem value="Nurse">Nurse</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-              <Field
-                as={TextField}
-                label="Password"
-                type="password"
-                name="password"
-                fullWidth
-                margin="normal"
-                required
-                sx={{ borderRadius: 3 }}
-                helperText={<ErrorMessage name="password" />}
-                error={Boolean(<ErrorMessage name="password" />)}
-              />
+                  <Grid item>
+                    <TextField
+                      label="Username"
+                      name="username"
+                      value={values.username}
+                      onChange={handleChange}
+                      error={touched.username && Boolean(errors.username)}
+                      helperText={touched.username && errors.username}
+                      fullWidth
+                      sx={roundedField}
+                      size="small"
+                    />
+                  </Grid>
 
-              <Field
-                as={TextField}
-                label="Registration Number"
-                name="registrationNumber"
-                fullWidth
-                margin="normal"
-                required
-                sx={{ borderRadius: 3 }}
-                helperText={<ErrorMessage name="registrationNumber" />}
-                error={Boolean(<ErrorMessage name="registrationNumber" />)}
-              />
+                  <Grid item>
+                    <TextField
+                      label="Password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={values.password}
+                      onChange={handleChange}
+                      error={touched.password && Boolean(errors.password)}
+                      helperText={touched.password && errors.password}
+                      fullWidth
+                      sx={roundedField}
+                      size="small"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={togglePassword}>
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
 
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Ward</InputLabel>
-                <Select
-                  name="ward"
-                  value={values.ward}
-                  onChange={handleChange}
-                  label="Ward"
-                  required
-                >
-                  <MenuItem value="Side A">Side A</MenuItem>
-                  <MenuItem value="Side B">Side B</MenuItem>
-                </Select>
-              </FormControl>
+                  <Grid item>
+                    <TextField
+                      label="Registration Number"
+                      name="registrationNumber"
+                      value={values.registrationNumber}
+                      onChange={handleChange}
+                      error={
+                        touched.registrationNumber &&
+                        Boolean(errors.registrationNumber)
+                      }
+                      helperText={
+                        touched.registrationNumber && errors.registrationNumber
+                      }
+                      fullWidth
+                      sx={roundedField}
+                      size="small"
+                    />
+                  </Grid>
 
-              <Box className="pt-4 pb-4">
-                <MuiTelInput
-                  value={values.mobileNumber}
-                  onChange={(value) => setFieldValue("mobileNumber", value)}
-                  label="Mobile Number"
-                  defaultCountry="LK"
-                  forceCallingCode
-                  fullWidth
-                  required
-                />
-              </Box>
+                  <Grid item>
+                    <FormControl fullWidth sx={roundedField} size="small">
+                      <InputLabel>Ward</InputLabel>
+                      <Select
+                        name="ward"
+                        value={values.ward}
+                        onChange={handleChange}
+                        label="Ward"
+                      >
+                        <MenuItem value="Side A">Side A</MenuItem>
+                        <MenuItem value="Side B">Side B</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </Grid>
 
-              <Field
-                as={TextField}
-                label="Email"
-                name="email"
-                fullWidth
-                margin="normal"
-                required
-                sx={{ borderRadius: 3 }}
-                helperText={<ErrorMessage name="email" />}
-                error={Boolean(<ErrorMessage name="email" />)}
-              />
+              {/* Right Column */}
+              <Grid item xs={12} sm={6}>
+                <Grid container spacing={2} direction="column">
+                  <Grid item>
+                    <MuiTelInput
+                      value={values.mobileNumber}
+                      onChange={(val) => setFieldValue("mobileNumber", val)}
+                      label="Mobile Number"
+                      defaultCountry="LK"
+                      fullWidth
+                      sx={{
+                        "& .MuiOutlinedInput-root": { borderRadius: "12px" },
+                      }}
+                      TextFieldProps={{
+                        sx: roundedField,
+                        size: "small",
+                        error:
+                          touched.mobileNumber && Boolean(errors.mobileNumber),
+                        helperText: touched.mobileNumber && errors.mobileNumber,
+                      }}
+                    />
+                  </Grid>
 
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Sex</InputLabel>
-                <Select
-                  name="sex"
-                  value={values.sex}
-                  onChange={handleChange}
-                  label="Sex"
-                  required
-                >
-                  <MenuItem value="Male">Male</MenuItem>
-                  <MenuItem value="Female">Female</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                </Select>
-              </FormControl>
+                  <Grid item>
+                    <TextField
+                      label="Email"
+                      name="email"
+                      value={values.email}
+                      onChange={handleChange}
+                      error={touched.email && Boolean(errors.email)}
+                      helperText={touched.email && errors.email}
+                      fullWidth
+                      sx={roundedField}
+                      size="small"
+                    />
+                  </Grid>
 
-              {(values.role === "House Officer" ||
-                values.role === "Medical Officer" ||
-                values.role === "Consultant") && (
-                <>
-                  <Field
-                    as={TextField}
-                    label="Name With Initials"
-                    name="nameWithInitials"
-                    fullWidth
-                    margin="normal"
-                    required
-                    sx={{ borderRadius: 3 }}
-                    helperText={<ErrorMessage name="nameWithInitials" />}
-                    error={Boolean(<ErrorMessage name="nameWithInitials" />)}
-                  />
+                  <Grid item>
+                    <FormControl fullWidth sx={roundedField} size="small">
+                      <InputLabel>Sex</InputLabel>
+                      <Select
+                        name="sex"
+                        value={values.sex}
+                        onChange={handleChange}
+                        label="Sex"
+                      >
+                        <MenuItem value="Male">Male</MenuItem>
+                        <MenuItem value="Female">Female</MenuItem>
+                        <MenuItem value="Other">Other</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-                  <Field
-                    as={TextField}
-                    label="Speciality"
-                    name="speciality"
-                    fullWidth
-                    margin="normal"
-                    required
-                    sx={{ borderRadius: 3 }}
-                    helperText={<ErrorMessage name="speciality" />}
-                    error={Boolean(<ErrorMessage name="speciality" />)}
-                  />
-                </>
-              )}
+                  {["Consultant", "House Officer", "Medical Officer"].includes(
+                    values.role
+                  ) && (
+                    <>
+                      <Grid item>
+                        <TextField
+                          label="Name with Initials"
+                          name="nameWithInitials"
+                          value={values.nameWithInitials}
+                          onChange={handleChange}
+                          error={
+                            touched.nameWithInitials &&
+                            Boolean(errors.nameWithInitials)
+                          }
+                          helperText={
+                            touched.nameWithInitials && errors.nameWithInitials
+                          }
+                          fullWidth
+                          sx={roundedField}
+                          size="small"
+                        />
+                      </Grid>
 
-              {values.role === "Nurse" && (
-                <FormControl fullWidth margin="normal">
-                  <InputLabel>Grade</InputLabel>
-                  <Select
-                    name="grade"
-                    value={values.grade}
-                    onChange={handleChange}
-                    label="Grade"
-                    required
-                  >
-                    {nurseGrades.map((grade) => (
-                      <MenuItem key={grade} value={grade}>
-                        {grade}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
+                      <Grid item>
+                        <TextField
+                          label="Speciality"
+                          name="speciality"
+                          value={values.speciality}
+                          onChange={handleChange}
+                          error={
+                            touched.speciality && Boolean(errors.speciality)
+                          }
+                          helperText={touched.speciality && errors.speciality}
+                          fullWidth
+                          sx={roundedField}
+                          size="small"
+                        />
+                      </Grid>
+                    </>
+                  )}
 
+                  {values.role === "Nurse" && (
+                    <Grid item>
+                      <FormControl fullWidth sx={roundedField} size="small">
+                        <InputLabel>Grade</InputLabel>
+                        <Select
+                          name="grade"
+                          value={values.grade}
+                          onChange={handleChange}
+                          label="Grade"
+                        >
+                          {nurseGrades.map((grade) => (
+                            <MenuItem key={grade} value={grade}>
+                              {grade}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  )}
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* Submit Button */}
+            <Box mt={4}>
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 fullWidth
                 sx={{
-                  mt: 2,
-                  borderRadius: 3,
-                  boxShadow: 2,
-                  ":hover": { boxShadow: 4 },
+                  mt: 3,
+                  borderRadius: 2,
+                  py: 1.5,
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  fontSize: "16px",
                 }}
-                disabled={isSubmitting}
+                disabled={globalLoading}
               >
-                {isSubmitting ? <CircularProgress size={24} /> : "Register"}
+                Register
               </Button>
-            </Form>
-          )}
-        </Formik>
+            </Box>
 
-        <Typography align="center" sx={{ mt: 2 }}>
-          Already have an account?{" "}
-          <MuiLink component={Link} to="/login" underline="hover">
-            Login here
-          </MuiLink>
-        </Typography>
-      </Paper>
-    </Container>
+            {/* Login Link */}
+            <Box mt={2} textAlign="center">
+              <Typography align="center" sx={{ fontSize: "14px" }}>
+                Already have an account?{" "}
+                <MuiLink
+                  component={Link}
+                  to="/login"
+                  fontSize="14px"
+                  underline="hover"
+                >
+                  Login here
+                </MuiLink>
+              </Typography>
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </>
   );
 };
 

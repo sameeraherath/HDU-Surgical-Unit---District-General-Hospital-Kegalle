@@ -3,8 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
   Typography,
-  CircularProgress,
-  Grid2,
+  Grid,
   AppBar,
   Toolbar,
   IconButton,
@@ -13,51 +12,38 @@ import {
   DialogContent,
   DialogTitle,
   Button,
+  Avatar,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import BedCard from "../components/BedCard";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { toast } from "material-react-toastify";
-import PatientDialog from "../components/PatientDialog";
+import { showToast } from "../features/ui/uiSlice";
+import PatientDialog from "../components/NurseDashboardForms/PatientDialog";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../features/loaderSlice";
 
 const NurseDashboard = () => {
   const [beds, setBeds] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedBed, setSelectedBed] = useState(null);
-
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const showToast = (message, type) => {
-    if (type === "success") {
-      toast.success(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    }
-    if (type === "error") {
-      toast.error(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    }
-  };
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchBeds();
+    // eslint-disable-next-line
   }, []);
 
   const fetchBeds = async () => {
     const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+    dispatch(setLoading(true)); // show spinner globally
     try {
       const response = await axios.get(`${BASE_URL}/beds`, {
         headers: {
@@ -65,10 +51,10 @@ const NurseDashboard = () => {
         },
       });
       setBeds(response.data);
-      setLoading(false);
     } catch (err) {
       setError(err.message);
-      setLoading(false);
+    } finally {
+      dispatch(setLoading(false)); // hide spinner
     }
   };
 
@@ -85,12 +71,20 @@ const NurseDashboard = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      showToast("Patient successfully removed from the bed.", "success");
+      dispatch(
+        showToast({
+          message: "Patient successfully removed from the bed.",
+          type: "success",
+        })
+      );
       fetchBeds();
     } catch (err) {
-      showToast(
-        "Failed to remove the patient from the bed. Please try again.",
-        "error"
+      dispatch(
+        showToast({
+          message:
+            "Failed to remove the patient from the bed. Please try again.",
+          type: "error",
+        })
       );
       console.error(err);
     }
@@ -109,6 +103,8 @@ const NurseDashboard = () => {
 
     try {
       const BASE_URL = `${import.meta.env.VITE_API_URL}/api/beds`;
+      // Optionally show spinner here if you have a noticeable delay
+      dispatch(setLoading(true));
       const response = await fetch(`${BASE_URL}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -119,15 +115,20 @@ const NurseDashboard = () => {
         throw new Error("Failed to assign bed.");
       }
 
-      showToast("Bed assigned successfully.", "success");
+      dispatch(
+        showToast({ message: "Bed assigned successfully.", type: "success" })
+      );
       setOpen(false);
       await fetchBeds();
     } catch (error) {
-      showToast("Error assigning bed.", "error");
-      console.log("🚀 ~ handleSubmit ~ error:", error);
+      dispatch(showToast({ message: "Error assigning bed.", type: "error" }));
+      console.log("Error during assignment:", error);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
+  // Existing logout dialog handlers
   const handleLogoutClick = () => {
     setLogoutDialogOpen(true);
   };
@@ -141,15 +142,30 @@ const NurseDashboard = () => {
     setLogoutDialogOpen(false);
   };
 
-  if (loading) {
-    return (
-      <div
-        style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}
-      >
-        <CircularProgress />
-      </div>
-    );
-  }
+  // Handlers for Avatar Dropdown Menu
+  const handleAvatarClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDashborad = () => {
+    dispatch(showToast({ message: "Dashboard clicked", type: "info" }));
+    handleMenuClose();
+  };
+
+  const handleProfile = () => {
+    dispatch(showToast({ message: "Profile clicked", type: "info" }));
+    handleMenuClose();
+  };
+
+  const handleLogout = () => {
+    closeLogoutDialog();
+    localStorage.removeItem("token");
+    navigate("/landing");
+  };
 
   if (error) {
     return (
@@ -163,16 +179,40 @@ const NurseDashboard = () => {
     <div>
       <AppBar position="sticky" sx={{ boxShadow: "none" }}>
         <Toolbar>
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Nurse Dashboard - Bed Overview
           </Typography>
+
+          {/* Avatar with dropdown menu */}
+          <IconButton color="inherit" onClick={handleAvatarClick}>
+            <Avatar alt="User Avatar" src="/path/to/avatar.jpg" />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <MenuItem onClick={handleProfile}>Profile</MenuItem>
+            <MenuItem onClick={handleDashborad}>Dashboard</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+
+          {/* Optional extra Logout button */}
           <IconButton color="inherit" onClick={handleLogoutClick}>
             <LogoutIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      <Grid2
+      <Grid
         container
         spacing={2}
         style={{
@@ -184,15 +224,15 @@ const NurseDashboard = () => {
         }}
       >
         {beds.slice(0, 10).map((bed) => (
-          <Grid2 key={bed.id}>
+          <Grid key={bed.id} item>
             <BedCard
               bed={bed}
               assignBed={handleAssignBed}
               deassignBed={deAssignBed}
             />
-          </Grid2>
+          </Grid>
         ))}
-      </Grid2>
+      </Grid>
 
       <PatientDialog
         open={open}
@@ -200,6 +240,7 @@ const NurseDashboard = () => {
         handleSubmit={handleSubmit}
         selectedBed={selectedBed}
       />
+
       <Dialog
         open={logoutDialogOpen}
         onClose={closeLogoutDialog}

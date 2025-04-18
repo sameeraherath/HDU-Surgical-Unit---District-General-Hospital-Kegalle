@@ -1,75 +1,97 @@
-import React from "react";
 import {
-  Button,
-  TextField,
-  Typography,
-  Container,
+  Box,
   Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
   Link as MuiLink,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../features/auth/authSlice";
-import { toast } from "material-react-toastify";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import CircularProgress from "@mui/material/CircularProgress";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../../features/loaderSlice";
+import { showToast } from "../../features/ui/uiSlice";
 
 const Login = () => {
-  const dispatch = useDispatch();
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.auth);
-
-  const showToast = (message) => {
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-  };
+  const dispatch = useDispatch();
 
   const LoginSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),
     password: Yup.string().required("Password is required"),
   });
 
-  const redirectToDashboard = (role) => {
-    const roleRoutes = {
-      Nurse: "/nurse-dashboard",
-      "House Officer": "/house-officer-dashboard",
-      "Medical Officer": "/medical-officer-dashboard",
-      Consultant: "/consultant-dashboard",
-    };
-    return roleRoutes[role] || "/";
-  };
-
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+    dispatch(setLoading(true));
     try {
-      const result = await dispatch(loginUser(values)).unwrap();
-      navigate(redirectToDashboard(result.role));
+      const result = await login(values);
+
+      const route =
+        {
+          Nurse: "/nurse-dashboard",
+          "House Officer": "/house-officer-dashboard",
+          "Medical Officer": "/medical-officer-dashboard",
+          Consultant: "/consultant-dashboard",
+        }[result.role] || "/";
+
+      navigate(route);
     } catch {
       setErrors({ general: "Invalid username or password" });
-      showToast("Unable to log in. Please try again.");
+
+      dispatch(
+        showToast({
+          message: "Unable to log in. Please try again.",
+          type: "error",
+        })
+      );
     }
+
+    dispatch(setLoading(false));
     setSubmitting(false);
   };
 
   return (
-    <Container
-      maxWidth="xs"
+    <Box
       sx={{
+        width: "100vw",
         height: "100vh",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        background: "linear-gradient(135deg, #f5f7fa, #c3cfe2)",
+        px: 2,
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, borderRadius: "16px", width: "100%" }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          Login
+      <Paper
+        elevation={6}
+        sx={{
+          p: 4,
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: 400,
+          boxShadow: 3,
+        }}
+      >
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: "bold", fontSize: "28px" }}
+        >
+          Welcome Back
+        </Typography>
+
+        <Typography
+          variant="subtitle1"
+          align="center"
+          gutterBottom
+          sx={{ fontSize: "16px", color: "text.secondary" }}
+        >
+          Sign in to your account to continue
         </Typography>
 
         <Formik
@@ -87,64 +109,67 @@ const Login = () => {
           }) => (
             <Form>
               {errors.general && (
-                <Typography color="error" align="center" gutterBottom>
+                <Alert severity="error" sx={{ mb: 2 }}>
                   {errors.general}
-                </Typography>
+                </Alert>
               )}
 
               <TextField
+                fullWidth
                 label="Username"
                 name="username"
-                variant="outlined"
-                fullWidth
                 margin="normal"
                 value={values.username}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.username && Boolean(errors.username)}
                 helperText={touched.username && errors.username}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
               />
 
               <TextField
+                fullWidth
                 label="Password"
                 name="password"
                 type="password"
-                variant="outlined"
-                fullWidth
                 margin="normal"
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
               />
 
               <Button
-                type="submit"
+                fullWidth
                 variant="contained"
                 color="primary"
-                fullWidth
-                sx={{ mt: 2, borderRadius: "8px", padding: "12px" }}
-                disabled={isSubmitting || loading}
+                sx={{
+                  mt: 3,
+                  borderRadius: 2,
+                  py: 1.5,
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                }}
+                type="submit"
+                disabled={isSubmitting}
               >
-                {isSubmitting || loading ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  "Login"
-                )}
+                Login
               </Button>
             </Form>
           )}
         </Formik>
 
-        <Typography align="center" sx={{ mt: 2 }}>
+        <Typography align="center" sx={{ mt: 2, fontSize: "14px" }}>
           Not registered yet?{" "}
-          <MuiLink component={Link} to="/register" underline="hover">
+          <MuiLink component={Link} to="/register" fontSize="14px">
             Register here
           </MuiLink>
         </Typography>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

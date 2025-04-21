@@ -1,54 +1,60 @@
 import { useDispatch, useSelector } from "react-redux";
 import * as authApi from "../api/authApi";
 import {
-  setUser,
-  clearUser,
+  setCredentials,
+  clearCredentials,
   setLoading,
   setError,
+  selectCurrentUser,
+  selectCurrentToken,
 } from "../features/auth/authSlice";
 
 export const useAuth = () => {
   const dispatch = useDispatch();
-  const { user, loading, error } = useSelector((state) => state.auth);
+  const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectCurrentToken);
+  const loading = useSelector((state) => state.auth.loading);
+  const error = useSelector((state) => state.auth.error);
 
   const login = async (credentials) => {
     try {
       dispatch(setLoading(true));
-      const res = await authApi.login(credentials);
-      dispatch(setUser(res));
-      dispatch(setLoading(false));
-      return res;
+      const response = await authApi.login(credentials);
+      dispatch(setCredentials(response));
+      return response;
     } catch (err) {
-      dispatch(setLoading(false));
       dispatch(setError(err.response?.data?.message || "Login failed"));
       throw err;
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
   const register = async (formData) => {
     try {
       dispatch(setLoading(true));
-      const res = await authApi.register(formData);
-      dispatch(setUser(res));
-      dispatch(setLoading(false));
-      return res;
+      const response = await authApi.register(formData);
+      dispatch(setCredentials(response));
+      return response;
     } catch (err) {
-      dispatch(setLoading(false));
       dispatch(setError(err.response?.data?.message || "Registration failed"));
       throw err;
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
-  const logoutUser = () => {
-    dispatch(clearUser());
+  const logout = () => {
+    dispatch(clearCredentials());
   };
 
   return {
     user,
+    token,
     loading,
     error,
     login,
     register,
-    logoutUser,
+    logout,
   };
 };

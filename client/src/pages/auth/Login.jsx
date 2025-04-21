@@ -30,18 +30,22 @@ const Login = () => {
     try {
       const result = await login(values);
 
-      const route =
-        {
-          Nurse: "/nurse-dashboard",
-          "House Officer": "/house-officer-dashboard",
-          "Medical Officer": "/medical-officer-dashboard",
-          Consultant: "/consultant-dashboard",
-        }[result.role] || "/";
+      if (result.user && result.user.role) {
+        const route =
+          {
+            Nurse: "/nurse-dashboard",
+            "House Officer": "/house-officer-dashboard",
+            "Medical Officer": "/medical-officer-dashboard",
+            Consultant: "/consultant-dashboard",
+          }[result.user.role] || "/landing";
 
-      navigate(route);
-    } catch {
+        navigate(route);
+      } else {
+        navigate("/landing");
+      }
+    } catch (error) {
       setErrors({ general: "Invalid username or password" });
-
+      console.error("Login error:", error);
       dispatch(
         showToast({
           message: "Unable to log in. Please try again.",

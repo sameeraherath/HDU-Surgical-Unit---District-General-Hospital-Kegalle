@@ -19,6 +19,8 @@ export const store = configureStore({
     ui: uiReducer,
     alerts: alertsReducer,
     // form: formReducer,
+    // consider ui color & font & font sizes and alignment
+    // component unmount with remove store state - forms field data
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(customLogger),

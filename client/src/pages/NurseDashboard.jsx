@@ -4,24 +4,18 @@ import { useNavigate } from "react-router-dom";
 import {
   Typography,
   Grid,
-  AppBar,
-  Toolbar,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Button,
-  Avatar,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import BedCard from "../components/BedCard";
-import LogoutIcon from "@mui/icons-material/Logout";
 import { showToast } from "../features/ui/uiSlice";
 import PatientDialog from "../components/NurseDashboardForms/PatientDialog";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../features/loaderSlice";
+import GlobalAppBar from "../components/GlobalAppBar";
 
 const NurseDashboard = () => {
   const [beds, setBeds] = useState([]);
@@ -30,11 +24,9 @@ const NurseDashboard = () => {
   const [selectedBed, setSelectedBed] = useState(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const openMenu = Boolean(anchorEl);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     fetchBeds();
@@ -43,7 +35,7 @@ const NurseDashboard = () => {
 
   const fetchBeds = async () => {
     const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
-    dispatch(setLoading(true)); // show spinner globally
+    dispatch(setLoading(true));
     try {
       const response = await axios.get(`${BASE_URL}/beds`, {
         headers: {
@@ -54,7 +46,7 @@ const NurseDashboard = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      dispatch(setLoading(false)); // hide spinner
+      dispatch(setLoading(false));
     }
   };
 
@@ -103,7 +95,6 @@ const NurseDashboard = () => {
 
     try {
       const BASE_URL = `${import.meta.env.VITE_API_URL}/api/beds`;
-      // Optionally show spinner here if you have a noticeable delay
       dispatch(setLoading(true));
       const response = await fetch(`${BASE_URL}/assign`, {
         method: "POST",
@@ -128,7 +119,6 @@ const NurseDashboard = () => {
     }
   };
 
-  // Existing logout dialog handlers
   const handleLogoutClick = () => {
     setLogoutDialogOpen(true);
   };
@@ -142,31 +132,6 @@ const NurseDashboard = () => {
     setLogoutDialogOpen(false);
   };
 
-  // Handlers for Avatar Dropdown Menu
-  const handleAvatarClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleDashborad = () => {
-    dispatch(showToast({ message: "Dashboard clicked", type: "info" }));
-    handleMenuClose();
-  };
-
-  const handleProfile = () => {
-    dispatch(showToast({ message: "Profile clicked", type: "info" }));
-    handleMenuClose();
-  };
-
-  const handleLogout = () => {
-    closeLogoutDialog();
-    localStorage.removeItem("token");
-    navigate("/landing");
-  };
-
   if (error) {
     return (
       <Typography color="error" align="center">
@@ -177,40 +142,11 @@ const NurseDashboard = () => {
 
   return (
     <div>
-      <AppBar position="sticky" sx={{ boxShadow: "none" }}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Nurse Dashboard - Bed Overview
-          </Typography>
-
-          {/* Avatar with dropdown menu */}
-          <IconButton color="inherit" onClick={handleAvatarClick}>
-            <Avatar alt="User Avatar" src="/path/to/avatar.jpg" />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={openMenu}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-          >
-            <MenuItem onClick={handleProfile}>Profile</MenuItem>
-            <MenuItem onClick={handleDashborad}>Dashboard</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
-
-          {/* Optional extra Logout button */}
-          <IconButton color="inherit" onClick={handleLogoutClick}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      <GlobalAppBar
+        title="Nurse Dashboard - Bed Overview"
+        onLogoutClick={handleLogoutClick}
+        role={user?.role}
+      />
 
       <Grid
         container

@@ -7,6 +7,7 @@ import MedicalOfficerDashboard from "../pages/MedicalOfficerDashboard";
 import NurseDashboard from "../pages/NurseDashboard";
 import LandingPage from "../pages/LandingPage";
 import ConsultantDashboard from "../pages/ConsultantDashboard";
+import MainLayout from "../layouts/MainLayout";
 import { useSelector } from "react-redux";
 
 const ProtectedRoute = ({ role, children }) => {
@@ -24,38 +25,42 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route
-        path="/house-officer-dashboard"
-        element={
-          <ProtectedRoute role="House Officer">
-            <HouseOfficerDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/medical-officer-dashboard"
-        element={
-          <ProtectedRoute role="Medical Officer">
-            <MedicalOfficerDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/nurse-dashboard"
-        element={
-          <ProtectedRoute role="Nurse">
-            <NurseDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/consultant-dashboard"
-        element={
-          <ProtectedRoute role="Consultant">
-            <ConsultantDashboard />
-          </ProtectedRoute>
-        }
-      />
+
+      <Route element={<MainLayout />}>
+        <Route
+          path="/house-officer-dashboard"
+          element={
+            <ProtectedRoute role="House Officer">
+              <HouseOfficerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medical-officer-dashboard"
+          element={
+            <ProtectedRoute role="Medical Officer">
+              <MedicalOfficerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/nurse-dashboard"
+          element={
+            <ProtectedRoute role="Nurse">
+              <NurseDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/consultant-dashboard"
+          element={
+            <ProtectedRoute role="Consultant">
+              <ConsultantDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );

@@ -74,7 +74,7 @@ const GlobalAppBar = ({ title, role }) => {
     <>
       <AppBar position="sticky" sx={{ boxShadow: "none" }}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
             {title}
           </Typography>
 

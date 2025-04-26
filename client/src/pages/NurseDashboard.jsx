@@ -15,31 +15,32 @@ import { showToast } from "../features/ui/uiSlice";
 import PatientDialog from "../components/NurseDashboardForms/PatientDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../features/loaderSlice";
-import GlobalAppBar from "../components/GlobalAppBar";
+import {
+  setDialogOpen,
+  setSelectedBed,
+} from "../features/patients/patientSlice";
+import { clearCredentials } from "../features/auth/authSlice";
 
 const NurseDashboard = () => {
   const [beds, setBeds] = useState([]);
   const [error, setError] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [selectedBed, setSelectedBed] = useState(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
+  const selectedBed = useSelector((state) => state.patient.selectedBed);
 
   useEffect(() => {
     fetchBeds();
-    // eslint-disable-next-line
-  }, []);
-
+  }, [dispatch]);
   const fetchBeds = async () => {
     const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
     dispatch(setLoading(true));
     try {
       const response = await axios.get(`${BASE_URL}/beds`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       setBeds(response.data);
@@ -51,8 +52,8 @@ const NurseDashboard = () => {
   };
 
   const handleAssignBed = (bedData) => {
-    setSelectedBed(bedData);
-    setOpen(true);
+    dispatch(setSelectedBed(bedData));
+    dispatch(setDialogOpen(true));
   };
 
   const deAssignBed = async (bed) => {
@@ -60,7 +61,7 @@ const NurseDashboard = () => {
       const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
       await axios.delete(`${BASE_URL}/beds/${bed.id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       dispatch(
@@ -80,11 +81,6 @@ const NurseDashboard = () => {
       );
       console.error(err);
     }
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedBed(null);
   };
 
   const handleSubmit = async (values) => {
@@ -109,7 +105,6 @@ const NurseDashboard = () => {
       dispatch(
         showToast({ message: "Bed assigned successfully.", type: "success" })
       );
-      setOpen(false);
       await fetchBeds();
     } catch (error) {
       dispatch(showToast({ message: "Error assigning bed.", type: "error" }));
@@ -119,12 +114,8 @@ const NurseDashboard = () => {
     }
   };
 
-  const handleLogoutClick = () => {
-    setLogoutDialogOpen(true);
-  };
-
   const confirmLogout = () => {
-    localStorage.removeItem("token");
+    dispatch(clearCredentials());
     navigate("/landing");
   };
 
@@ -141,26 +132,15 @@ const NurseDashboard = () => {
   }
 
   return (
-    <div>
-      <GlobalAppBar
-        title="Nurse Dashboard - Bed Overview"
-        onLogoutClick={handleLogoutClick}
-        role={user?.role}
-      />
-
+    <div style={{ padding: "0px 24px", paddingTop: "65px" }}>
       <Grid
         container
         spacing={2}
-        style={{
-          marginTop: "20px",
-          height: "50vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        justifyContent="center"
+        sx={{ width: "100%", margin: "0 auto" }}
       >
         {beds.slice(0, 10).map((bed) => (
-          <Grid key={bed.id} item>
+          <Grid key={bed.id} item xs={12} sm={6} md={4} lg={3} xl={2.4}>
             <BedCard
               bed={bed}
               assignBed={handleAssignBed}
@@ -170,12 +150,7 @@ const NurseDashboard = () => {
         ))}
       </Grid>
 
-      <PatientDialog
-        open={open}
-        handleClose={handleClose}
-        handleSubmit={handleSubmit}
-        selectedBed={selectedBed}
-      />
+      <PatientDialog handleSubmit={handleSubmit} />
 
       <Dialog
         open={logoutDialogOpen}

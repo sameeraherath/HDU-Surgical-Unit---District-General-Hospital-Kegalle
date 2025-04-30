@@ -17,17 +17,16 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-const StyledCard = styled(Card)(({ theme, occupied }) => ({
-  width: "250px",
+const StyledCard = styled(Card)(({ occupied }) => ({
+  width: "100%",
   height: "200px",
-  margin: theme.spacing(2),
   backgroundColor: occupied ? "#ffd1d1" : "#d1ffd1",
   cursor: "pointer",
   borderRadius: "12px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   transition: "all 0.3s ease",
   "&:hover": {
-    transform: "scale(1.05)",
+    transform: "scale(1.02)",
   },
 }));
 
@@ -144,7 +143,7 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
                 backgroundColor: "success.main",
                 color: "white",
                 paddingX: 3,
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                boxShadow: "0p</Tooltip>x 4px 6px rgba(0, 0, 0, 0.15)",
                 "&:hover": {
                   backgroundColor: "success.dark",
                   transform: "scale(1.05)",

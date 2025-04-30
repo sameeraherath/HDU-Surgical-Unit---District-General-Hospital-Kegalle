@@ -3,6 +3,7 @@ import authReducer from "../features/auth/authSlice";
 import loaderReducer from "../features/loaderSlice";
 import uiReducer from "../features/ui/uiSlice";
 import alertsReducer from "../features/alerts/alertsSlice";
+import patientReducer from "../features/patients/patientSlice";
 
 const customLogger = (storeAPI) => (next) => (action) => {
   console.log("➡️ Dispatching:", action);
@@ -18,9 +19,7 @@ export const store = configureStore({
     loader: loaderReducer,
     ui: uiReducer,
     alerts: alertsReducer,
-    // form: formReducer,
-    // consider ui color & font & font sizes and alignment
-    // component unmount with remove store state - forms field data
+    patient: patientReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(customLogger),

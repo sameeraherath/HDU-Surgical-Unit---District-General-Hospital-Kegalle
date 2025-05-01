@@ -1,7 +1,11 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 import defineBed from "../models/BedMySQL.js";
-import definePatient from "../models/PatientMySQL.js";
+import definePatient from "../models/normalized/Patient.js";
+import defineEmergencyContact from "../models/normalized/EmergencyContact.js";
+import defineMedicalRecord from "../models/normalized/MedicalRecord.js";
+import defineAdmission from "../models/normalized/Admission.js";
+import definePatientDocument from "../models/normalized/PatientDocument.js";
 import defineUser from "../models/UserMySQL.js";
 
 dotenv.config();
@@ -18,81 +22,51 @@ const sequelize = new Sequelize(
   }
 );
 
+// Define models
 const BedMySQL = defineBed(sequelize);
-const PatientMySQL = definePatient(sequelize);
+const Patient = definePatient(sequelize);
+const EmergencyContact = defineEmergencyContact(sequelize);
+const MedicalRecord = defineMedicalRecord(sequelize);
+const Admission = defineAdmission(sequelize);
+const PatientDocument = definePatientDocument(sequelize);
 const UserMySQLModel = defineUser(sequelize);
 
-BedMySQL.belongsTo(PatientMySQL, { foreignKey: "patientId" });
-PatientMySQL.hasMany(BedMySQL, { foreignKey: "patientId" });
+// Define associations
+Patient.hasMany(EmergencyContact, { foreignKey: "patientId" });
+EmergencyContact.belongsTo(Patient, { foreignKey: "patientId" });
+
+Patient.hasMany(MedicalRecord, { foreignKey: "patientId" });
+MedicalRecord.belongsTo(Patient, { foreignKey: "patientId" });
+
+Patient.hasMany(Admission, { foreignKey: "patientId" });
+Admission.belongsTo(Patient, { foreignKey: "patientId" });
+
+Patient.hasMany(PatientDocument, { foreignKey: "patientId" });
+PatientDocument.belongsTo(Patient, { foreignKey: "patientId" });
+
+// Legacy association for bed assignment
+BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
+Patient.hasMany(BedMySQL, { foreignKey: "patientId" });
 
 const connectMySql = async () => {
   try {
     await sequelize.authenticate();
     console.log("Database connection established successfully.");
 
-    await PatientMySQL.sync({ alter: true });
-    await BedMySQL.sync({ alter: true });
+    // Sync all models - reordering to ensure dependencies are created first
     await UserMySQLModel.sync({ alter: true });
-
-    const patientCount = await PatientMySQL.count();
-    if (patientCount === 0) {
-      const initialPatients = [
-        {
-          fullName: "John Doe",
-          age: 45,
-          birthDate: "1979-05-15",
-          sex: "Male",
-          condition: "Fever and cough",
-          contactDetails: "123-456-7890",
-          frequencyMeasure: "Red",
-        },
-        {
-          fullName: "Jane Smith",
-          age: 32,
-          birthDate: "1992-08-22",
-          sex: "Female",
-          condition: "Broken leg",
-          contactDetails: "234-567-8901",
-          frequencyMeasure: "Green",
-        },
-        {
-          fullName: "Alex Lee",
-          age: 60,
-          birthDate: "1964-03-10",
-          sex: "Other",
-          condition: "Diabetes",
-          contactDetails: "345-678-9012",
-          frequencyMeasure: "Blue",
-        },
-        {
-          fullName: "Mary Johnson",
-          age: 28,
-          birthDate: "1996-11-30",
-          sex: "Female",
-          condition: "Asthma",
-          contactDetails: "456-789-0123",
-          frequencyMeasure: "Yellow",
-        },
-        {
-          fullName: "Tom Brown",
-          age: 50,
-          birthDate: "1974-07-19",
-          sex: "Male",
-          condition: "Hypertension",
-          contactDetails: "567-890-1234",
-          frequencyMeasure: "Brown",
-        },
-      ];
-      await PatientMySQL.bulkCreate(initialPatients);
-      console.log("Initial patients seeded.");
-    }
+    await Patient.sync({ alter: true });
+    await EmergencyContact.sync({ alter: true });
+    await MedicalRecord.sync({ alter: true });
+    await Admission.sync({ alter: true });
+    await PatientDocument.sync({ alter: true });
+    await BedMySQL.sync({ alter: true });
 
     const bedCount = await BedMySQL.count();
     if (bedCount === 0) {
-      const patients = await PatientMySQL.findAll({ limit: 5 });
       const initialBeds = Array.from({ length: 10 }, (_, i) => ({
         bedNumber: `B${i + 1}`,
-        patientId: i < patients.length ? patients[i].id : null,
+        patientId: null,
       }));
       await BedMySQL.bulkCreate(initialBeds);
       console.log("Initial beds seeded.");
@@ -103,4 +77,14 @@ const connectMySql = async () => {
   }
 };
 
-export { sequelize, connectMySql, BedMySQL, PatientMySQL, UserMySQLModel };
+export {
+  sequelize,
+  connectMySql,
+  BedMySQL,
+  Patient,
+  EmergencyContact,
+  MedicalRecord,
+  Admission,
+  PatientDocument,
+  UserMySQLModel,
+};

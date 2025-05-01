@@ -1,9 +1,20 @@
-import BedRepository from "../repositories/bedRepository.js";
-import { BedMySQL, PatientMySQL } from "../config/mysqlDB.js";
+import { BedMySQL, Admission } from "../config/mysqlDB.js";
+import patientRepository from "../repositories/patientRepository.js";
 
 export async function getBeds(req, res) {
   try {
-    const beds = await BedRepository.getAllBeds();
+    const beds = await BedMySQL.findAll({
+      include: {
+        association: "Patient",
+        attributes: [
+          "id",
+          "patientNumber",
+          "fullName",
+          "gender",
+          "contactNumber",
+        ],
+      },
+    });
     res.json(beds);
   } catch (err) {
     console.error(err);
@@ -13,7 +24,7 @@ export async function getBeds(req, res) {
 
 export async function assignBed(req, res) {
   try {
-    console.log("Incoming request:", req.body);
+    console.log("Incoming patient assignment request:", req.body);
 
     const { patientData } = req.body;
     const { bedId } = patientData;
@@ -28,13 +39,7 @@ export async function assignBed(req, res) {
       return res.status(400).json({ msg: "Patient data is required" });
     }
 
-    console.log("Received patientData:", patientData);
-
-    const patientDetails = {
-      ...patientData,
-      admitDateTime: new Date(),
-    };
-
+    // Check if bed exists and is available
     const bed = await BedMySQL.findOne({ where: { id: bedId } });
     if (!bed) {
       console.error("Bed not found:", bedId);
@@ -46,18 +51,33 @@ export async function assignBed(req, res) {
       return res.status(400).json({ msg: "Bed is already occupied" });
     }
 
-    const patient = await PatientMySQL.create(patientDetails);
+    // Create patient with normalized data structure
+    try {
+      const result = await patientRepository.createPatient(patientData);
 
-    const [updatedCount] = await BedMySQL.update(
-      { patientId: patient.id },
-      { where: { id: bedId, patientId: null } }
-    );
+      // Update bed with new patient ID
+      const [updatedCount] = await BedMySQL.update(
+        { patientId: result.patient.id },
+        { where: { id: bedId, patientId: null } }
+      );
 
-    if (updatedCount > 0) {
-      return res.json({ msg: "Bed assigned successfully" });
-    } else {
-      console.error("Failed to update the bed:", bedId);
-      return res.status(400).json({ msg: "Failed to assign bed" });
+      if (updatedCount > 0) {
+        return res.json({
+          msg: "Bed assigned successfully",
+          patientId: result.patient.id,
+          patientNumber: result.patient.patientNumber,
+          admissionId: result.admission.id,
+        });
+      } else {
+        console.error("Failed to update the bed:", bedId);
+        return res.status(400).json({ msg: "Failed to assign bed" });
+      }
+    } catch (error) {
+      console.error("Error creating patient:", error);
+      return res.status(500).json({
+        msg: "Failed to create patient record",
+        error: error.message,
+      });
     }
   } catch (err) {
     console.error("assignBed Error:", err);
@@ -70,7 +90,7 @@ export async function deAssignBed(req, res) {
     const { bedId } = req.params;
 
     if (!bedId) {
-      console.error("Bed ID is missing in request:", req.body);
+      console.error("Bed ID is missing in request");
       return res.status(400).json({ msg: "Bed ID is required" });
     }
 
@@ -83,6 +103,30 @@ export async function deAssignBed(req, res) {
     if (bed.patientId === null) {
       console.error("Bed is already unoccupied:", bedId);
       return res.status(400).json({ msg: "Bed is already unoccupied" });
+    }
+
+    // If we have an admission record for this patient, update its status
+    if (bed.patientId) {
+      try {
+        const admissions = await Admission.findAll({
+          where: {
+            patientId: bed.patientId,
+            status: "Active",
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        if (admissions && admissions.length > 0) {
+          const currentAdmission = admissions[0];
+          await currentAdmission.update({
+            status: "Discharged",
+            dischargeDateTime: new Date(),
+          });
+        }
+      } catch (error) {
+        console.warn("Could not update admission status:", error.message);
+        // Continue with bed deassignment even if admission update fails
+      }
     }
 
     const [updatedCount] = await BedMySQL.update(

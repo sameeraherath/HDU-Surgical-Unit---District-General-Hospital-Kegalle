@@ -205,6 +205,39 @@ const PatientDialog = ({ handleSubmit }) => {
 
   console.log("[PatientDialog] Initial form values:", initialValues);
 
+  // Function to normalize form data before submission
+  const normalizeFormData = (values) => {
+    // Make sure bedId is included (required for the backend)
+    const normalizedData = {
+      ...values,
+      bedId: selectedBed?.id,
+    };
+
+    // Convert dateOfBirth to ISO format if it exists
+    if (normalizedData.dateOfBirth) {
+      try {
+        normalizedData.dateOfBirth = new Date(normalizedData.dateOfBirth)
+          .toISOString()
+          .split("T")[0];
+      } catch (e) {
+        console.error("Error formatting date of birth:", e);
+      }
+    }
+
+    // Convert admissionDateTime to ISO format if it exists
+    if (normalizedData.admissionDateTime) {
+      try {
+        normalizedData.admissionDateTime = new Date(
+          normalizedData.admissionDateTime
+        ).toISOString();
+      } catch (e) {
+        console.error("Error formatting admission date time:", e);
+      }
+    }
+
+    return normalizedData;
+  };
+
   return (
     <Dialog
       open={dialogOpen && !!selectedBed}
@@ -260,9 +293,13 @@ const PatientDialog = ({ handleSubmit }) => {
             console.log("[PatientDialog] Submitting form with values:", values);
             setSubmitting(true);
             try {
-              dispatch(updateFormData(values)); // Only update Redux on submit
-              await handleSubmit(values);
-              console.log("[PatientDialog] Form submission successful");
+              const normalizedData = normalizeFormData(values);
+              dispatch(updateFormData(values)); // Update Redux store with user's input
+              await handleSubmit(normalizedData); // Send normalized data to the backend
+              console.log(
+                "[PatientDialog] Form submission successful with normalized data:",
+                normalizedData
+              );
             } catch (error) {
               console.error("[PatientDialog] Form submission error:", error);
             } finally {

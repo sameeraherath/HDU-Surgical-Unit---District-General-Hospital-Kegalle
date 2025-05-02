@@ -30,6 +30,7 @@ import {
   resetForm,
   setDialogOpen,
 } from "../../../features/patients/patientSlice";
+import { uploadPatientDocuments } from "../../../api/documentApi";
 
 import FormSection from "./components/FormSection";
 import {
@@ -55,6 +56,7 @@ const PatientDialog = ({ handleSubmit }) => {
     (state) => state.patient
   );
   const [submissionError, setSubmissionError] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState(null);
 
   const handleNext = async (validateForm, values, setErrors) => {
     const currentStepFields = (() => {
@@ -201,6 +203,35 @@ const PatientDialog = ({ handleSubmit }) => {
     return normalizedData;
   };
 
+  // Helper to check if documents are selected
+  const hasDocuments = (values) => {
+    return (
+      (values.medicalReports && values.medicalReports.length > 0) ||
+      values.idProof ||
+      values.consentForm
+    );
+  };
+
+  // Process document uploads
+  const processDocumentUploads = async (patientId, values) => {
+    if (!hasDocuments(values)) return;
+
+    setUploadStatus("uploading");
+    try {
+      const documentsToUpload = {
+        medicalReports: values.medicalReports || [],
+        idProof: values.idProof || null,
+        consentForm: values.consentForm || null,
+      };
+
+      await uploadPatientDocuments(patientId, documentsToUpload);
+      setUploadStatus("success");
+    } catch (error) {
+      console.error("Document upload error:", error);
+      setUploadStatus("error");
+    }
+  };
+
   return (
     <Dialog
       open={dialogOpen && !!selectedBed}
@@ -257,6 +288,14 @@ const PatientDialog = ({ handleSubmit }) => {
           </Alert>
         )}
 
+        {uploadStatus === "error" && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            Patient was created successfully, but there was an issue uploading
+            documents. You can upload documents later from the patient details
+            page.
+          </Alert>
+        )}
+
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -266,7 +305,19 @@ const PatientDialog = ({ handleSubmit }) => {
             try {
               const normalizedData = normalizeFormData(values);
               dispatch(updateFormData(values));
-              await handleSubmit(normalizedData);
+              const patientResponse = await handleSubmit(normalizedData);
+
+              // If patient was created successfully and has documents, upload them
+              if (
+                patientResponse?.success &&
+                patientResponse?.patient?.id &&
+                hasDocuments(values)
+              ) {
+                await processDocumentUploads(
+                  patientResponse.patient.id,
+                  values
+                );
+              }
             } catch (error) {
               console.error("[PatientDialog] Form submission error:", error);
               setSubmissionError(

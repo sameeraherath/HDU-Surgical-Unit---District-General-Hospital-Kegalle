@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,6 +11,7 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Alert,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import {
@@ -53,6 +54,7 @@ const PatientDialog = ({ handleSubmit }) => {
   const { activeStep, dialogOpen, selectedBed, formData } = useSelector(
     (state) => state.patient
   );
+  const [submissionError, setSubmissionError] = useState(null);
 
   const handleNext = async (validateForm, values, setErrors) => {
     const currentStepFields = (() => {
@@ -247,17 +249,27 @@ const PatientDialog = ({ handleSubmit }) => {
           </Stepper>
         </Box>
 
+        {submissionError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {submissionError}
+          </Alert>
+        )}
+
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             setSubmitting(true);
+            setSubmissionError(null);
             try {
               const normalizedData = normalizeFormData(values);
               dispatch(updateFormData(values)); // Update Redux store with user's input
               await handleSubmit(normalizedData); // Send normalized data to the backend
             } catch (error) {
               console.error("[PatientDialog] Form submission error:", error);
+              setSubmissionError(
+                "An error occurred while submitting the form. Please try again."
+              );
             } finally {
               setSubmitting(false);
             }

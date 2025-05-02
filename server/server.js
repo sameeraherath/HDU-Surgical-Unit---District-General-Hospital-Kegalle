@@ -24,5 +24,5 @@ app.use("/api/auth", authRoutes);
 app.use("/api/beds", bedRoutes);
 
 app.listen(PORT, () => {
-  // Server started silently
+  
 });

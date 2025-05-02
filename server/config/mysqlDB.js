@@ -51,7 +51,7 @@ Patient.hasMany(BedMySQL, { foreignKey: "patientId" });
 const connectMySql = async () => {
   try {
     await sequelize.authenticate();
-    console.log("Database connection established successfully.");
+    // Database connection established successfully.
 
     // Sync all models - reordering to ensure dependencies are created first
     await UserMySQLModel.sync({ alter: true });
@@ -69,7 +69,7 @@ const connectMySql = async () => {
         patientId: null,
       }));
       await BedMySQL.bulkCreate(initialBeds);
-      console.log("Initial beds seeded.");
+      // Initial beds seeded.
     }
   } catch (error) {
     console.error("Unable to connect to the database:", error);

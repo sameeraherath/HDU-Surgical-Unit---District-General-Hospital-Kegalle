@@ -24,7 +24,7 @@ export async function getBeds(req, res) {
 
 export async function assignBed(req, res) {
   try {
-    console.log("Incoming patient assignment request:", req.body);
+    // Incoming patient assignment request logic
 
     const { patientData } = req.body;
     const { bedId } = patientData;

@@ -54,20 +54,7 @@ const PatientDialog = ({ handleSubmit }) => {
     (state) => state.patient
   );
 
-  console.log("[PatientDialog] Dialog rendered with state:", {
-    activeStep,
-    dialogOpen,
-    selectedBedId: selectedBed?.id,
-    selectedBedNumber: selectedBed?.bedNumber,
-  });
-
   const handleNext = async (validateForm, values, setErrors) => {
-    console.log(
-      "[PatientDialog] Attempting to move to next step:",
-      activeStep + 1
-    );
-    console.log("[PatientDialog] Current form values:", values);
-
     const currentStepFields = (() => {
       switch (activeStep) {
         case 0:
@@ -85,11 +72,6 @@ const PatientDialog = ({ handleSubmit }) => {
       }
     })();
 
-    console.log(
-      "[PatientDialog] Fields to validate in this step:",
-      currentStepFields
-    );
-
     values.bedNumber = selectedBed?.bedNumber || values.bedNumber || "";
 
     const currentStepValues = {};
@@ -97,15 +79,9 @@ const PatientDialog = ({ handleSubmit }) => {
       currentStepValues[fieldName] = values[fieldName];
     });
 
-    console.log(
-      "[PatientDialog] currentStepValues to be validated:",
-      currentStepValues
-    );
-
     try {
       const errors = {};
       const validation = await validateForm();
-      console.log("[PatientDialog] Validation result:", validation);
 
       Object.keys(validation).forEach((key) => {
         if (currentStepFields.includes(key)) {
@@ -114,15 +90,10 @@ const PatientDialog = ({ handleSubmit }) => {
       });
 
       if (Object.keys(errors).length > 0) {
-        console.error("[PatientDialog] Validation errors found:", errors);
         setErrors(errors);
         return;
       }
 
-      console.log(
-        "[PatientDialog] Step validation successful, moving to step:",
-        activeStep + 1
-      );
       dispatch(setActiveStep(activeStep + 1));
     } catch (err) {
       console.error("[PatientDialog] Validation error:", err);
@@ -130,23 +101,15 @@ const PatientDialog = ({ handleSubmit }) => {
   };
 
   const handleBack = () => {
-    console.log(
-      "[PatientDialog] Moving back from step:",
-      activeStep,
-      "to step:",
-      activeStep - 1
-    );
     dispatch(setActiveStep(activeStep - 1));
   };
 
   const handleDialogClose = () => {
-    console.log("[PatientDialog] Closing dialog and resetting form");
     dispatch(setDialogOpen(false));
     dispatch(resetForm());
   };
 
   const renderStepContent = (step, formProps) => {
-    console.log("[PatientDialog] Rendering content for step:", step);
     switch (step) {
       case 0:
         return (
@@ -202,8 +165,6 @@ const PatientDialog = ({ handleSubmit }) => {
     ...formData,
     bedNumber: selectedBed?.bedNumber || "",
   };
-
-  console.log("[PatientDialog] Initial form values:", initialValues);
 
   // Function to normalize form data before submission
   const normalizeFormData = (values) => {
@@ -290,16 +251,11 @@ const PatientDialog = ({ handleSubmit }) => {
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
-            console.log("[PatientDialog] Submitting form with values:", values);
             setSubmitting(true);
             try {
               const normalizedData = normalizeFormData(values);
               dispatch(updateFormData(values)); // Update Redux store with user's input
               await handleSubmit(normalizedData); // Send normalized data to the backend
-              console.log(
-                "[PatientDialog] Form submission successful with normalized data:",
-                normalizedData
-              );
             } catch (error) {
               console.error("[PatientDialog] Form submission error:", error);
             } finally {
@@ -309,11 +265,6 @@ const PatientDialog = ({ handleSubmit }) => {
           enableReinitialize
         >
           {(formikProps) => {
-            console.log("[PatientDialog] Formik props:", {
-              dirty: formikProps.dirty,
-              isValid: formikProps.isValid,
-              errorCount: Object.keys(formikProps.errors).length,
-            });
             return (
               <Form>
                 {renderStepContent(activeStep, formikProps)}

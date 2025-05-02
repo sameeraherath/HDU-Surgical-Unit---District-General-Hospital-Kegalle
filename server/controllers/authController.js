@@ -5,7 +5,6 @@ import UserRepository from "../repositories/userRepository.js";
 const { sign } = jwt;
 
 export async function register(req, res) {
-  console.log("🚀 ~ register ~ req:", req.body);
   const {
     username,
     password,
@@ -22,7 +21,6 @@ export async function register(req, res) {
 
   try {
     let user = await UserRepository.findByUsername(username);
-    console.log("🚀 ~ register ~ user:", user);
     if (user) return res.status(400).json({ msg: "Username already exists" });
 
     const salt = await genSalt(10);
@@ -49,7 +47,6 @@ export async function register(req, res) {
       res.json({ token, role: user.role });
     });
   } catch (err) {
-    console.log("🚀 ~ register ~ err:", err);
     console.error(err);
     res.status(500).send("Server error");
   }
@@ -60,11 +57,9 @@ export async function login(req, res) {
 
   try {
     let user = await UserRepository.findByUsername(username);
-    console.log("🚀 ~ login ~ user:", user);
     if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
     const isMatch = await compare(password, user.password);
-    console.log("🚀 ~ login ~ isMatch:", isMatch);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
     const payload = { user: { id: user.id, role: user.role } };

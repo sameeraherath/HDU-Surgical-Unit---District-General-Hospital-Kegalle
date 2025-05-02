@@ -106,9 +106,8 @@ const NurseDashboard = () => {
         showToast({ message: "Bed assigned successfully.", type: "success" })
       );
       await fetchBeds();
-    } catch (error) {
+    } catch {
       dispatch(showToast({ message: "Error assigning bed.", type: "error" }));
-      console.log("Error during assignment:", error);
     } finally {
       dispatch(setLoading(false));
     }

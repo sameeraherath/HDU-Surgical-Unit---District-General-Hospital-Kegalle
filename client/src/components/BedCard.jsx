@@ -172,7 +172,7 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
             padding: "16px",
           }}
         >
-          <Typography variant="h6" fontWeight="600">
+          <Typography variant="h6" component="div" fontWeight="600">
             Confirm Deassign
           </Typography>
         </DialogTitle>

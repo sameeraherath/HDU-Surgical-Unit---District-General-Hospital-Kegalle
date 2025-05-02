@@ -208,12 +208,14 @@ const PatientDialog = ({ handleSubmit }) => {
       maxWidth="md"
       fullWidth
       disableRestoreFocus
+      container={document.body}
       PaperProps={{
         sx: {
           borderRadius: 2,
           overflow: "hidden",
         },
       }}
+      aria-modal="true"
     >
       <DialogTitle
         sx={{
@@ -263,8 +265,8 @@ const PatientDialog = ({ handleSubmit }) => {
             setSubmissionError(null);
             try {
               const normalizedData = normalizeFormData(values);
-              dispatch(updateFormData(values)); // Update Redux store with user's input
-              await handleSubmit(normalizedData); // Send normalized data to the backend
+              dispatch(updateFormData(values));
+              await handleSubmit(normalizedData);
             } catch (error) {
               console.error("[PatientDialog] Form submission error:", error);
               setSubmissionError(

@@ -1,19 +1,13 @@
 import React from "react";
 import { Container, Typography, Box, Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import GlobalAppBar from "../components/GlobalAppBar";
+
 
 const MedicalOfficerDashboard = () => {
-  const user = useSelector((state) => state.auth.user);
-
+ 
   return (
     <>
-      <GlobalAppBar
-        title="Medical Officer Dashboard"
-        onLogoutClick={() => {}}
-        role={user?.role}
-      />
+    
       <Container
         maxWidth="sm"
         sx={{

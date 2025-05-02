@@ -11,7 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import BedCard from "../components/BedCard";
-import { showToast } from "../features/ui/uiSlice";
+import { showToast, setAppBarTitle } from "../features/ui/uiSlice";
 import PatientDialog from "../components/NurseDashboardForms/PatientDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../features/loaderSlice";
@@ -32,8 +32,10 @@ const NurseDashboard = () => {
   const selectedBed = useSelector((state) => state.patient.selectedBed);
 
   useEffect(() => {
+    dispatch(setAppBarTitle("Nurse Dashboard - Bed Management"));
     fetchBeds();
   }, [dispatch]);
+
   const fetchBeds = async () => {
     const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
     dispatch(setLoading(true));
@@ -44,6 +46,7 @@ const NurseDashboard = () => {
         },
       });
       setBeds(response.data);
+      dispatch(setAppBarTitle(`Nurse Dashboard - Beds`));
     } catch (err) {
       setError(err.message);
     } finally {

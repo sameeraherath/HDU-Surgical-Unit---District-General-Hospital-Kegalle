@@ -1,26 +1,17 @@
 import React from "react";
 import { Container, Typography, Box, Paper, Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import GlobalAppBar from "../components/GlobalAppBar";
 
 const ConsultantDashboard = () => {
-  const user = useSelector((state) => state.auth.user);
-
   return (
     <>
-      <GlobalAppBar
-        title="Consultant Dashboard"
-        onLogoutClick={() => {}}
-        role={user?.role}
-      />
       <Container
         maxWidth="sm"
         sx={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "calc(100vh - 64px)", // Subtract AppBar height
+          height: "calc(100vh - 64px)",
           backgroundColor: "#f4f4f4",
         }}
       >

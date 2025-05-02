@@ -14,17 +14,19 @@ import {
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "../features/ui/uiSlice";
 import { useAuth } from "../hooks/useAuth";
 
-const GlobalAppBar = ({ title, role }) => {
+const GlobalAppBar = ({ role }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const openMenu = Boolean(anchorEl);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { logout } = useAuth();
+
+  const appBarTitle = useSelector((state) => state.ui.appBarTitle);
 
   const handleAvatarClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +77,7 @@ const GlobalAppBar = ({ title, role }) => {
       <AppBar position="sticky" sx={{ boxShadow: "none" }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-            {title}
+            {appBarTitle}
           </Typography>
 
           <IconButton color="inherit" onClick={handleAvatarClick}>

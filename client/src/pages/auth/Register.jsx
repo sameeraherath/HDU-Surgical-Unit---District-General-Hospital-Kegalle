@@ -57,7 +57,6 @@ const Register = () => {
 
   return (
     <>
-      {/* Global Backdrop Loader */}
       <Backdrop open={globalLoading} sx={{ zIndex: 1201, color: "#fff" }}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -85,7 +84,6 @@ const Register = () => {
             mx: "auto",
           }}
         >
-          {/* Header */}
           <Box textAlign="center" mb={3}>
             <Avatar sx={{ bgcolor: "primary.main", mx: "auto", mb: 1 }}>
               <PersonAdd />
@@ -107,11 +105,8 @@ const Register = () => {
               Please fill in the form to create an account
             </Typography>
           </Box>
-
-          {/* Form */}
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              {/* Left Column */}
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={2} direction="column">
                   <Grid item>
@@ -210,8 +205,6 @@ const Register = () => {
                   </Grid>
                 </Grid>
               </Grid>
-
-              {/* Right Column */}
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={2} direction="column">
                   <Grid item>
@@ -327,8 +320,6 @@ const Register = () => {
                 </Grid>
               </Grid>
             </Grid>
-
-            {/* Submit Button */}
             <Box mt={4}>
               <Button
                 type="submit"
@@ -347,8 +338,6 @@ const Register = () => {
                 Register
               </Button>
             </Box>
-
-            {/* Login Link */}
             <Box mt={2} textAlign="center">
               <Typography align="center" sx={{ fontSize: "14px" }}>
                 Already have an account?{" "}

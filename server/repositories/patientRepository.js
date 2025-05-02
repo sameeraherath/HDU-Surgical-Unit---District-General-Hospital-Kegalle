@@ -10,16 +10,11 @@ import { generatePatientNumber } from "../utils/generators.js";
 
 class PatientRepository {
   async createPatient(patientData) {
-    // Start a transaction to ensure data consistency
     const transaction = await sequelize.transaction();
 
     try {
-      // Generate a unique patient number
       const patientNumber = await generatePatientNumber();
-
-      // Extract data for different tables
       const {
-        // Patient details
         fullName,
         nicPassport,
         dateOfBirth,
@@ -30,12 +25,10 @@ class PatientRepository {
         email,
         address,
 
-        // Emergency contact details
         emergencyContactName,
         emergencyContactRelationship,
         emergencyContactNumber,
 
-        // Medical record details
         knownAllergies,
         medicalHistory,
         currentMedications,
@@ -43,19 +36,16 @@ class PatientRepository {
         bloodType,
         initialDiagnosis,
 
-        // Admission details
         admissionDateTime,
         department,
         consultantInCharge,
         bedId,
 
-        // Documents
         medicalReports,
         idProof,
         consentForm,
       } = patientData;
 
-      // 1. Create patient record
       const patient = await Patient.create(
         {
           patientNumber,
@@ -72,7 +62,6 @@ class PatientRepository {
         { transaction }
       );
 
-      // 2. Create emergency contact
       if (emergencyContactName && emergencyContactNumber) {
         await EmergencyContact.create(
           {
@@ -86,7 +75,6 @@ class PatientRepository {
         );
       }
 
-      // 3. Create medical record
       await MedicalRecord.create(
         {
           patientId: patient.id,
@@ -100,7 +88,6 @@ class PatientRepository {
         { transaction }
       );
 
-      // 4. Create admission record
       const admission = await Admission.create(
         {
           patientId: patient.id,
@@ -112,7 +99,6 @@ class PatientRepository {
         { transaction }
       );
 
-      // 5. Handle document uploads if they exist
       const documentPromises = [];
 
       if (medicalReports) {
@@ -126,7 +112,7 @@ class PatientRepository {
                 {
                   patientId: patient.id,
                   documentType: "MedicalReport",
-                  fileUrl: `/uploads/patients/${patient.id}/${file.name}`, // This would need actual file upload logic
+                  fileUrl: `/uploads/patients/${patient.id}/${file.name}`, // This would need actual file 
                   fileName: file.name,
                   fileType: file.type,
                   fileSize: file.size || 0,
@@ -174,7 +160,6 @@ class PatientRepository {
         await Promise.all(documentPromises);
       }
 
-      // Commit the transaction
       await transaction.commit();
 
       return {
@@ -182,7 +167,6 @@ class PatientRepository {
         admission,
       };
     } catch (error) {
-      // Rollback transaction in case of error
       await transaction.rollback();
       console.error("Error creating patient records:", error);
       throw error;
@@ -216,7 +200,6 @@ class PatientRepository {
         throw new Error("Patient not found");
       }
 
-      // Update patient core data
       if (patientData.fullName) patient.fullName = patientData.fullName;
       if (patientData.contactNumber)
         patient.contactNumber = patientData.contactNumber;
@@ -226,8 +209,6 @@ class PatientRepository {
       if (patientData.address) patient.address = patientData.address;
 
       await patient.save({ transaction });
-
-      // Update or create emergency contact
       if (
         patientData.emergencyContactName ||
         patientData.emergencyContactNumber
@@ -256,9 +237,6 @@ class PatientRepository {
           await emergencyContact.save({ transaction });
         }
       }
-
-      // Handle other updates as needed (medical records, documents, etc.)
-
       await transaction.commit();
       return patient;
     } catch (error) {

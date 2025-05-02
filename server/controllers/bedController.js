@@ -24,8 +24,6 @@ export async function getBeds(req, res) {
 
 export async function assignBed(req, res) {
   try {
-    // Incoming patient assignment request logic
-
     const { patientData } = req.body;
     const { bedId } = patientData;
 
@@ -38,8 +36,6 @@ export async function assignBed(req, res) {
       console.error("Patient data is missing or empty");
       return res.status(400).json({ msg: "Patient data is required" });
     }
-
-    // Check if bed exists and is available
     const bed = await BedMySQL.findOne({ where: { id: bedId } });
     if (!bed) {
       console.error("Bed not found:", bedId);
@@ -51,11 +47,9 @@ export async function assignBed(req, res) {
       return res.status(400).json({ msg: "Bed is already occupied" });
     }
 
-    // Create patient with normalized data structure
     try {
       const result = await patientRepository.createPatient(patientData);
 
-      // Update bed with new patient ID
       const [updatedCount] = await BedMySQL.update(
         { patientId: result.patient.id },
         { where: { id: bedId, patientId: null } }
@@ -104,8 +98,6 @@ export async function deAssignBed(req, res) {
       console.error("Bed is already unoccupied:", bedId);
       return res.status(400).json({ msg: "Bed is already unoccupied" });
     }
-
-    // If we have an admission record for this patient, update its status
     if (bed.patientId) {
       try {
         const admissions = await Admission.findAll({
@@ -125,7 +117,6 @@ export async function deAssignBed(req, res) {
         }
       } catch (error) {
         console.warn("Could not update admission status:", error.message);
-        // Continue with bed deassignment even if admission update fails
       }
     }
 

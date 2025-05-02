@@ -22,7 +22,6 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-// Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api/auth", authRoutes);

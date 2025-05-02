@@ -170,15 +170,12 @@ const PatientDialog = ({ handleSubmit }) => {
     bedNumber: selectedBed?.bedNumber || "",
   };
 
-  // Function to normalize form data before submission
   const normalizeFormData = (values) => {
-    // Make sure bedId is included (required for the backend)
     const normalizedData = {
       ...values,
       bedId: selectedBed?.id,
     };
 
-    // Convert dateOfBirth to ISO format if it exists
     if (normalizedData.dateOfBirth) {
       try {
         normalizedData.dateOfBirth = new Date(normalizedData.dateOfBirth)
@@ -189,7 +186,6 @@ const PatientDialog = ({ handleSubmit }) => {
       }
     }
 
-    // Convert admissionDateTime to ISO format if it exists
     if (normalizedData.admissionDateTime) {
       try {
         normalizedData.admissionDateTime = new Date(
@@ -203,7 +199,6 @@ const PatientDialog = ({ handleSubmit }) => {
     return normalizedData;
   };
 
-  // Helper to check if documents are selected
   const hasDocuments = (values) => {
     return (
       (values.medicalReports && values.medicalReports.length > 0) ||
@@ -212,7 +207,6 @@ const PatientDialog = ({ handleSubmit }) => {
     );
   };
 
-  // Process document uploads
   const processDocumentUploads = async (patientId, values) => {
     if (!hasDocuments(values)) return;
 
@@ -307,7 +301,6 @@ const PatientDialog = ({ handleSubmit }) => {
               dispatch(updateFormData(values));
               const patientResponse = await handleSubmit(normalizedData);
 
-              // If patient was created successfully and has documents, upload them
               if (
                 patientResponse?.success &&
                 patientResponse?.patient?.id &&

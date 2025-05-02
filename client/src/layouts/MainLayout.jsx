@@ -13,7 +13,6 @@ const MainLayout = () => {
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    // Set title based on current route
     const routeTitles = {
       "/": "HDU Surgical Unit",
       "/landing": "Welcome to HDU Surgical Unit",
@@ -21,7 +20,6 @@ const MainLayout = () => {
       "/house-officer-dashboard": "House Officer Dashboard",
       "/medical-officer-dashboard": "Medical Officer Dashboard",
       "/consultant-dashboard": "Consultant Dashboard",
-      // Add other routes as needed
     };
 
     const currentTitle = routeTitles[location.pathname] || "HDU Surgical Unit";

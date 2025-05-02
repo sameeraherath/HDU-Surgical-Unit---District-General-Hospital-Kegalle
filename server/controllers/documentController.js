@@ -3,13 +3,11 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 
-// Create uploads directory if it doesn't exist
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
@@ -20,7 +18,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter to validate file types
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "application/pdf",
@@ -41,12 +38,10 @@ const fileFilter = (req, file, cb) => {
     );
   }
 };
-
-// Create multer upload instance
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, 
 });
 
 export const uploadPatientDocuments = async (req, res) => {
@@ -62,7 +57,6 @@ export const uploadPatientDocuments = async (req, res) => {
     const documentResults = [];
 
     for (const file of req.files) {
-      // Determine document type from field name
       const documentType =
         file.fieldname === "medicalReports"
           ? "MedicalReport"
@@ -72,10 +66,8 @@ export const uploadPatientDocuments = async (req, res) => {
           ? "ConsentForm"
           : "Other";
 
-      // Get the database connection from the request
       const { PatientDocument } = req.db.models;
 
-      // Save document metadata to database
       const document = await PatientDocument.create({
         patientId,
         documentType,

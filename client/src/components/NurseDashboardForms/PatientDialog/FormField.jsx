@@ -76,7 +76,6 @@ const FormField = ({
     handleChange(e);
   };
 
-  // Handle field change with special handling for date of birth
   const handleFieldChange = (e) => {
     
     if (type === "number") {

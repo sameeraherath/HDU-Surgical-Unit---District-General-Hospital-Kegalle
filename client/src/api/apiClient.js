@@ -11,7 +11,6 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor for adding token
 apiClient.interceptors.request.use(
   (config) => {
     const token = store.getState().auth.token;
@@ -32,7 +31,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling token expiration
 apiClient.interceptors.response.use(
   (response) => {
     console.log("[API Response]", {
@@ -51,11 +49,9 @@ apiClient.interceptors.response.use(
     });
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized errors
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Clear credentials and redirect to login
       store.dispatch(clearCredentials());
       window.location.href = "/login";
     }

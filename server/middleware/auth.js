@@ -1,17 +1,23 @@
 import jwt from "jsonwebtoken";
 
 export const authenticateJWT = (req, res, next) => {
-  
-  const token = req.header("x-auth-token");
+  const authHeader = req.header("Authorization");
+  const xAuthToken = req.header("x-auth-token");
+
+  let token;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.substring(7);
+  } else if (xAuthToken) {
+    token = xAuthToken;
+  }
+
   if (!token) {
     return res.status(401).json({ msg: "No token, authorization denied" });
   }
 
   try {
-   
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-   
     req.user = decoded.user;
     next();
   } catch (err) {
@@ -20,7 +26,6 @@ export const authenticateJWT = (req, res, next) => {
 };
 
 export const authorize = (roles = []) => {
-
   if (typeof roles === "string") {
     roles = [roles];
   }

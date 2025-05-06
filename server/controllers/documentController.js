@@ -3,9 +3,8 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import cloudinary from "../config/cloudinary.js";
-import { PatientDocument } from "../config/mysqlDB.js";
+import { PatientDocument, sequelize } from "../config/mysqlDB.js";
 
-// We'll still use multer, but only for memory storage instead of disk storage
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -71,6 +70,22 @@ export const uploadPatientDocuments = async (req, res) => {
         .json({ success: false, message: "No files uploaded" });
     }
 
+    // Verify if the patient exists in the database
+    const patientExists = await sequelize.query(
+      "SELECT id FROM patients WHERE id = ?",
+      {
+        replacements: [patientId],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (!patientExists || patientExists.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `Patient with ID ${patientId} not found. Please ensure the patient exists before uploading documents.`,
+      });
+    }
+
     const documentResults = [];
 
     // Process each file type (medicalReports, idProof, consentForm)
@@ -115,6 +130,13 @@ export const uploadPatientDocuments = async (req, res) => {
           });
         } catch (uploadError) {
           console.error(`Error uploading ${file.originalname}:`, uploadError);
+
+          // Add more details to the error logging
+          if (uploadError.name === "SequelizeForeignKeyConstraintError") {
+            console.error(
+              `Foreign key constraint error: Patient with ID ${patientId} may not exist in the database.`
+            );
+          }
         }
       }
     }
@@ -136,6 +158,37 @@ export const uploadPatientDocuments = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to upload documents",
+      error: error.message,
+    });
+  }
+};
+
+export const getPatientDocuments = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const documents = await PatientDocument.findAll({
+      where: { patientId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    if (!documents || documents.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No documents found for this patient",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: documents.length,
+      documents,
+    });
+  } catch (error) {
+    console.error("Error retrieving patient documents:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve patient documents",
       error: error.message,
     });
   }

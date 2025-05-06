@@ -41,9 +41,8 @@ class PatientRepository {
         consultantInCharge,
         bedId,
 
-        medicalReports,
-        idProof,
-        consentForm,
+        // Document-related fields are removed from direct DB handling
+        // as they will be processed by the document controller
       } = patientData;
 
       const patient = await Patient.create(
@@ -99,66 +98,8 @@ class PatientRepository {
         { transaction }
       );
 
-      const documentPromises = [];
-
-      if (medicalReports) {
-        const files = Array.isArray(medicalReports)
-          ? medicalReports
-          : [medicalReports];
-        files.forEach((file) => {
-          if (file && file.name) {
-            documentPromises.push(
-              PatientDocument.create(
-                {
-                  patientId: patient.id,
-                  documentType: "MedicalReport",
-                  fileUrl: `/uploads/patients/${patient.id}/${file.name}`, // This would need actual file 
-                  fileName: file.name,
-                  fileType: file.type,
-                  fileSize: file.size || 0,
-                },
-                { transaction }
-              )
-            );
-          }
-        });
-      }
-
-      if (idProof && idProof.name) {
-        documentPromises.push(
-          PatientDocument.create(
-            {
-              patientId: patient.id,
-              documentType: "IdProof",
-              fileUrl: `/uploads/patients/${patient.id}/${idProof.name}`,
-              fileName: idProof.name,
-              fileType: idProof.type,
-              fileSize: idProof.size || 0,
-            },
-            { transaction }
-          )
-        );
-      }
-
-      if (consentForm && consentForm.name) {
-        documentPromises.push(
-          PatientDocument.create(
-            {
-              patientId: patient.id,
-              documentType: "ConsentForm",
-              fileUrl: `/uploads/patients/${patient.id}/${consentForm.name}`,
-              fileName: consentForm.name,
-              fileType: consentForm.type,
-              fileSize: consentForm.size || 0,
-            },
-            { transaction }
-          )
-        );
-      }
-
-      if (documentPromises.length > 0) {
-        await Promise.all(documentPromises);
-      }
+      // Document creation is now handled by the document controller using Cloudinary
+      // We don't need to manage documents here anymore
 
       await transaction.commit();
 

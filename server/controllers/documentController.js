@@ -2,21 +2,11 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import cloudinary from "../config/cloudinary.js";
+import { PatientDocument } from "../config/mysqlDB.js";
 
-const uploadDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueFilename = `${uuidv4()}-${file.originalname}`;
-    cb(null, uniqueFilename);
-  },
-});
+// We'll still use multer, but only for memory storage instead of disk storage
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
@@ -38,17 +28,44 @@ const fileFilter = (req, file, cb) => {
     );
   }
 };
+
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, 
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max file size
 });
+
+// Helper function to upload file to Cloudinary
+const uploadToCloudinary = async (file, folder) => {
+  return new Promise((resolve, reject) => {
+    // Create a data URI from the buffer
+    const fileStr = `data:${file.mimetype};base64,${file.buffer.toString(
+      "base64"
+    )}`;
+
+    cloudinary.uploader.upload(
+      fileStr,
+      {
+        folder: `patient-documents/${folder}`,
+        resource_type: "auto",
+        public_id: `${uuidv4()}-${path.parse(file.originalname).name}`,
+      },
+      (err, result) => {
+        if (err) {
+          console.error("Cloudinary upload error:", err);
+          return reject(err);
+        }
+        resolve(result);
+      }
+    );
+  });
+};
 
 export const uploadPatientDocuments = async (req, res) => {
   try {
     const { patientId } = req.params;
 
-    if (!req.files || req.files.length === 0) {
+    if (!req.files || Object.keys(req.files).length === 0) {
       return res
         .status(400)
         .json({ success: false, message: "No files uploaded" });
@@ -56,34 +73,56 @@ export const uploadPatientDocuments = async (req, res) => {
 
     const documentResults = [];
 
-    for (const file of req.files) {
+    // Process each file type (medicalReports, idProof, consentForm)
+    for (const [fieldName, files] of Object.entries(req.files)) {
       const documentType =
-        file.fieldname === "medicalReports"
+        fieldName === "medicalReports"
           ? "MedicalReport"
-          : file.fieldname === "idProof"
+          : fieldName === "idProof"
           ? "IdProof"
-          : file.fieldname === "consentForm"
+          : fieldName === "consentForm"
           ? "ConsentForm"
           : "Other";
 
-      const { PatientDocument } = req.db.models;
+      // If it's an array of files (like medicalReports)
+      const fileList = Array.isArray(files) ? files : [files];
 
-      const document = await PatientDocument.create({
-        patientId,
-        documentType,
-        fileUrl: `/uploads/${file.filename}`,
-        fileName: file.originalname,
-        fileType: file.mimetype,
-        fileSize: file.size,
-        uploadedBy: req.user?.id || null,
-      });
+      for (const file of fileList) {
+        try {
+          // Upload the file to Cloudinary
+          const cloudinaryResult = await uploadToCloudinary(
+            file,
+            documentType.toLowerCase()
+          );
 
-      documentResults.push({
-        id: document.id,
-        documentType,
-        fileName: file.originalname,
-        fileUrl: `/uploads/${file.filename}`,
-        fileSize: file.size,
+          // Create a record in the database
+          const document = await PatientDocument.create({
+            patientId,
+            documentType,
+            fileUrl: cloudinaryResult.secure_url,
+            fileName: file.originalname,
+            fileType: file.mimetype,
+            fileSize: file.size,
+            uploadedBy: req.user?.id || null,
+          });
+
+          documentResults.push({
+            id: document.id,
+            documentType,
+            fileName: file.originalname,
+            fileUrl: cloudinaryResult.secure_url,
+            fileSize: file.size,
+          });
+        } catch (uploadError) {
+          console.error(`Error uploading ${file.originalname}:`, uploadError);
+        }
+      }
+    }
+
+    if (documentResults.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload any documents",
       });
     }
 
@@ -97,30 +136,6 @@ export const uploadPatientDocuments = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to upload documents",
-      error: error.message,
-    });
-  }
-};
-
-export const getPatientDocuments = async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const { PatientDocument } = req.db.models;
-
-    const documents = await PatientDocument.findAll({
-      where: { patientId },
-      order: [["createdAt", "DESC"]],
-    });
-
-    res.status(200).json({
-      success: true,
-      documents,
-    });
-  } catch (error) {
-    console.error("Error fetching patient documents:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch patient documents",
       error: error.message,
     });
   }

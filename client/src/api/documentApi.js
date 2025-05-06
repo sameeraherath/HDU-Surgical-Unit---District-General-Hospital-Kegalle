@@ -33,6 +33,10 @@ export const uploadPatientDocuments = async (patientId, files) => {
   }
 };
 
+
+/*
+
+
 export const getPatientDocuments = async (patientId) => {
   try {
     const response = await apiClient.get(
@@ -44,3 +48,6 @@ export const getPatientDocuments = async (patientId) => {
     throw error;
   }
 };
+
+*/
+

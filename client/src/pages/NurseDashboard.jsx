@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Routes, Route } from "react-router-dom";
 import {
   Typography,
   Grid,
@@ -13,6 +13,7 @@ import {
 import BedCard from "../components/BedCard";
 import { showToast, setAppBarTitle } from "../features/ui/uiSlice";
 import PatientDialog from "../components/NurseDashboardForms/PatientDialog";
+import PatientAssignmentContainer from "./NurseDashboardPages/PatientAssignmentContainer";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../features/loaderSlice";
 import {
@@ -30,6 +31,7 @@ const NurseDashboard = () => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
   const selectedBed = useSelector((state) => state.patient.selectedBed);
+  const dialogOpen = useSelector((state) => state.patient.dialogOpen);
 
   useEffect(() => {
     dispatch(setAppBarTitle("Nurse Dashboard - Bed Management"));
@@ -105,12 +107,18 @@ const NurseDashboard = () => {
         throw new Error("Failed to assign bed.");
       }
 
+      const data = await response.json();
       dispatch(
         showToast({ message: "Bed assigned successfully.", type: "success" })
       );
+      dispatch(setDialogOpen(false));
       await fetchBeds();
-    } catch {
+      navigate("/nurse-dashboard");
+      return data;
+    } catch (error) {
       dispatch(showToast({ message: "Error assigning bed.", type: "error" }));
+      console.error("[NurseDashboard] Error assigning bed:", error);
+      throw error;
     } finally {
       dispatch(setLoading(false));
     }
@@ -152,7 +160,7 @@ const NurseDashboard = () => {
         ))}
       </Grid>
 
-      <PatientDialog handleSubmit={handleSubmit} />
+      {dialogOpen && <PatientDialog handleSubmit={handleSubmit} />}
 
       <Dialog
         open={logoutDialogOpen}

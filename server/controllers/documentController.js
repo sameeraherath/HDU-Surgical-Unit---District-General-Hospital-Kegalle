@@ -1,6 +1,5 @@
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import cloudinary from "../config/cloudinary.js";
 import { PatientDocument, sequelize } from "../config/mysqlDB.js";
@@ -31,13 +30,11 @@ const fileFilter = (req, file, cb) => {
 export const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max file size
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-// Helper function to upload file to Cloudinary
 const uploadToCloudinary = async (file, folder) => {
   return new Promise((resolve, reject) => {
-    // Create a data URI from the buffer
     const fileStr = `data:${file.mimetype};base64,${file.buffer.toString(
       "base64"
     )}`;
@@ -51,7 +48,6 @@ const uploadToCloudinary = async (file, folder) => {
       },
       (err, result) => {
         if (err) {
-          console.error("Cloudinary upload error:", err);
           return reject(err);
         }
         resolve(result);
@@ -70,7 +66,6 @@ export const uploadPatientDocuments = async (req, res) => {
         .json({ success: false, message: "No files uploaded" });
     }
 
-    // Verify if the patient exists in the database
     const patientExists = await sequelize.query(
       "SELECT id FROM patients WHERE id = ?",
       {
@@ -88,7 +83,6 @@ export const uploadPatientDocuments = async (req, res) => {
 
     const documentResults = [];
 
-    // Process each file type (medicalReports, idProof, consentForm)
     for (const [fieldName, files] of Object.entries(req.files)) {
       const documentType =
         fieldName === "medicalReports"
@@ -99,18 +93,15 @@ export const uploadPatientDocuments = async (req, res) => {
           ? "ConsentForm"
           : "Other";
 
-      // If it's an array of files (like medicalReports)
       const fileList = Array.isArray(files) ? files : [files];
 
       for (const file of fileList) {
         try {
-          // Upload the file to Cloudinary
           const cloudinaryResult = await uploadToCloudinary(
             file,
             documentType.toLowerCase()
           );
 
-          // Create a record in the database
           const document = await PatientDocument.create({
             patientId,
             documentType,
@@ -129,14 +120,14 @@ export const uploadPatientDocuments = async (req, res) => {
             fileSize: file.size,
           });
         } catch (uploadError) {
-          console.error(`Error uploading ${file.originalname}:`, uploadError);
-
-          // Add more details to the error logging
-          if (uploadError.name === "SequelizeForeignKeyConstraintError") {
-            console.error(
-              `Foreign key constraint error: Patient with ID ${patientId} may not exist in the database.`
-            );
-          }
+          console.error(
+            `Error uploading file ${file.originalname} to Cloudinary: ${uploadError.message}`
+          );
+          return res.status(500).json({
+            success: false,
+            message: `Failed to upload file ${file.originalname}`,
+            error: uploadError.message,
+          });
         }
       }
     }
@@ -154,7 +145,6 @@ export const uploadPatientDocuments = async (req, res) => {
       documents: documentResults,
     });
   } catch (error) {
-    console.error("Error uploading documents:", error);
     res.status(500).json({
       success: false,
       message: "Failed to upload documents",
@@ -185,7 +175,6 @@ export const getPatientDocuments = async (req, res) => {
       documents,
     });
   } catch (error) {
-    console.error("Error retrieving patient documents:", error);
     res.status(500).json({
       success: false,
       message: "Failed to retrieve patient documents",

@@ -13,4 +13,10 @@ export const store = configureStore({
     alerts: alertsReducer,
     patient: patientReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: ["patient.fileObjects"],
+      },
+    }),
 });

@@ -4,13 +4,21 @@ export const uploadPatientDocuments = async (patientId, files) => {
   try {
     const formData = new FormData();
 
+    if (!files || Object.keys(files).length === 0) {
+      throw new Error("No files provided for upload");
+    }
+
     Object.entries(files).forEach(([type, fileList]) => {
-      if (fileList && fileList.length > 0) {
-        if (Array.isArray(fileList)) {
+      if (fileList) {
+        if (Array.isArray(fileList) && fileList.length > 0) {
           fileList.forEach((file) => {
-            formData.append(type, file);
+            if (file instanceof File) {
+              formData.append(type, file);
+            }
           });
-        } else {
+        } else if (fileList instanceof File) {
+          formData.append(type, fileList);
+        } else if (fileList.name) {
           formData.append(type, fileList);
         }
       }
@@ -28,14 +36,14 @@ export const uploadPatientDocuments = async (patientId, files) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error uploading documents:", error);
-    throw error;
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Server error during document upload"
+      );
+    }
+    throw new Error(error.message || "Failed to upload documents");
   }
 };
-
-
-/*
-
 
 export const getPatientDocuments = async (patientId) => {
   try {
@@ -44,10 +52,11 @@ export const getPatientDocuments = async (patientId) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching patient documents:", error);
-    throw error;
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to fetch documents"
+      );
+    }
+    throw new Error(error.message || "Failed to fetch documents");
   }
 };
-
-*/
-

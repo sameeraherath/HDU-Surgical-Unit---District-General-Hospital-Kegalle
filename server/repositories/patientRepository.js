@@ -39,10 +39,6 @@ class PatientRepository {
         admissionDateTime,
         department,
         consultantInCharge,
-        bedId,
-
-        // Document-related fields are removed from direct DB handling
-        // as they will be processed by the document controller
       } = patientData;
 
       const patient = await Patient.create(
@@ -97,9 +93,6 @@ class PatientRepository {
         },
         { transaction }
       );
-
-      // Document creation is now handled by the document controller using Cloudinary
-      // We don't need to manage documents here anymore
 
       await transaction.commit();
 

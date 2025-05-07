@@ -8,6 +8,7 @@ import NurseDashboard from "../pages/NurseDashboard";
 import LandingPage from "../pages/LandingPage";
 import ConsultantDashboard from "../pages/ConsultantDashboard";
 import MainLayout from "../layouts/MainLayout";
+import PatientAssignmentContainer from "../pages/NurseDashboardPages/PatientAssignmentContainer";
 import { useSelector } from "react-redux";
 
 const ProtectedRoute = ({ role, children }) => {
@@ -48,6 +49,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute role="Nurse">
               <NurseDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/nurse-dashboard/patient-assignment"
+          element={
+            <ProtectedRoute role="Nurse">
+              <PatientAssignmentContainer />
             </ProtectedRoute>
           }
         />

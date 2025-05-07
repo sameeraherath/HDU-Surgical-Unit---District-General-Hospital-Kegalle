@@ -1,1 +1,3 @@
-export { default } from "./PatientDialog";
+import PatientDialog from "./PatientDialog";
+
+export default PatientDialog;

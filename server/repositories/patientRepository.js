@@ -124,62 +124,7 @@ class PatientRepository {
     return await Patient.findOne(options);
   }
 
-  async updatePatient(patientId, patientData) {
-    const transaction = await sequelize.transaction();
-
-    try {
-      const patient = await Patient.findByPk(patientId, { transaction });
-
-      if (!patient) {
-        throw new Error("Patient not found");
-      }
-
-      if (patientData.fullName) patient.fullName = patientData.fullName;
-      if (patientData.contactNumber)
-        patient.contactNumber = patientData.contactNumber;
-      if (patientData.email) patient.email = patientData.email;
-      if (patientData.maritalStatus)
-        patient.maritalStatus = patientData.maritalStatus;
-      if (patientData.address) patient.address = patientData.address;
-
-      await patient.save({ transaction });
-      if (
-        patientData.emergencyContactName ||
-        patientData.emergencyContactNumber
-      ) {
-        const [emergencyContact] = await EmergencyContact.findOrCreate({
-          where: { patientId, isPrimary: true },
-          defaults: {
-            patientId,
-            name: patientData.emergencyContactName,
-            relationship: patientData.emergencyContactRelationship || "Other",
-            contactNumber: patientData.emergencyContactNumber,
-            isPrimary: true,
-          },
-          transaction,
-        });
-
-        if (emergencyContact) {
-          if (patientData.emergencyContactName)
-            emergencyContact.name = patientData.emergencyContactName;
-          if (patientData.emergencyContactRelationship)
-            emergencyContact.relationship =
-              patientData.emergencyContactRelationship;
-          if (patientData.emergencyContactNumber)
-            emergencyContact.contactNumber = patientData.emergencyContactNumber;
-
-          await emergencyContact.save({ transaction });
-        }
-      }
-      await transaction.commit();
-      return patient;
-    } catch (error) {
-      await transaction.rollback();
-      console.error("Error updating patient:", error);
-      throw error;
-    }
-  }
-
+  
   async getAllPatients(options = {}) {
     const queryOptions = {
       include: [

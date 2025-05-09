@@ -13,7 +13,7 @@ router.use(authenticateJWT);
 router.post(
   "/patients/:patientId/documents",
   upload.fields([
-    { name: "medicalReports", maxCount: 5 },
+    { name: "medicalReports" },
     { name: "idProof", maxCount: 1 },
     { name: "consentForm", maxCount: 1 },
   ]),

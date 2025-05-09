@@ -29,7 +29,6 @@ const FormField = ({
   setFieldValue,
   values,
 }) => {
- 
   const calculateAge = React.useCallback(
     (dob) => {
       try {
@@ -62,22 +61,17 @@ const FormField = ({
   }, [name, values.dateOfBirth, calculateAge]);
 
   const handleInputValidation = (e) => {
-
     if (name === "age" && type === "number") {
-    
       if (e.target.value < 0 || e.target.value === "-") {
-       
         setFieldValue(name, 0);
         return;
       }
     }
 
-
     handleChange(e);
   };
 
   const handleFieldChange = (e) => {
-    
     if (type === "number") {
       handleInputValidation(e);
     } else {
@@ -122,7 +116,7 @@ const FormField = ({
             variant="outlined"
             startIcon={<CloudUploadIcon />}
             sx={{
-              borderRadius: 2,
+              borderRadius: "12px",
               py: 1.2,
               px: 2,
               textTransform: "none",
@@ -215,6 +209,7 @@ const FormField = ({
         sx={{
           "& .MuiOutlinedInput-root": {
             backgroundColor: "background.paper",
+            borderRadius: "12px",
             "&:hover fieldset": {
               borderColor: "primary.light",
             },

@@ -16,22 +16,22 @@ import {
   Contacts as ContactsIcon,
   Medication as MedicationIcon,
   Hotel as HotelIcon,
-  UploadFile as UploadFileIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateFormData,
   resetForm,
 } from "../../features/patients/patientSlice";
+import { setLoading } from "../../features/loaderSlice";
 import { uploadPatientDocuments } from "../../api/documentApi";
 
 import FormSection from "../../components/NurseDashboardForms/PatientDialog/components/FormSection";
+import DocumentUpload from "../../components/NurseDashboardForms/PatientDialog/components/DocumentUpload";
 import {
   patientDetailsFields,
   emergencyContactFields,
   medicalInfoFields,
   admissionFields,
-  documentUploadFields,
 } from "../../components/NurseDashboardForms/PatientDialog/config/formFields";
 import { validationSchema } from "../../components/NurseDashboardForms/PatientDialog/validationSchema";
 
@@ -40,9 +40,9 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
   const { selectedBed, formData } = useSelector((state) => state.patient);
   const [submissionError, setSubmissionError] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
-
   const handleCancel = () => {
     dispatch(resetForm());
+    dispatch(setLoading(false));
     if (onClose) onClose();
   };
 
@@ -87,18 +87,11 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
       fileData.consentForm
     );
   };
-
   const processDocumentUploads = async (patientId, fileData) => {
     if (!hasDocuments(fileData)) return;
 
-    console.log("Starting document upload process for patient ID:", patientId);
-    console.log("Documents to upload:", {
-      medicalReports: fileData.medicalReports?.length || 0,
-      idProof: fileData.idProof ? "Yes" : "No",
-      consentForm: fileData.consentForm ? "Yes" : "No",
-    });
-
     setUploadStatus("uploading");
+    dispatch(setLoading(true));
     try {
       const documentsToUpload = {};
 
@@ -119,6 +112,7 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
       if (Object.keys(documentsToUpload).length === 0) {
         console.log("No documents to upload, skipping API call");
         setUploadStatus("success");
+        dispatch(setLoading(false));
         return;
       }
 
@@ -131,25 +125,10 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
     } catch (error) {
       console.error("Document upload error:", error);
       setUploadStatus("error");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
-
-  if (!selectedBed) {
-    return (
-      <Container maxWidth="md">
-        <Paper sx={{ p: 4, mt: 4, borderRadius: 2 }}>
-          <Typography variant="h6" align="center">
-            No bed selected. Please select a bed first.
-          </Typography>
-          <Box sx={{ mt: 3, textAlign: "center" }}>
-            <Button variant="contained" onClick={handleCancel}>
-              Return to Dashboard
-            </Button>
-          </Box>
-        </Paper>
-      </Container>
-    );
-  }
 
   return (
     <Container maxWidth="lg">
@@ -198,6 +177,7 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
             onSubmit={async (values, { setSubmitting }) => {
               setSubmitting(true);
               setSubmissionError(null);
+              dispatch(setLoading(true));
               try {
                 const {
                   medicalReports,
@@ -252,6 +232,7 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
                 );
               } finally {
                 setSubmitting(false);
+                dispatch(setLoading(false));
               }
             }}
             enableReinitialize
@@ -266,62 +247,40 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
                   >
                     Patient Information Form
                   </Typography>
-
                   <Divider sx={{ mb: 4 }} />
-
                   <FormSection
                     icon={<PersonIcon color="primary" fontSize="large" />}
                     title="Patient Details"
                     fields={patientDetailsFields}
                     formProps={formikProps}
                   />
-
                   <FormSection
                     icon={<ContactsIcon color="primary" fontSize="large" />}
                     title="Emergency Contact Information"
                     fields={emergencyContactFields}
                     formProps={formikProps}
                   />
-
                   <FormSection
                     icon={<MedicationIcon color="primary" fontSize="large" />}
                     title="Medical Information"
                     fields={medicalInfoFields}
                     formProps={formikProps}
-                  />
-
+                  />{" "}
                   <FormSection
                     icon={<HotelIcon color="primary" fontSize="large" />}
                     title="Admission Details"
                     fields={admissionFields}
                     formProps={formikProps}
                   />
-
-                  <FormSection
-                    icon={<UploadFileIcon color="primary" fontSize="large" />}
-                    title="Document Upload"
-                    fields={documentUploadFields}
+                  <DocumentUpload
                     formProps={formikProps}
+                    uploadStatus={uploadStatus}
                   />
-
-                  {uploadStatus === "uploading" && (
-                    <Alert severity="info" sx={{ mt: 2, mb: 1 }}>
-                      Uploading patient documents to server...
-                    </Alert>
-                  )}
-
-                  {uploadStatus === "success" && (
-                    <Alert severity="success" sx={{ mt: 2, mb: 1 }}>
-                      Documents uploaded successfully!
-                    </Alert>
-                  )}
-
                   <Box sx={{ mt: 3, textAlign: "right" }}>
                     <Typography variant="caption" color="text.secondary">
                       * Required fields
                     </Typography>
                   </Box>
-
                   <Box
                     sx={{
                       mt: 4,
@@ -335,7 +294,13 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
                       onClick={handleCancel}
                       variant="outlined"
                       color="secondary"
-                      sx={{ borderRadius: 2, px: 3.5, py: 1.2, mr: 2 }}
+                      sx={{
+                        borderRadius: 2,
+                        px: 3.5,
+                        py: 1.2,
+                        mr: 2,
+                        textTransform: "none",
+                      }}
                     >
                       Cancel
                     </Button>
@@ -348,6 +313,7 @@ const PatientAssignmentPage = ({ handleSubmit, onClose }) => {
                         px: 4,
                         py: 1.2,
                         fontWeight: "medium",
+                        textTransform: "none",
                       }}
                       disabled={formikProps.isSubmitting}
                     >

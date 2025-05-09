@@ -30,7 +30,6 @@ const Admission = defineAdmission(sequelize);
 const PatientDocument = definePatientDocument(sequelize);
 const UserMySQLModel = defineUser(sequelize);
 
-
 Patient.hasMany(EmergencyContact, { foreignKey: "patientId" });
 EmergencyContact.belongsTo(Patient, { foreignKey: "patientId" });
 
@@ -43,14 +42,12 @@ Admission.belongsTo(Patient, { foreignKey: "patientId" });
 Patient.hasMany(PatientDocument, { foreignKey: "patientId" });
 PatientDocument.belongsTo(Patient, { foreignKey: "patientId" });
 
-
+Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
 BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
-Patient.hasMany(BedMySQL, { foreignKey: "patientId" });
 
 const connectMySql = async () => {
   try {
     await sequelize.authenticate();
-   
     await UserMySQLModel.sync({ alter: true });
     await Patient.sync({ alter: true });
     await EmergencyContact.sync({ alter: true });
@@ -66,7 +63,6 @@ const connectMySql = async () => {
         patientId: null,
       }));
       await BedMySQL.bulkCreate(initialBeds);
-     
     }
   } catch (error) {
     console.error("Unable to connect to the database:", error);

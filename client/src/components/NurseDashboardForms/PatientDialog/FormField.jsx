@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { MuiTelInput } from "mui-tel-input";
 
 const FormField = ({
   name,
@@ -157,6 +158,64 @@ const FormField = ({
             </Typography>
           </Box>
         )}
+        {touched[name] && errors[name] && (
+          <FormHelperText
+            error
+            sx={{
+              ml: 1.5,
+              mt: 0.5,
+              fontSize: "0.75rem",
+              fontWeight: "500",
+              color: "error.main",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {errors[name]}
+          </FormHelperText>
+        )}
+      </Box>
+    );
+  }
+
+  if (type === "tel") {
+    return (
+      <Box sx={{ width: "100%" }}>
+        <MuiTelInput
+          value={values[name]}
+          onChange={(value) => setFieldValue(name, value)}
+          label={
+            <>
+              {label}
+              {required && (
+                <Box component="span" sx={{ color: "error.main", ml: 0.5 }}>
+                  *
+                </Box>
+              )}
+            </>
+          }
+          defaultCountry="LK"
+          fullWidth
+          size="small"
+          error={touched[name] && Boolean(errors[name])}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: "background.paper",
+              borderRadius: "12px",
+              "&:hover fieldset": {
+                borderColor: "primary.light",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "primary.main",
+                borderWidth: 2,
+              },
+              "&.Mui-error fieldset": {
+                borderColor: "error.main",
+                borderWidth: 2,
+              },
+            },
+          }}
+        />
         {touched[name] && errors[name] && (
           <FormHelperText
             error

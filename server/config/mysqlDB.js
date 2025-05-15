@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
+import { sequelize, testConnection } from "./database.js";
 import defineBed from "../models/BedMySQL.js";
 import definePatient from "../models/patients/Patient.js";
 import defineEmergencyContact from "../models/patients/EmergencyContact.js";
@@ -7,20 +7,8 @@ import defineMedicalRecord from "../models/patients/MedicalRecord.js";
 import defineAdmission from "../models/patients/Admission.js";
 import definePatientDocument from "../models/patients/PatientDocument.js";
 import defineUser from "../models/UserMySQL.js";
-
-dotenv.config();
-
-const sequelize = new Sequelize(
-  process.env.MYSQL_DATABASE,
-  process.env.MYSQL_USER,
-  process.env.MYSQL_PASSWORD,
-  {
-    host: process.env.MYSQL_HOST,
-    port: process.env.MYSQL_PORT,
-    dialect: "mysql",
-    logging: false,
-  }
-);
+import defineCriticalFactor from "../models/patients/CriticalFactor.js";
+import defineAuditLog from "../models/AuditLog.js";
 
 const BedMySQL = defineBed(sequelize);
 const Patient = definePatient(sequelize);
@@ -29,32 +17,104 @@ const MedicalRecord = defineMedicalRecord(sequelize);
 const Admission = defineAdmission(sequelize);
 const PatientDocument = definePatientDocument(sequelize);
 const UserMySQLModel = defineUser(sequelize);
+const CriticalFactor = defineCriticalFactor(sequelize);
+const AuditLog = defineAuditLog(sequelize);
 
-Patient.hasMany(EmergencyContact, { foreignKey: "patientId" });
-EmergencyContact.belongsTo(Patient, { foreignKey: "patientId" });
+const defineAssociations = () => {
+  Patient.hasMany(Admission, { foreignKey: "patientId", as: "admissions" });
+  Admission.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 
-Patient.hasMany(MedicalRecord, { foreignKey: "patientId" });
-MedicalRecord.belongsTo(Patient, { foreignKey: "patientId" });
+  Patient.hasMany(EmergencyContact, {
+    foreignKey: "patientId",
+    as: "emergencyContacts",
+  });
+  EmergencyContact.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
 
-Patient.hasMany(Admission, { foreignKey: "patientId" });
-Admission.belongsTo(Patient, { foreignKey: "patientId" });
+  Patient.hasMany(MedicalRecord, {
+    foreignKey: "patientId",
+    as: "medicalRecords",
+  });
+  MedicalRecord.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 
-Patient.hasMany(PatientDocument, { foreignKey: "patientId" });
-PatientDocument.belongsTo(Patient, { foreignKey: "patientId" });
+  Patient.hasMany(PatientDocument, {
+    foreignKey: "patientId",
+    as: "documents",
+  });
+  PatientDocument.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
 
-Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
-BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
+  Patient.hasMany(CriticalFactor, {
+    foreignKey: "patientId",
+    as: "criticalFactors",
+  });
+  CriticalFactor.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  UserMySQLModel.hasMany(CriticalFactor, {
+    foreignKey: "recordedBy",
+    as: "recordedCriticalFactors",
+  });
+  CriticalFactor.belongsTo(UserMySQLModel, {
+    foreignKey: "recordedBy",
+    as: "recorder",
+  });
+  UserMySQLModel.hasMany(PatientDocument, {
+    foreignKey: "uploadedBy",
+    as: "uploadedDocuments",
+    constraints: false,
+  });
+  PatientDocument.belongsTo(UserMySQLModel, {
+    foreignKey: "uploadedBy",
+    as: "uploader",
+    constraints: false,
+  });
+
+  UserMySQLModel.hasMany(AuditLog, {
+    foreignKey: "userId",
+    as: "auditLogs",
+    constraints: false,
+  });
+  AuditLog.belongsTo(UserMySQLModel, {
+    foreignKey: "userId",
+    as: "user",
+    constraints: false,
+  });
+
+  Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
+  BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
+};
+
+defineAssociations();
 
 const connectMySql = async () => {
   try {
     await sequelize.authenticate();
+    console.log("MySQL connection has been established successfully.");
+
+    // Sync models with force: false and alter: true for safer migrations
     await UserMySQLModel.sync({ alter: true });
-    await Patient.sync({ alter: true });
-    await EmergencyContact.sync({ alter: true });
-    await MedicalRecord.sync({ alter: true });
-    await Admission.sync({ alter: true });
-    await PatientDocument.sync({ alter: true });
-    await BedMySQL.sync({ alter: true });
+    console.log("User model synchronized");
+
+    await sequelize.transaction(async (t) => {
+      // Sync models in a specific order to avoid dependency issues
+      await Patient.sync({ alter: true });
+      await EmergencyContact.sync({ alter: true });
+      await MedicalRecord.sync({ alter: true });
+      await Admission.sync({ alter: true });
+      await PatientDocument.sync({ alter: true });
+      await BedMySQL.sync({ alter: true });
+      await CriticalFactor.sync({ alter: true });
+      await AuditLog.sync({ alter: true });
+    });
+
+    console.log("All models synchronized successfully");
 
     const bedCount = await BedMySQL.count();
     if (bedCount === 0) {
@@ -66,7 +126,7 @@ const connectMySql = async () => {
     }
   } catch (error) {
     console.error("Unable to connect to the database:", error);
-    process.exit(1);
+    throw error;
   }
 };
 
@@ -80,4 +140,6 @@ export {
   Admission,
   PatientDocument,
   UserMySQLModel,
+  CriticalFactor,
+  AuditLog,
 };

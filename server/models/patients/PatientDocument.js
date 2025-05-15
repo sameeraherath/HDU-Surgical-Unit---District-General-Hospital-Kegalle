@@ -46,10 +46,7 @@ const definePatientDocument = (sequelize) => {
       uploadedBy: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: {
-          model: "users",
-          key: "id",
-        },
+        // Don't use direct references in the schema to avoid constraint issues
       },
     },
     {

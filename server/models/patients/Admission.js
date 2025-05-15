@@ -12,11 +12,7 @@ const defineAdmission = (sequelize) => {
       patientId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: "patients",
-          key: "id",
-        },
-        onDelete: "CASCADE",
+        // Define relationship in associations instead
       },
       admissionDateTime: {
         type: DataTypes.DATE,

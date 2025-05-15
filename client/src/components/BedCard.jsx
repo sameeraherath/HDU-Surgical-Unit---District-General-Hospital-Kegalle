@@ -17,6 +17,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import CriticalFactorsForm from "./CriticalFactorsForm"; // Import the new form
+
 const StyledCard = styled(Card)(({ occupied }) => ({
   width: "100%",
   height: "230px",
@@ -33,6 +35,7 @@ const StyledCard = styled(Card)(({ occupied }) => ({
 const BedCard = ({ bed, assignBed, deassignBed }) => {
   const [openModal, setOpenModal] = React.useState(false);
   const [bedToDeassign, setBedToDeassign] = React.useState(null);
+  const [openVitalsForm, setOpenVitalsForm] = React.useState(false); // State for vitals form
 
   const isOccupied = bed.patientId !== null;
 
@@ -48,99 +51,154 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
 
   const handleConfirmDeassign = () => {
     if (bedToDeassign) {
-      deassignBed(bedToDeassign);
+      deassignBed(bedToDeassign.id);
     }
-    setOpenModal(false);
-    setBedToDeassign(null);
+    handleCloseModal();
   };
 
-  const handleRecordVitalsClick = (bed) => {
-    console.log("Record Vitals for bed:", bed);
+  // Handler to open the vitals form
+  const handleRecordVitalsClick = () => {
+    if (bed.patientId) {
+      setOpenVitalsForm(true);
+    } else {
+      // Optionally, show an alert or message if no patient is assigned
+      console.warn("No patient assigned to this bed to record vitals.");
+      // You might want to dispatch an alert to the user here
+    }
+  };
+
+  // Handler to close the vitals form
+  const handleCloseVitalsForm = () => {
+    setOpenVitalsForm(false);
   };
 
   return (
-    <StyledCard occupied={isOccupied.toString()}>
-      <CardContent>
-        <Box mb={2}>
-          <Typography
-            variant="h6"
-            color="textPrimary"
-            fontWeight="bold"
-            gutterBottom
-          >
-            Bed Number: {bed.bedNumber}
-          </Typography>
-          <Chip
-            label={isOccupied ? "Occupied" : "Available"}
-            color={isOccupied ? "error" : "success"}
-            size="medium"
-            sx={{
-              fontWeight: "bold",
-              borderRadius: "16px",
-              paddingX: 2,
-              paddingY: 1,
-              display: "inline-flex",
-              alignItems: "center",
-              transition: "none",
-            }}
-            icon={
-              isOccupied ? (
-                <CancelIcon fontSize="small" />
-              ) : (
-                <CheckCircleIcon fontSize="small" />
-              )
-            }
-          />
-        </Box>
-
-        {isOccupied && bed.patientId ? (
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="flex-start"
-            justifyContent="space-between"
-            height="100%"
-          >
-            <Typography variant="body1" color="textSecondary" marginBottom={1}>
-              Patient ID: {bed.patientId}
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: 1,
-                width: "100%",
-              }}
+    <>
+      <StyledCard occupied={isOccupied.toString()}>
+        <CardContent>
+          <Box mb={2}>
+            <Typography
+              variant="h6"
+              color="textPrimary"
+              fontWeight="bold"
+              gutterBottom
             >
-              <Button
-                variant="contained"
+              Bed Number: {bed.bedNumber}
+            </Typography>
+            <Chip
+              label={isOccupied ? "Occupied" : "Available"}
+              color={isOccupied ? "error" : "success"}
+              size="medium"
+              sx={{
+                fontWeight: "bold",
+                borderRadius: "16px",
+                paddingX: 2,
+                paddingY: 1,
+                display: "inline-flex",
+                alignItems: "center",
+                transition: "none",
+              }}
+              icon={
+                isOccupied ? (
+                  <CancelIcon fontSize="small" />
+                ) : (
+                  <CheckCircleIcon fontSize="small" />
+                )
+              }
+            />
+          </Box>
+
+          {isOccupied && bed.patientId ? (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              height="100%"
+            >
+              <Typography
+                variant="body1"
+                color="textSecondary"
+                marginBottom={1}
+              >
+                Patient ID: {bed.patientId}
+              </Typography>
+              <Box
                 sx={{
-                  textTransform: "none",
-                  fontSize: "14px",
-                  borderRadius: "30px",
-                  backgroundColor: "error.main",
-                  color: "white",
-                  paddingX: 3,
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
-                  "&:hover": {
-                    backgroundColor: "error.dark",
-                    transform: "scale(1.05)",
-                  },
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 1,
                   width: "100%",
                 }}
-                startIcon={<RemoveIcon />}
-                onClick={() => handleDeassignClick(bed)}
               >
-                Deassign
-              </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    fontSize: "14px",
+                    borderRadius: "30px",
+                    backgroundColor: "error.main",
+                    color: "white",
+                    paddingX: 3,
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                    "&:hover": {
+                      backgroundColor: "error.dark",
+                      transform: "scale(1.05)",
+                    },
+                    width: "100%",
+                  }}
+                  startIcon={<RemoveIcon />}
+                  onClick={() => handleDeassignClick(bed)}
+                >
+                  Deassign
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    fontSize: "14px",
+                    borderRadius: "30px",
+                    backgroundColor: "success.main",
+                    color: "white",
+                    paddingX: 3,
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                    "&:hover": {
+                      backgroundColor: "success.dark",
+                      transform: "scale(1.05)",
+                    },
+                    width: "100%",
+                  }}
+                  startIcon={<AssignmentIcon />}
+                  onClick={handleRecordVitalsClick} // Updated onClick
+                >
+                  Record Vitals
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              height="100%"
+            >
+              <Typography
+                variant="body1"
+                color="textSecondary"
+                marginBottom={1}
+              >
+                No patient assigned
+              </Typography>
               <Button
                 variant="contained"
                 sx={{
                   textTransform: "none",
+                  marginTop: "auto",
                   fontSize: "14px",
                   borderRadius: "30px",
-                  backgroundColor: "success.main", 
+                  backgroundColor: "success.main",
                   color: "white",
                   paddingX: 3,
                   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
@@ -148,114 +206,92 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
                     backgroundColor: "success.dark",
                     transform: "scale(1.05)",
                   },
-                  width: "100%", 
                 }}
-                startIcon={<AssignmentIcon />} 
-                onClick={() => handleRecordVitalsClick(bed)}
+                startIcon={<HotelIcon />}
+                onClick={() => assignBed(bed)}
               >
-                Record Vitals
+                Assign
               </Button>
             </Box>
-          </Box>
-        ) : (
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="flex-start"
-            justifyContent="space-between"
-            height="100%"
+          )}
+        </CardContent>
+
+        <Dialog
+          open={openModal}
+          onClose={handleCloseModal}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle
+            sx={{
+              bgcolor: "primary.light",
+              color: "text.primary",
+              textAlign: "center",
+              padding: "16px",
+            }}
           >
-            <Typography variant="body1" color="textSecondary" marginBottom={1}>
-              No patient assigned
+            <Typography variant="h6" component="div" fontWeight="600">
+              Confirm Deassign
             </Typography>
+          </DialogTitle>
+
+          <DialogContent
+            sx={{ textAlign: "center", padding: "24px", marginTop: "20px" }}
+          >
+            <Typography
+              variant="body1"
+              sx={{ color: "text.secondary", fontWeight: "400" }}
+            >
+              Are you sure you want to deassign this bed from Patient ID{" "}
+              <strong>{bedToDeassign?.patientId}</strong>?
+            </Typography>
+          </DialogContent>
+
+          <DialogActions
+            sx={{ justifyContent: "center", padding: "16px 24px" }}
+          >
             <Button
-              variant="contained"
+              onClick={handleCloseModal}
+              variant="outlined"
+              color="primary"
               sx={{
-                textTransform: "none",
-                marginTop: "auto",
-                fontSize: "14px",
-                borderRadius: "30px",
-                backgroundColor: "success.main",
-                color: "white",
-                paddingX: 3,
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                marginRight: 2,
+                padding: "8px 20px",
+                fontWeight: "600",
+                borderColor: "primary.main",
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDeassign}
+              variant="contained"
+              color="error"
+              sx={{
+                padding: "8px 20px",
+                fontWeight: "600",
+                backgroundColor: "#ff6f61",
                 "&:hover": {
-                  backgroundColor: "success.dark",
-                  transform: "scale(1.05)",
+                  backgroundColor: "#ff3d2d",
                 },
               }}
-              startIcon={<HotelIcon />}
-              onClick={() => assignBed(bed)}
             >
-              Assign
+              Confirm Deassign
             </Button>
-          </Box>
-        )}
-      </CardContent>
+          </DialogActions>
+        </Dialog>
+      </StyledCard>
 
-      <Dialog
-        open={openModal}
-        onClose={handleCloseModal}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle
-          sx={{
-            bgcolor: "primary.light",
-            color: "text.primary",
-            textAlign: "center",
-            padding: "16px",
-          }}
-        >
-          <Typography variant="h6" component="div" fontWeight="600">
-            Confirm Deassign
-          </Typography>
-        </DialogTitle>
-
-        <DialogContent
-          sx={{ textAlign: "center", padding: "24px", marginTop: "20px" }}
-        >
-          <Typography
-            variant="body1"
-            sx={{ color: "text.secondary", fontWeight: "400" }}
-          >
-            Are you sure you want to deassign this bed from Patient ID{" "}
-            <strong>{bedToDeassign?.patientId}</strong>?
-          </Typography>
-        </DialogContent>
-
-        <DialogActions sx={{ justifyContent: "center", padding: "16px 24px" }}>
-          <Button
-            onClick={handleCloseModal}
-            variant="outlined"
-            color="primary"
-            sx={{
-              marginRight: 2,
-              padding: "8px 20px",
-              fontWeight: "600",
-              borderColor: "primary.main",
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmDeassign}
-            variant="contained"
-            color="error"
-            sx={{
-              padding: "8px 20px",
-              fontWeight: "600",
-              backgroundColor: "#ff6f61",
-              "&:hover": {
-                backgroundColor: "#ff3d2d",
-              },
-            }}
-          >
-            Confirm Deassign
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </StyledCard>
+      {/* Critical Factors Form Dialog */}
+      {isOccupied && bed.patientId && (
+        <CriticalFactorsForm
+          open={openVitalsForm}
+          onClose={handleCloseVitalsForm}
+          patientId={bed.patientId}
+          bedNumber={bed.bedNumber}
+        />
+      )}
+    </>
   );
 };
 

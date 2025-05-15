@@ -4,10 +4,9 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import bedRoutes from "./routes/bedRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
-import { connectMySql } from "./config/mysqlDB.js";
+import criticalFactorRoutes from "./routes/criticalFactorRoutes.js";
+import { connectMySql, sequelize } from "./config/mysqlDB.js";
 import path from "path";
-
-connectMySql();
 
 dotenv.config();
 const app = express();
@@ -27,7 +26,14 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/beds", bedRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/critical-factors", criticalFactorRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  try {
+    await connectMySql();
+    console.log("Database is connected and models are synchronized");
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+  }
 });

@@ -16,10 +16,10 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-
+import AssignmentIcon from "@mui/icons-material/Assignment";
 const StyledCard = styled(Card)(({ occupied }) => ({
   width: "100%",
-  height: "200px",
+  height: "230px",
   backgroundColor: occupied ? "#ffd1d1" : "#d1ffd1",
   cursor: "pointer",
   borderRadius: "12px",
@@ -52,6 +52,10 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
     }
     setOpenModal(false);
     setBedToDeassign(null);
+  };
+
+  const handleRecordVitalsClick = (bed) => {
+    console.log("Record Vitals for bed:", bed);
   };
 
   return (
@@ -100,27 +104,58 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
             <Typography variant="body1" color="textSecondary" marginBottom={1}>
               Patient ID: {bed.patientId}
             </Typography>
-            <Button
-              variant="contained"
+            <Box
               sx={{
-                textTransform: "none",
-                marginTop: "auto",
-                fontSize: "14px",
-                borderRadius: "30px",
-                backgroundColor: "error.main",
-                color: "white",
-                paddingX: 3,
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
-                "&:hover": {
-                  backgroundColor: "error.dark",
-                  transform: "scale(1.05)",
-                },
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 1,
+                width: "100%",
               }}
-              startIcon={<RemoveIcon />}
-              onClick={() => handleDeassignClick(bed)}
             >
-              Deassign
-            </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  textTransform: "none",
+                  fontSize: "14px",
+                  borderRadius: "30px",
+                  backgroundColor: "error.main",
+                  color: "white",
+                  paddingX: 3,
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                  "&:hover": {
+                    backgroundColor: "error.dark",
+                    transform: "scale(1.05)",
+                  },
+                  width: "100%",
+                }}
+                startIcon={<RemoveIcon />}
+                onClick={() => handleDeassignClick(bed)}
+              >
+                Deassign
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  textTransform: "none",
+                  fontSize: "14px",
+                  borderRadius: "30px",
+                  backgroundColor: "success.main", 
+                  color: "white",
+                  paddingX: 3,
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                  "&:hover": {
+                    backgroundColor: "success.dark",
+                    transform: "scale(1.05)",
+                  },
+                  width: "100%", 
+                }}
+                startIcon={<AssignmentIcon />} 
+                onClick={() => handleRecordVitalsClick(bed)}
+              >
+                Record Vitals
+              </Button>
+            </Box>
           </Box>
         ) : (
           <Box
@@ -143,7 +178,7 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
                 backgroundColor: "success.main",
                 color: "white",
                 paddingX: 3,
-                boxShadow: "0p</Tooltip>x 4px 6px rgba(0, 0, 0, 0.15)",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
                 "&:hover": {
                   backgroundColor: "success.dark",
                   transform: "scale(1.05)",

@@ -16,40 +16,40 @@ const defineAuditLog = (sequelize) => {
       },
       userId: {
         type: DataTypes.INTEGER,
-        allowNull: true, // Allow null if action can be system-generated
+        allowNull: true, 
         references: {
-          model: "users", // Reference the actual 'users' table name
+          model: "users", 
           key: "id",
         },
         onDelete: "SET NULL",
       },
       action: {
-        type: DataTypes.STRING, // E.g., 'CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT'
+        type: DataTypes.STRING, 
         allowNull: false,
       },
       tableName: {
-        type: DataTypes.STRING, // E.g., 'CriticalFactors', 'Patients', 'User'
+        type: DataTypes.STRING, 
         allowNull: true,
       },
       recordId: {
-        type: DataTypes.INTEGER, // ID of the affected record in tableName
+        type: DataTypes.INTEGER, 
         allowNull: true,
       },
       oldValues: {
-        type: DataTypes.JSON, // Store previous state of the record (for UPDATE)
+        type: DataTypes.JSON, 
         allowNull: true,
       },
       newValues: {
-        type: DataTypes.JSON, // Store new state of the record (for CREATE/UPDATE)
+        type: DataTypes.JSON, 
         allowNull: true,
       },
       description: {
-        type: DataTypes.TEXT, // Human-readable description of the event
+        type: DataTypes.TEXT, 
         allowNull: true,
       },
     },
     {
-      timestamps: false, // 'timestamp' field serves this purpose
+      timestamps: false, 
       tableName: "audit_logs",
     }
   );

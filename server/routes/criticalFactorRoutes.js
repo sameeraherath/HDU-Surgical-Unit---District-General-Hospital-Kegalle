@@ -8,7 +8,7 @@ import { authenticateJWT as protect, authorize } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Route to add critical factors for a patient
+
 router.post(
   "/patients/:patientId/critical-factors",
   protect,
@@ -16,7 +16,7 @@ router.post(
   addCriticalFactors
 );
 
-// Route to get critical factors for a patient
+
 router.get(
   "/patients/:patientId/critical-factors",
   protect,
@@ -24,7 +24,7 @@ router.get(
   getCriticalFactorsByPatientId
 );
 
-// Route to update critical factors
+
 router.put(
   "/critical-factors/:criticalFactorId",
   protect,

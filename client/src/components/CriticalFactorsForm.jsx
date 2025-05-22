@@ -9,8 +9,20 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  Switch,
+  FormControlLabel,
+  Typography,
+  Box,
+  Tooltip,
+  IconButton,
+  Paper,
 } from "@mui/material";
-import apiClient from "../api/apiClient";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {
+  fetchLatestVitalSigns,
+  createVitalSigns,
+  updateVitalSigns,
+} from "../api/vitalSignsApi";
 import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -32,10 +44,13 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
     }),
     []
   );
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [fetchingData, setFetchingData] = useState(false);
+  const [latestRecord, setLatestRecord] = useState(null);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
   // Validation schema for Formik - all fields are optional
   const validationSchema = Yup.object({
@@ -115,13 +130,16 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
           payload[key] = null;
         }
       }
-
       try {
-        await apiClient.post(
-          `/critical-factors/patients/${patientId}/critical-factors`,
-          payload
-        );
-        setSuccessMessage("Critical factors recorded successfully!");
+        // If in update mode, update the existing record, otherwise create a new one
+        if (isUpdateMode && latestRecord?.id) {
+          await updateVitalSigns(latestRecord.id, payload);
+          setSuccessMessage("Critical factors updated successfully!");
+        } else {
+          await createVitalSigns(patientId, payload);
+          setSuccessMessage("Critical factors recorded successfully!");
+        }
+
         setIsLoading(false);
         setTimeout(() => {
           onClose();
@@ -135,15 +153,114 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
         setIsLoading(false);
       }
     },
-  }); // Reset form when dialog opens
+  });
+
+  // Fetch the latest vital signs when the form opens
+  useEffect(() => {
+    if (open && patientId) {
+      fetchLatestVitals();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, patientId]);
+  // Fetch latest vitals for the patient
+  const fetchLatestVitals = async () => {
+    if (!patientId) return;
+
+    setFetchingData(true);
+    setError(null);
+
+    try {
+      const data = await fetchLatestVitalSigns(patientId);
+      if (data && data.length > 0) {
+        // Get the most recent record (assuming they are sorted by recordedAt DESC)
+        const latest = data[0];
+        setLatestRecord(latest);
+
+        // Populate form with the latest values
+        const formValues = { ...initialFormState };
+        // Map each field from the latest record to the form
+        for (const key in formValues) {
+          if (latest[key] !== null && latest[key] !== undefined) {
+            formValues[key] = latest[key].toString();
+          }
+        }
+        formik.setValues(formValues);
+      } else {
+        // If no records found, reset to initial state
+        formik.resetForm();
+        setLatestRecord(null);
+      }
+    } catch (err) {
+      setError(err.message || "Failed to fetch latest vital signs.");
+      formik.resetForm();
+    } finally {
+      setFetchingData(false);
+    }
+  };
+
+  // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      formik.resetForm();
       setError(null);
       setSuccessMessage(null);
+      setIsUpdateMode(false);
+    } else {
+      formik.resetForm();
+      setLatestRecord(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]); // Intentionally excluding formik to prevent infinite renders
+
+  // Handle toggle between create and update modes
+  const handleModeToggle = (event) => {
+    setIsUpdateMode(event.target.checked);
+
+    if (event.target.checked && latestRecord) {
+      // Populate form with latest values for update
+      const formValues = { ...initialFormState };
+      for (const key in formValues) {
+        if (latestRecord[key] !== null && latestRecord[key] !== undefined) {
+          formValues[key] = latestRecord[key].toString();
+        }
+      }
+      formik.setValues(formValues);
+    } else {
+      // Reset form for new entry
+      formik.resetForm();
+    }
+  };
+  // Check if any values are outside normal range
+  const hasAbnormalValues = () => {
+    for (const field of fields) {
+      if (isOutsideNormalRange(field.name, formik.values[field.name])) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Handle form submission
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // If there are abnormal values, show confirmation dialog first
+    if (hasAbnormalValues()) {
+      setConfirmDialogOpen(true);
+    } else {
+      // Otherwise, submit directly
+      formik.handleSubmit();
+    }
+  };
+
+  // Confirm and proceed with submission
+  const handleConfirmSubmit = () => {
+    setConfirmDialogOpen(false);
+    formik.handleSubmit();
+  };
+
+  // Cancel confirmation dialog
+  const handleCancelConfirm = () => {
+    setConfirmDialogOpen(false);
+  };
 
   const fields = [
     {
@@ -198,12 +315,124 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
     },
   ];
 
+  // Function to check if a value is outside the normal range
+  const isOutsideNormalRange = (field, value) => {
+    if (!value || value === "") return false;
+
+    const numValue = parseFloat(value);
+
+    switch (field) {
+      case "heartRate":
+        return numValue < 60 || numValue > 100;
+      case "respiratoryRate":
+        return numValue < 12 || numValue > 20;
+      case "bloodPressureSystolic":
+        return numValue < 90 || numValue > 120;
+      case "bloodPressureDiastolic":
+        return numValue < 60 || numValue > 80;
+      case "spO2":
+        return numValue < 95 || numValue > 100;
+      case "temperature":
+        return numValue < 36.1 || numValue > 37.2;
+      case "glasgowComaScale":
+        return numValue < 13 || numValue > 15;
+      case "painScale":
+        return numValue < 0 || numValue > 10; // Updated to match requirement range 0-10
+      case "bloodGlucose":
+        return numValue < 70 || numValue > 140;
+      case "urineOutput":
+        return numValue < 0.5;
+      default:
+        return false;
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      sx={{
+        "& .MuiDialog-paper": {
+          borderRadius: "8px",
+          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.15)",
+        },
+      }}
+    >
       <DialogTitle>
-        Record Vitals for Patient in Bed {bedNumber} (ID: {patientId || "N/A"})
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h6">
+            Record Vitals for Patient in Bed {bedNumber} (ID:{" "}
+            {patientId || "N/A"})
+          </Typography>
+          <Tooltip
+            title={
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Normal Ranges:
+                </Typography>
+                <Typography variant="body2">Heart Rate: 60-100 bpm</Typography>
+                <Typography variant="body2">
+                  Respiratory Rate: 12-20 breaths/min
+                </Typography>
+                <Typography variant="body2">
+                  Blood Pressure (Systolic): 90-120 mmHg
+                </Typography>
+                <Typography variant="body2">
+                  Blood Pressure (Diastolic): 60-80 mmHg
+                </Typography>
+                <Typography variant="body2">SpO2: 95-100%</Typography>
+                <Typography variant="body2">
+                  Temperature: 36.1-37.2°C
+                </Typography>
+                <Typography variant="body2">
+                  Glasgow Coma Scale: 13-15
+                </Typography>
+                <Typography variant="body2">Pain Scale: 0-10</Typography>
+                <Typography variant="body2">
+                  Blood Glucose: 70-140 mg/dL
+                </Typography>
+                <Typography variant="body2">
+                  Urine Output: ≥0.5 mL/kg/hr
+                </Typography>
+              </Box>
+            }
+            placement="right"
+          >
+            <IconButton>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </DialogTitle>
       <DialogContent dividers>
+        {isLoading && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1,
+              flexDirection: "column",
+              borderRadius: "4px",
+            }}
+          >
+            <CircularProgress size={60} />
+            <Typography variant="body1" sx={{ mt: 2, fontWeight: "medium" }}>
+              {isUpdateMode
+                ? "Updating vital signs..."
+                : "Saving vital signs..."}
+            </Typography>
+          </Box>
+        )}
+
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
@@ -214,62 +443,236 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
             {successMessage}
           </Alert>
         )}
-        <form onSubmit={formik.handleSubmit}>
-          <Grid container spacing={2}>
-            {fields.map((field) => (
-              <Grid item xs={12} sm={6} md={4} key={field.name}>
-                <TextField
-                  fullWidth
-                  type={
-                    field.name === "temperature" || field.name === "urineOutput"
-                      ? "number"
-                      : "number"
+
+        {fetchingData ? (
+          <Box display="flex" justifyContent="center" my={4}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            {" "}
+            {latestRecord && (
+              <Box
+                mb={2}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Latest vitals recorded:{" "}
+                    {new Date(latestRecord.recordedAt).toLocaleString()}
+                    {latestRecord.recorder &&
+                      ` by ${
+                        latestRecord.recorder.nameWithInitials ||
+                        latestRecord.recorder.username
+                      }`}
+                  </Typography>
+                  {latestRecord.isAmended && (
+                    <Typography
+                      variant="body2"
+                      color="warning.main"
+                      sx={{ mt: 0.5 }}
+                    >
+                      This record was amended on{" "}
+                      {new Date(latestRecord.amendedAt).toLocaleString()}
+                    </Typography>
+                  )}
+                </Box>
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isUpdateMode}
+                      onChange={handleModeToggle}
+                      color="primary"
+                    />
                   }
-                  name={field.name}
-                  label={`${field.label} (${field.unit})`}
-                  value={formik.values[field.name]}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched[field.name] &&
-                    Boolean(formik.errors[field.name])
+                  label={
+                    isUpdateMode ? "Update Latest Record" : "Create New Record"
                   }
-                  helperText={
-                    (formik.touched[field.name] && formik.errors[field.name]) ||
-                    `Normal: ${field.normalRange}`
-                  }
-                  variant="outlined"
-                  margin="dense"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    step:
-                      field.name === "temperature" ||
-                      field.name === "urineOutput"
-                        ? "0.1"
-                        : "1",
-                  }}
                 />
+              </Box>
+            )}{" "}
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                {fields.map((field) => {
+                  const isOutsideRange = isOutsideNormalRange(
+                    field.name,
+                    formik.values[field.name]
+                  );
+
+                  return (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      key={field.name}
+                      sx={{
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-2px)",
+                        },
+                      }}
+                    >
+                      <TextField
+                        fullWidth
+                        type={
+                          field.name === "temperature" ||
+                          field.name === "urineOutput"
+                            ? "number"
+                            : "number"
+                        }
+                        name={field.name}
+                        label={`${field.label} (${field.unit})`}
+                        value={formik.values[field.name]}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={
+                          (formik.touched[field.name] &&
+                            Boolean(formik.errors[field.name])) ||
+                          isOutsideRange
+                        }
+                        helperText={
+                          (formik.touched[field.name] &&
+                            formik.errors[field.name]) ||
+                          (isOutsideRange
+                            ? `Outside normal range: ${field.normalRange}`
+                            : `Normal: ${field.normalRange}`)
+                        }
+                        variant="outlined"
+                        margin="dense"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{
+                          endAdornment: (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ ml: 1 }}
+                            >
+                              {field.unit}
+                            </Typography>
+                          ),
+                          sx: {
+                            fontWeight: isOutsideRange ? "bold" : "normal",
+                          },
+                        }}
+                        inputProps={{
+                          step:
+                            field.name === "temperature" ||
+                            field.name === "urineOutput"
+                              ? "0.1"
+                              : "1",
+                          style: {
+                            textAlign: "right",
+                            paddingRight: field.unit ? "50px" : "14px",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                              borderColor: isOutsideRange
+                                ? "error.main"
+                                : undefined,
+                              borderWidth: isOutsideRange ? 2 : 1,
+                            },
+                            backgroundColor: isOutsideRange
+                              ? "rgba(255, 0, 0, 0.05)"
+                              : "transparent",
+                          },
+                          "& .MuiFormHelperText-root": {
+                            color: isOutsideRange ? "error.main" : undefined,
+                            fontWeight: isOutsideRange ? "bold" : undefined,
+                          },
+                          "& .MuiInputBase-input": {
+                            fontWeight: isOutsideRange ? "bold" : "normal",
+                          },
+                        }}
+                      />
+                    </Grid>
+                  );
+                })}
               </Grid>
-            ))}
-          </Grid>
-          <DialogActions sx={{ p: "16px 24px" }}>
-            <Button onClick={onClose} color="secondary" variant="outlined">
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              disabled={isLoading}
-              startIcon={isLoading ? <CircularProgress size={20} /> : null}
-            >
-              {isLoading ? "Saving..." : "Save Vitals"}
-            </Button>
-          </DialogActions>
-        </form>
+              <DialogActions sx={{ p: "16px 24px" }}>
+                <Button onClick={onClose} color="secondary" variant="outlined">
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  disabled={isLoading}
+                  startIcon={isLoading ? <CircularProgress size={20} /> : null}
+                >
+                  {isLoading
+                    ? "Saving..."
+                    : isUpdateMode
+                    ? "Update Vitals"
+                    : "Save Vitals"}
+                </Button>
+              </DialogActions>
+            </form>
+          </>
+        )}
       </DialogContent>
+
+      {/* Confirmation Dialog for abnormal values */}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={handleCancelConfirm}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: "error.main", fontWeight: "bold" }}>
+          Abnormal Vital Signs
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            Some vital signs are outside the normal range.
+          </Alert>
+          <Typography variant="body1" gutterBottom>
+            Please confirm that you want to save the following vital signs that
+            are outside the normal range:
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            {fields.map((field) => {
+              const value = formik.values[field.name];
+              if (value && isOutsideNormalRange(field.name, value)) {
+                return (
+                  <Typography
+                    key={field.name}
+                    variant="body2"
+                    sx={{ mb: 1, color: "error.main", fontWeight: "bold" }}
+                  >
+                    {field.label}: {value} {field.unit} (Normal range:{" "}
+                    {field.normalRange})
+                  </Typography>
+                );
+              }
+              return null;
+            })}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelConfirm}
+            color="secondary"
+            variant="outlined"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmSubmit}
+            color="error"
+            variant="contained"
+          >
+            Confirm and Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

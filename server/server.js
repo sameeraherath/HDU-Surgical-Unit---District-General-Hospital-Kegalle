@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs";
 import authRoutes from "./routes/authRoutes.js";
 import bedRoutes from "./routes/bedRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";

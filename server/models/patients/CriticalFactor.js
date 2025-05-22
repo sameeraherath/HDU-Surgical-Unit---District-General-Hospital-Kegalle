@@ -72,6 +72,24 @@ const defineCriticalFactor = (sequelize) => {
         },
         onDelete: "SET NULL",
       },
+      isAmended: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      amendedBy: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        onDelete: "SET NULL",
+      },
+      amendedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

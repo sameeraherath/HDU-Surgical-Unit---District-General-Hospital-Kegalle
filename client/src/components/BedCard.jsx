@@ -17,7 +17,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import CriticalFactorsForm from "./CriticalFactorsForm"; // Import the new form
+import CriticalFactorsForm from "./CriticalFactorsForm";
 
 const StyledCard = styled(Card)(({ occupied }) => ({
   width: "100%",
@@ -35,7 +35,7 @@ const StyledCard = styled(Card)(({ occupied }) => ({
 const BedCard = ({ bed, assignBed, deassignBed }) => {
   const [openModal, setOpenModal] = React.useState(false);
   const [bedToDeassign, setBedToDeassign] = React.useState(null);
-  const [openVitalsForm, setOpenVitalsForm] = React.useState(false); // State for vitals form
+  const [openVitalsForm, setOpenVitalsForm] = React.useState(false);
 
   const isOccupied = bed.patientId !== null;
 
@@ -56,18 +56,14 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
     handleCloseModal();
   };
 
-  // Handler to open the vitals form
   const handleRecordVitalsClick = () => {
     if (bed.patientId) {
       setOpenVitalsForm(true);
     } else {
-      // Optionally, show an alert or message if no patient is assigned
       console.warn("No patient assigned to this bed to record vitals.");
-      // You might want to dispatch an alert to the user here
     }
   };
 
-  // Handler to close the vitals form
   const handleCloseVitalsForm = () => {
     setOpenVitalsForm(false);
   };
@@ -152,7 +148,7 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
                   onClick={() => handleDeassignClick(bed)}
                 >
                   Deassign
-                </Button>
+                </Button>{" "}
                 <Button
                   variant="contained"
                   sx={{
@@ -168,9 +164,23 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
                       transform: "scale(1.05)",
                     },
                     width: "100%",
+                    animation: bed.criticalStatus
+                      ? "pulse 1.5s infinite"
+                      : "none",
+                    "@keyframes pulse": {
+                      "0%": {
+                        boxShadow: "0 0 0 0 rgba(0, 200, 0, 0.7)",
+                      },
+                      "70%": {
+                        boxShadow: "0 0 0 10px rgba(0, 200, 0, 0)",
+                      },
+                      "100%": {
+                        boxShadow: "0 0 0 0 rgba(0, 200, 0, 0)",
+                      },
+                    },
                   }}
                   startIcon={<AssignmentIcon />}
-                  onClick={handleRecordVitalsClick} // Updated onClick
+                  onClick={handleRecordVitalsClick}
                 >
                   Record Vitals
                 </Button>
@@ -282,7 +292,6 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
         </Dialog>
       </StyledCard>
 
-      {/* Critical Factors Form Dialog */}
       {isOccupied && bed.patientId && (
         <CriticalFactorsForm
           open={openVitalsForm}

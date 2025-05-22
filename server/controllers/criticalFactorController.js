@@ -67,9 +67,7 @@ export const addCriticalFactors = async (req, res) => {
         },
         { transaction: t }
       );
-      createdFactors.push(newFactor);
-
-      // Log audit for each new factor
+      createdFactors.push(newFactor); // Log audit for each new factor
       await logAudit(
         userId,
         "CREATE",
@@ -136,12 +134,15 @@ export const updateCriticalFactors = async (req, res) => {
         .status(404)
         .json({ message: "Critical factor record not found" });
     }
-
     const oldValues = factor.toJSON();
+
+    // Add amendment tracking to the update
+    updatedData.isAmended = true;
+    updatedData.amendedBy = userId;
+    updatedData.amendedAt = new Date();
 
     // Update only the fields provided in the request body
     await factor.update(updatedData, { transaction: t });
-
     await logAudit(
       userId,
       "UPDATE",
@@ -149,7 +150,7 @@ export const updateCriticalFactors = async (req, res) => {
       criticalFactorId,
       oldValues,
       factor.toJSON(), // factor now contains the updated values
-      `Updated critical factors for record ID: ${criticalFactorId}`,
+      `Updated critical factors for patient ID: ${factor.patientId}, record ID: ${criticalFactorId}. This is a medical record amendment.`,
       t
     );
 
@@ -158,6 +159,42 @@ export const updateCriticalFactors = async (req, res) => {
   } catch (error) {
     await t.rollback();
     console.error("Error updating critical factors:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Get audit history for a specific critical factor
+export const getCriticalFactorAuditHistory = async (req, res) => {
+  try {
+    const { criticalFactorId } = req.params;
+
+    // First, verify the critical factor exists
+    const factor = await CriticalFactor.findByPk(criticalFactorId);
+    if (!factor) {
+      return res
+        .status(404)
+        .json({ message: "Critical factor record not found" });
+    }
+
+    // Get audit logs for this critical factor
+    const auditLogs = await AuditLog.findAll({
+      where: {
+        tableName: "CriticalFactors",
+        recordId: criticalFactorId,
+      },
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "username", "nameWithInitials"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json(auditLogs);
+  } catch (error) {
+    console.error("Error fetching critical factor audit history:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

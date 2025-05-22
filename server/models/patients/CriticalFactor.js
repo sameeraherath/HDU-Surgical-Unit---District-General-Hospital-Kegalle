@@ -90,6 +90,11 @@ const defineCriticalFactor = (sequelize) => {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      amendmentReason: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: "Reason for amending this critical factor record",
+      },
     },
     {
       timestamps: true,

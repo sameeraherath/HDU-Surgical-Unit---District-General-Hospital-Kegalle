@@ -57,7 +57,7 @@ export const createVitalSigns = async (patientId, vitalSignsData) => {
 export const updateVitalSigns = async (criticalFactorId, vitalSignsData) => {
   try {
     const response = await apiClient.put(
-      `/critical-factors/critical-factors/${criticalFactorId}`,
+      `/critical-factors/${criticalFactorId}`,
       vitalSignsData
     );
     return response.data;
@@ -79,7 +79,7 @@ export const updateVitalSigns = async (criticalFactorId, vitalSignsData) => {
 export const getVitalSignsAuditHistory = async (criticalFactorId) => {
   try {
     const response = await apiClient.get(
-      `/critical-factors/critical-factors/${criticalFactorId}/audit`
+      `/critical-factors/${criticalFactorId}/audit`
     );
     return response.data;
   } catch (error) {

@@ -15,7 +15,6 @@ import {
   Box,
   Tooltip,
   IconButton,
-  Paper,
 } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
@@ -51,8 +50,8 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
   const [latestRecord, setLatestRecord] = useState(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [amendmentReason, setAmendmentReason] = useState("");
 
-  // Validation schema for Formik - all fields are optional
   const validationSchema = Yup.object({
     heartRate: Yup.number()
       .nullable()
@@ -130,12 +129,29 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
           payload[key] = null;
         }
       }
+      // Debug logs
+      console.log("[DEBUG] onSubmit called");
+      console.log("[DEBUG] isUpdateMode:", isUpdateMode);
+      console.log("[DEBUG] latestRecord:", latestRecord);
+      console.log("[DEBUG] payload:", payload);
       try {
         // If in update mode, update the existing record, otherwise create a new one
         if (isUpdateMode && latestRecord?.id) {
+          if (!amendmentReason.trim()) {
+            setError("Amendment reason is required for updates.");
+            setIsLoading(false);
+            return;
+          }
+          payload.amendmentReason = amendmentReason;
+          console.log(
+            "[DEBUG] Calling updateVitalSigns",
+            latestRecord.id,
+            payload
+          );
           await updateVitalSigns(latestRecord.id, payload);
           setSuccessMessage("Critical factors updated successfully!");
         } else {
+          console.log("[DEBUG] Calling createVitalSigns", patientId, payload);
           await createVitalSigns(patientId, payload);
           setSuccessMessage("Critical factors recorded successfully!");
         }
@@ -204,6 +220,11 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
       setError(null);
       setSuccessMessage(null);
       setIsUpdateMode(false);
+      setAmendmentReason("");
+      console.log(
+        "[DEBUG] CriticalFactorsForm opened for patientId:",
+        patientId
+      );
     } else {
       formik.resetForm();
       setLatestRecord(null);
@@ -214,7 +235,10 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
   // Handle toggle between create and update modes
   const handleModeToggle = (event) => {
     setIsUpdateMode(event.target.checked);
-
+    console.log(
+      "[DEBUG] handleModeToggle called. New isUpdateMode:",
+      event.target.checked
+    );
     if (event.target.checked && latestRecord) {
       // Populate form with latest values for update
       const formValues = { ...initialFormState };
@@ -346,6 +370,13 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
         return false;
     }
   };
+
+  // Reset amendment reason when switching modes or closing
+  useEffect(() => {
+    if (!isUpdateMode || !open) {
+      setAmendmentReason("");
+    }
+  }, [isUpdateMode, open]);
 
   return (
     <Dialog
@@ -616,6 +647,24 @@ const CriticalFactorsForm = ({ open, onClose, patientId, bedNumber }) => {
               </DialogActions>
             </form>
           </>
+        )}
+
+        {/* Amendment reason input for update mode */}
+        {isUpdateMode && (
+          <Box mb={2}>
+            <TextField
+              label="Amendment Reason"
+              value={amendmentReason}
+              onChange={(e) => setAmendmentReason(e.target.value)}
+              required
+              fullWidth
+              multiline
+              minRows={2}
+              variant="outlined"
+              margin="normal"
+              helperText="Please provide a reason for updating this record."
+            />
+          </Box>
         )}
       </DialogContent>
 

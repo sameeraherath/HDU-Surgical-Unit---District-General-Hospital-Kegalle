@@ -24,15 +24,14 @@ router.get(
 );
 
 router.put(
-  "/critical-factors/:criticalFactorId",
+  "/:criticalFactorId",
   protect,
   authorize(["Nurse", "Medical Officer", "Consultant", "House Officer"]),
   updateCriticalFactors
 );
 
-// Get audit history for a specific critical factor record
 router.get(
-  "/critical-factors/:criticalFactorId/audit",
+  "/:criticalFactorId/audit",
   protect,
   authorize(["Nurse", "Medical Officer", "Consultant", "House Officer"]),
   getCriticalFactorAuditHistory

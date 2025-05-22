@@ -65,6 +65,16 @@ const defineAssociations = () => {
     foreignKey: "recordedBy",
     as: "recorder",
   });
+
+  UserMySQLModel.hasMany(CriticalFactor, {
+    foreignKey: "amendedBy",
+    as: "amendedCriticalFactors",
+  });
+  CriticalFactor.belongsTo(UserMySQLModel, {
+    foreignKey: "amendedBy",
+    as: "amender",
+  });
+
   UserMySQLModel.hasMany(PatientDocument, {
     foreignKey: "uploadedBy",
     as: "uploadedDocuments",
@@ -98,12 +108,10 @@ const connectMySql = async () => {
     await sequelize.authenticate();
     console.log("MySQL connection has been established successfully.");
 
-    // Sync models with force: false and alter: true for safer migrations
     await UserMySQLModel.sync({ alter: true });
     console.log("User model synchronized");
 
     await sequelize.transaction(async (t) => {
-      // Sync models in a specific order to avoid dependency issues
       await Patient.sync({ alter: true });
       await EmergencyContact.sync({ alter: true });
       await MedicalRecord.sync({ alter: true });

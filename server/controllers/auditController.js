@@ -1,13 +1,9 @@
 import { AuditLog, UserMySQLModel as User } from "../config/mysqlDB.js";
 
-/**
- * Get audit history for a specific record
- */
 export const getAuditHistory = async (req, res) => {
   try {
     const { tableName, recordId } = req.params;
 
-    // Get audit logs for the specified record
     const auditLogs = await AuditLog.findAll({
       where: {
         tableName,

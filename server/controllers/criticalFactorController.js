@@ -74,7 +74,6 @@ export const addCriticalFactors = async (req, res) => {
       : [criticalFactorsData];
 
     for (const factorData of factorsToCreate) {
-      // Create the critical factor
       const newFactor = await CriticalFactor.create(
         {
           ...factorData,

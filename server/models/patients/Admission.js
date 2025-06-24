@@ -12,7 +12,6 @@ const defineAdmission = (sequelize) => {
       patientId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        // Define relationship in associations instead
       },
       admissionDateTime: {
         type: DataTypes.DATE,

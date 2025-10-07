@@ -4,6 +4,7 @@ import loaderReducer from "../features/loaderSlice";
 import uiReducer from "../features/ui/uiSlice";
 import alertsReducer from "../features/alerts/alertsSlice";
 import patientReducer from "../features/patients/patientSlice";
+import userProfileReducer from "../features/userProfile/userProfileSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     ui: uiReducer,
     alerts: alertsReducer,
     patient: patientReducer,
+    userProfile: userProfileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

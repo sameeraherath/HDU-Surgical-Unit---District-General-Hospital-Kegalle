@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "../features/ui/uiSlice";
 import { useAuth } from "../hooks/useAuth";
+import { fetchUserProfile } from "../features/userProfile/userProfileSlice";
 
 const GlobalAppBar = ({ role }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -27,6 +28,14 @@ const GlobalAppBar = ({ role }) => {
   const { logout } = useAuth();
 
   const appBarTitle = useSelector((state) => state.ui.appBarTitle);
+  const { profile } = useSelector((state) => state.userProfile);
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (user && !profile) {
+      dispatch(fetchUserProfile());
+    }
+  }, [user, profile, dispatch]);
 
   const handleAvatarClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -48,9 +57,7 @@ const GlobalAppBar = ({ role }) => {
   };
 
   const handleProfile = () => {
-    dispatch(
-      showToast({ message: "Profile feature coming soon", type: "info" })
-    );
+    navigate("/profile");
     handleMenuClose();
   };
 
@@ -81,7 +88,12 @@ const GlobalAppBar = ({ role }) => {
           </Typography>
 
           <IconButton color="inherit" onClick={handleAvatarClick}>
-            <Avatar alt="User Avatar" src="/path/to/avatar.jpg" />
+            <Avatar 
+              alt={user?.username || "User"} 
+              src={profile?.profile?.profilePictureUrl}
+            >
+              {user?.username?.charAt(0).toUpperCase()}
+            </Avatar>
           </IconButton>
 
           <Menu

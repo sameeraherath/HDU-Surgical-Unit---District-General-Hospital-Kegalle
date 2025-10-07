@@ -7,6 +7,7 @@ import MedicalOfficerDashboard from "../pages/MedicalOfficerDashboard";
 import NurseDashboard from "../pages/NurseDashboard";
 import LandingPage from "../pages/LandingPage";
 import ConsultantDashboard from "../pages/ConsultantDashboard";
+import UserProfilePage from "../pages/UserProfilePage";
 import MainLayout from "../layouts/MainLayout";
 import PatientAssignmentContainer from "../pages/NurseDashboardPages/PatientAssignmentContainer";
 import { useSelector } from "react-redux";
@@ -68,6 +69,7 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/profile" element={<UserProfilePage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" />} />

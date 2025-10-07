@@ -11,7 +11,9 @@ import documentRoutes from "./routes/documentRoutes.js";
 import criticalFactorRoutes from "./routes/criticalFactorRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
 import { connectMySql, sequelize } from "./config/mysqlDB.js";
+import { auditMiddleware } from "./middleware/auditMiddleware.js";
 import path from "path";
 
 dotenv.config();
@@ -75,12 +77,16 @@ io.on("connection", (socket) => {
 // Make io available to routes
 app.set("io", io);
 
+// Apply audit middleware to all routes (must be after authentication routes)
+app.use(auditMiddleware);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/beds", bedRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/critical-factors", criticalFactorRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/audit", auditRoutes);
 
 httpServer.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);

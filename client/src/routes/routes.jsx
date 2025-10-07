@@ -8,6 +8,7 @@ import NurseDashboard from "../pages/NurseDashboard";
 import LandingPage from "../pages/LandingPage";
 import ConsultantDashboard from "../pages/ConsultantDashboard";
 import UserProfilePage from "../pages/UserProfilePage";
+import AuditLogPage from "../pages/AuditLogPage";
 import MainLayout from "../layouts/MainLayout";
 import PatientAssignmentContainer from "../pages/NurseDashboardPages/PatientAssignmentContainer";
 import { useSelector } from "react-redux";
@@ -15,6 +16,14 @@ import { useSelector } from "react-redux";
 const ProtectedRoute = ({ role, children }) => {
   const user = useSelector((state) => state.auth.user);
   if (!user || user.role !== role) {
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
+
+const AdminOrConsultantRoute = ({ children }) => {
+  const user = useSelector((state) => state.auth.user);
+  if (!user || !["Admin", "Consultant"].includes(user.role)) {
     return <Navigate to="/login" />;
   }
   return children;
@@ -70,6 +79,14 @@ const AppRoutes = () => {
           }
         />
         <Route path="/profile" element={<UserProfilePage />} />
+        <Route
+          path="/audit-logs"
+          element={
+            <AdminOrConsultantRoute>
+              <AuditLogPage />
+            </AdminOrConsultantRoute>
+          }
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" />} />

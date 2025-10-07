@@ -11,6 +11,8 @@ import defineCriticalFactor from "../models/patients/CriticalFactor.js";
 import defineAuditLog from "../models/AuditLog.js";
 import defineUserProfile from "../models/UserProfile.js";
 import defineUserPreference from "../models/UserPreference.js";
+import defineNotification from "../models/Notification.js";
+import defineNotificationSettings from "../models/NotificationSettings.js";
 
 const BedMySQL = defineBed(sequelize);
 const Patient = definePatient(sequelize);
@@ -23,6 +25,8 @@ const CriticalFactor = defineCriticalFactor(sequelize);
 const AuditLog = defineAuditLog(sequelize);
 const UserProfile = defineUserProfile(sequelize);
 const UserPreference = defineUserPreference(sequelize);
+const Notification = defineNotification(sequelize);
+const NotificationSettings = defineNotificationSettings(sequelize);
 
 const defineAssociations = () => {
   Patient.hasMany(Admission, { foreignKey: "patientId", as: "admissions" });
@@ -122,6 +126,27 @@ const defineAssociations = () => {
     as: "user",
   });
 
+  // Notification associations
+  UserMySQLModel.hasMany(Notification, {
+    foreignKey: "userId",
+    as: "notifications",
+    onDelete: "CASCADE",
+  });
+  Notification.belongsTo(UserMySQLModel, {
+    foreignKey: "userId",
+    as: "user",
+  });
+
+  UserMySQLModel.hasOne(NotificationSettings, {
+    foreignKey: "userId",
+    as: "notificationSettings",
+    onDelete: "CASCADE",
+  });
+  NotificationSettings.belongsTo(UserMySQLModel, {
+    foreignKey: "userId",
+    as: "user",
+  });
+
   Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
   BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
 };
@@ -147,6 +172,8 @@ const connectMySql = async () => {
       await AuditLog.sync({ alter: true });
       await UserProfile.sync({ alter: true });
       await UserPreference.sync({ alter: true });
+      await Notification.sync({ alter: true });
+      await NotificationSettings.sync({ alter: true });
     });
 
     console.log("All models synchronized successfully");
@@ -179,4 +206,6 @@ export {
   AuditLog,
   UserProfile,
   UserPreference,
+  Notification,
+  NotificationSettings,
 };

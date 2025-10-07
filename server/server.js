@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 import bedRoutes from "./routes/bedRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 import criticalFactorRoutes from "./routes/criticalFactorRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import { connectMySql, sequelize } from "./config/mysqlDB.js";
 import path from "path";
 
@@ -28,6 +29,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/beds", bedRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/critical-factors", criticalFactorRoutes);
+app.use("/api/users", userRoutes);
 
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);

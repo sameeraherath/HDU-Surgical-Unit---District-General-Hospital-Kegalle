@@ -9,6 +9,8 @@ import definePatientDocument from "../models/patients/PatientDocument.js";
 import defineUser from "../models/UserMySQL.js";
 import defineCriticalFactor from "../models/patients/CriticalFactor.js";
 import defineAuditLog from "../models/AuditLog.js";
+import defineUserProfile from "../models/UserProfile.js";
+import defineUserPreference from "../models/UserPreference.js";
 
 const BedMySQL = defineBed(sequelize);
 const Patient = definePatient(sequelize);
@@ -19,6 +21,8 @@ const PatientDocument = definePatientDocument(sequelize);
 const UserMySQLModel = defineUser(sequelize);
 const CriticalFactor = defineCriticalFactor(sequelize);
 const AuditLog = defineAuditLog(sequelize);
+const UserProfile = defineUserProfile(sequelize);
+const UserPreference = defineUserPreference(sequelize);
 
 const defineAssociations = () => {
   Patient.hasMany(Admission, { foreignKey: "patientId", as: "admissions" });
@@ -97,6 +101,27 @@ const defineAssociations = () => {
     constraints: false,
   });
 
+  // User Profile and Preferences associations
+  UserMySQLModel.hasOne(UserProfile, {
+    foreignKey: "userId",
+    as: "profile",
+    onDelete: "CASCADE",
+  });
+  UserProfile.belongsTo(UserMySQLModel, {
+    foreignKey: "userId",
+    as: "user",
+  });
+
+  UserMySQLModel.hasOne(UserPreference, {
+    foreignKey: "userId",
+    as: "preferences",
+    onDelete: "CASCADE",
+  });
+  UserPreference.belongsTo(UserMySQLModel, {
+    foreignKey: "userId",
+    as: "user",
+  });
+
   Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
   BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
 };
@@ -120,6 +145,8 @@ const connectMySql = async () => {
       await BedMySQL.sync({ alter: true });
       await CriticalFactor.sync({ alter: true });
       await AuditLog.sync({ alter: true });
+      await UserProfile.sync({ alter: true });
+      await UserPreference.sync({ alter: true });
     });
 
     console.log("All models synchronized successfully");
@@ -150,4 +177,6 @@ export {
   UserMySQLModel,
   CriticalFactor,
   AuditLog,
+  UserProfile,
+  UserPreference,
 };

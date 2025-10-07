@@ -13,6 +13,12 @@ import defineUserProfile from "../models/UserProfile.js";
 import defineUserPreference from "../models/UserPreference.js";
 import defineNotification from "../models/Notification.js";
 import defineNotificationSettings from "../models/NotificationSettings.js";
+import ProgressNote from "../models/ProgressNote.js";
+import Investigation from "../models/Investigation.js";
+import InvestigationResult from "../models/InvestigationResult.js";
+import Prescription from "../models/Prescription.js";
+import Task from "../models/Task.js";
+import FluidBalance from "../models/FluidBalance.js";
 
 const BedMySQL = defineBed(sequelize);
 const Patient = definePatient(sequelize);
@@ -149,6 +155,190 @@ const defineAssociations = () => {
 
   Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
   BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
+
+  // Phase 2: Medical Officer Dashboard associations
+  // Progress Notes
+  Patient.hasMany(ProgressNote, {
+    foreignKey: "patientId",
+    as: "progressNotes",
+  });
+  ProgressNote.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  UserMySQLModel.hasMany(ProgressNote, {
+    foreignKey: "userId",
+    as: "progressNotes",
+  });
+  ProgressNote.belongsTo(UserMySQLModel, {
+    foreignKey: "userId",
+    as: "author",
+  });
+
+  ProgressNote.belongsTo(UserMySQLModel, {
+    foreignKey: "reviewedBy",
+    as: "reviewer",
+  });
+
+  // Investigations
+  Patient.hasMany(Investigation, {
+    foreignKey: "patientId",
+    as: "investigations",
+  });
+  Investigation.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  UserMySQLModel.hasMany(Investigation, {
+    foreignKey: "orderedBy",
+    as: "orderedInvestigations",
+  });
+  Investigation.belongsTo(UserMySQLModel, {
+    foreignKey: "orderedBy",
+    as: "orderer",
+  });
+
+  Investigation.belongsTo(UserMySQLModel, {
+    foreignKey: "specimenCollectedBy",
+    as: "specimenCollector",
+  });
+
+  Investigation.belongsTo(UserMySQLModel, {
+    foreignKey: "reportedBy",
+    as: "reporter",
+  });
+
+  Investigation.belongsTo(UserMySQLModel, {
+    foreignKey: "reviewedBy",
+    as: "reviewer",
+  });
+
+  // Investigation Results
+  Investigation.hasMany(InvestigationResult, {
+    foreignKey: "investigationId",
+    as: "results",
+  });
+  InvestigationResult.belongsTo(Investigation, {
+    foreignKey: "investigationId",
+    as: "investigation",
+  });
+
+  Patient.hasMany(InvestigationResult, {
+    foreignKey: "patientId",
+    as: "investigationResults",
+  });
+  InvestigationResult.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  InvestigationResult.belongsTo(UserMySQLModel, {
+    foreignKey: "verifiedBy",
+    as: "verifier",
+  });
+
+  // Prescriptions
+  Patient.hasMany(Prescription, {
+    foreignKey: "patientId",
+    as: "prescriptions",
+  });
+  Prescription.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  UserMySQLModel.hasMany(Prescription, {
+    foreignKey: "prescribedBy",
+    as: "prescriptions",
+  });
+  Prescription.belongsTo(UserMySQLModel, {
+    foreignKey: "prescribedBy",
+    as: "prescriber",
+  });
+
+  Prescription.belongsTo(UserMySQLModel, {
+    foreignKey: "discontinuedBy",
+    as: "discontinuer",
+  });
+
+  Prescription.belongsTo(UserMySQLModel, {
+    foreignKey: "verifiedBy",
+    as: "verifier",
+  });
+
+  Prescription.belongsTo(UserMySQLModel, {
+    foreignKey: "dispensedBy",
+    as: "dispenser",
+  });
+
+  // Tasks
+  Patient.hasMany(Task, {
+    foreignKey: "patientId",
+    as: "tasks",
+  });
+  Task.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  UserMySQLModel.hasMany(Task, {
+    foreignKey: "assignedTo",
+    as: "assignedTasks",
+  });
+  Task.belongsTo(UserMySQLModel, {
+    foreignKey: "assignedTo",
+    as: "assignee",
+  });
+
+  UserMySQLModel.hasMany(Task, {
+    foreignKey: "assignedBy",
+    as: "createdTasks",
+  });
+  Task.belongsTo(UserMySQLModel, {
+    foreignKey: "assignedBy",
+    as: "assigner",
+  });
+
+  Task.belongsTo(UserMySQLModel, {
+    foreignKey: "completedBy",
+    as: "completer",
+  });
+
+  Task.belongsTo(UserMySQLModel, {
+    foreignKey: "cancelledBy",
+    as: "canceller",
+  });
+
+  Task.belongsTo(Task, {
+    foreignKey: "parentTaskId",
+    as: "parentTask",
+  });
+
+  // Fluid Balance
+  Patient.hasMany(FluidBalance, {
+    foreignKey: "patientId",
+    as: "fluidBalanceRecords",
+  });
+  FluidBalance.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+  });
+
+  UserMySQLModel.hasMany(FluidBalance, {
+    foreignKey: "recordedBy",
+    as: "fluidBalanceRecords",
+  });
+  FluidBalance.belongsTo(UserMySQLModel, {
+    foreignKey: "recordedBy",
+    as: "recorder",
+  });
+
+  FluidBalance.belongsTo(UserMySQLModel, {
+    foreignKey: "verifiedBy",
+    as: "verifier",
+  });
 };
 
 defineAssociations();
@@ -174,6 +364,12 @@ const connectMySql = async () => {
       await UserPreference.sync({ alter: true });
       await Notification.sync({ alter: true });
       await NotificationSettings.sync({ alter: true });
+      await ProgressNote.sync({ alter: true });
+      await Investigation.sync({ alter: true });
+      await InvestigationResult.sync({ alter: true });
+      await Prescription.sync({ alter: true });
+      await Task.sync({ alter: true });
+      await FluidBalance.sync({ alter: true });
     });
 
     console.log("All models synchronized successfully");
@@ -208,4 +404,10 @@ export {
   UserPreference,
   Notification,
   NotificationSettings,
+  ProgressNote,
+  Investigation,
+  InvestigationResult,
+  Prescription,
+  Task,
+  FluidBalance,
 };

@@ -9,7 +9,7 @@ import {
   updateUserPreferences,
   changePassword,
 } from "../controllers/userProfileController.js";
-import { protect } from "../middleware/auth.js";
+import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -30,16 +30,16 @@ const upload = multer({
 });
 
 // Profile routes
-router.get("/profile", protect, getUserProfile);
-router.put("/profile", protect, updateUserProfile);
-router.post("/profile/picture", protect, upload.single("profilePicture"), uploadProfilePicture);
-router.delete("/profile/picture", protect, deleteProfilePicture);
+router.get("/profile", authenticateJWT, getUserProfile);
+router.put("/profile", authenticateJWT, updateUserProfile);
+router.post("/profile/picture", authenticateJWT, upload.single("profilePicture"), uploadProfilePicture);
+router.delete("/profile/picture", authenticateJWT, deleteProfilePicture);
 
 // Preferences routes
-router.get("/preferences", protect, getUserPreferences);
-router.put("/preferences", protect, updateUserPreferences);
+router.get("/preferences", authenticateJWT, getUserPreferences);
+router.put("/preferences", authenticateJWT, updateUserPreferences);
 
 // Password change route
-router.put("/password", protect, changePassword);
+router.put("/password", authenticateJWT, changePassword);
 
 export default router;

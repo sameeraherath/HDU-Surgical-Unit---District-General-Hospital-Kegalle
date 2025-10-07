@@ -12,6 +12,9 @@ import AuditLogPage from "../pages/AuditLogPage";
 import TaskManagementPage from "../pages/TaskManagementPage";
 import ProgressNotesPage from "../pages/ProgressNotesPage";
 import PatientDetailPage from "../pages/PatientDetailPage";
+import InvestigationsPage from "../pages/InvestigationsPage";
+import PrescriptionsPage from "../pages/PrescriptionsPage";
+import FluidBalancePage from "../pages/FluidBalancePage";
 import MainLayout from "../layouts/MainLayout";
 import PatientAssignmentContainer from "../pages/NurseDashboardPages/PatientAssignmentContainer";
 import { useSelector } from "react-redux";
@@ -111,6 +114,30 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute role="Medical Officer">
               <PatientDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medical-officer/investigations"
+          element={
+            <ProtectedRoute role="Medical Officer">
+              <InvestigationsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medical-officer/prescriptions"
+          element={
+            <ProtectedRoute role="Medical Officer">
+              <PrescriptionsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medical-officer/fluid-balance"
+          element={
+            <ProtectedRoute role="Medical Officer">
+              <FluidBalancePage />
             </ProtectedRoute>
           }
         />

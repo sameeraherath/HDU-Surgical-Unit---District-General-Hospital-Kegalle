@@ -12,6 +12,12 @@ import criticalFactorRoutes from "./routes/criticalFactorRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import auditRoutes from "./routes/auditRoutes.js";
+import progressNoteRoutes from "./routes/progressNoteRoutes.js";
+import investigationRoutes from "./routes/investigationRoutes.js";
+import prescriptionRoutes from "./routes/prescriptionRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
+import fluidBalanceRoutes from "./routes/fluidBalanceRoutes.js";
+import medicalOfficerRoutes from "./routes/medicalOfficerRoutes.js";
 import { connectMySql, sequelize } from "./config/mysqlDB.js";
 import { auditMiddleware } from "./middleware/auditMiddleware.js";
 import path from "path";
@@ -87,6 +93,14 @@ app.use("/api/critical-factors", criticalFactorRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/audit", auditRoutes);
+
+// Phase 2: Medical Officer Dashboard routes
+app.use("/api/medical-officer/progress-notes", progressNoteRoutes);
+app.use("/api/medical-officer/investigations", investigationRoutes);
+app.use("/api/medical-officer/prescriptions", prescriptionRoutes);
+app.use("/api/medical-officer/tasks", taskRoutes);
+app.use("/api/medical-officer/fluid-balance", fluidBalanceRoutes);
+app.use("/api/medical-officer", medicalOfficerRoutes);
 
 httpServer.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);

@@ -125,7 +125,8 @@ const NotificationBell = () => {
 
     if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
 
@@ -152,7 +153,13 @@ const NotificationBell = () => {
       >
         {/* Header */}
         <Box sx={{ p: 2, pb: 1 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Typography variant="h6">Notifications</Typography>
             {unreadCount > 0 && (
               <Button
@@ -175,7 +182,9 @@ const NotificationBell = () => {
           </Box>
         ) : notifications.length === 0 ? (
           <Box sx={{ p: 3, textAlign: "center" }}>
-            <NotificationsIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
+            <NotificationsIcon
+              sx={{ fontSize: 48, color: "text.disabled", mb: 1 }}
+            />
             <Typography color="text.secondary">No notifications</Typography>
           </Box>
         ) : (
@@ -185,37 +194,64 @@ const NotificationBell = () => {
                 <ListItem
                   disablePadding
                   sx={{
-                    backgroundColor: notification.isRead ? "transparent" : "action.hover",
+                    backgroundColor: notification.isRead
+                      ? "transparent"
+                      : "action.hover",
                   }}
                 >
-                  <ListItemButton onClick={() => handleNotificationClick(notification)}>
-                    <ListItemIcon>{getNotificationIcon(notification.type)}</ListItemIcon>
+                  <ListItemButton
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <ListItemIcon>
+                      {getNotificationIcon(notification.type)}
+                    </ListItemIcon>
                     <ListItemText
                       primary={
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: notification.isRead ? 400 : 600 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: notification.isRead ? 400 : 600 }}
+                          >
                             {notification.title}
                           </Typography>
                           {!notification.isRead && (
-                            <Circle sx={{ fontSize: 8, color: "primary.main" }} />
+                            <Circle
+                              sx={{ fontSize: 8, color: "primary.main" }}
+                            />
                           )}
                         </Box>
                       }
                       secondary={
                         <Box>
-                          <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: "block" }}
+                          >
                             {notification.message.length > 60
                               ? `${notification.message.substring(0, 60)}...`
                               : notification.message}
                           </Typography>
-                          <Box sx={{ display: "flex", gap: 1, mt: 0.5, alignItems: "center" }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              gap: 1,
+                              mt: 0.5,
+                              alignItems: "center",
+                            }}
+                          >
                             <Chip
                               label={notification.priority}
                               size="small"
                               color={getPriorityColor(notification.priority)}
                               sx={{ height: 20, fontSize: "0.65rem" }}
                             />
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {formatTimeAgo(notification.createdAt)}
                             </Typography>
                           </Box>
@@ -224,7 +260,9 @@ const NotificationBell = () => {
                     />
                     <IconButton
                       size="small"
-                      onClick={(e) => handleDeleteNotification(e, notification.id)}
+                      onClick={(e) =>
+                        handleDeleteNotification(e, notification.id)
+                      }
                     >
                       <Delete fontSize="small" />
                     </IconButton>

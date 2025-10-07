@@ -58,8 +58,16 @@ function TabPanel({ children, value, index, ...other }) {
 
 const UserProfilePage = () => {
   const dispatch = useDispatch();
-  const { profile, preferences, loading, uploadingPicture, updatingProfile, updatingPreferences, changingPassword, error } =
-    useSelector((state) => state.userProfile);
+  const {
+    profile,
+    preferences,
+    loading,
+    uploadingPicture,
+    updatingProfile,
+    updatingPreferences,
+    changingPassword,
+    error,
+  } = useSelector((state) => state.userProfile);
   const { user } = useSelector((state) => state.auth);
 
   const [tabValue, setTabValue] = useState(0);
@@ -176,7 +184,12 @@ const UserProfilePage = () => {
     e.preventDefault();
     const result = await dispatch(updateProfile(profileData));
     if (result.type === "userProfile/updateProfile/fulfilled") {
-      dispatch(showToast({ message: "Profile updated successfully", severity: "success" }));
+      dispatch(
+        showToast({
+          message: "Profile updated successfully",
+          severity: "success",
+        })
+      );
     }
   };
 
@@ -184,13 +197,18 @@ const UserProfilePage = () => {
     e.preventDefault();
     const result = await dispatch(updatePreferences(preferencesData));
     if (result.type === "userProfile/updatePreferences/fulfilled") {
-      dispatch(showToast({ message: "Preferences updated successfully", severity: "success" }));
+      dispatch(
+        showToast({
+          message: "Preferences updated successfully",
+          severity: "success",
+        })
+      );
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordError("New passwords do not match");
       return;
@@ -209,7 +227,12 @@ const UserProfilePage = () => {
     );
 
     if (result.type === "userProfile/updatePassword/fulfilled") {
-      dispatch(showToast({ message: "Password changed successfully", severity: "success" }));
+      dispatch(
+        showToast({
+          message: "Password changed successfully",
+          severity: "success",
+        })
+      );
       setPasswordData({
         currentPassword: "",
         newPassword: "",
@@ -222,12 +245,22 @@ const UserProfilePage = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        dispatch(showToast({ message: "File size must be less than 5MB", severity: "error" }));
+        dispatch(
+          showToast({
+            message: "File size must be less than 5MB",
+            severity: "error",
+          })
+        );
         return;
       }
       const result = await dispatch(uploadPicture(file));
       if (result.type === "userProfile/uploadPicture/fulfilled") {
-        dispatch(showToast({ message: "Profile picture uploaded successfully", severity: "success" }));
+        dispatch(
+          showToast({
+            message: "Profile picture uploaded successfully",
+            severity: "success",
+          })
+        );
       }
     }
   };
@@ -235,13 +268,25 @@ const UserProfilePage = () => {
   const handlePictureDelete = async () => {
     const result = await dispatch(deletePicture());
     if (result.type === "userProfile/deletePicture/fulfilled") {
-      dispatch(showToast({ message: "Profile picture deleted successfully", severity: "success" }));
+      dispatch(
+        showToast({
+          message: "Profile picture deleted successfully",
+          severity: "success",
+        })
+      );
     }
   };
 
   if (loading && !profile) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "400px",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -514,7 +559,9 @@ const UserProfilePage = () => {
                       onChange={handlePreferencesChange}
                       label="Timezone"
                     >
-                      <MenuItem value="Asia/Colombo">Asia/Colombo (IST)</MenuItem>
+                      <MenuItem value="Asia/Colombo">
+                        Asia/Colombo (IST)
+                      </MenuItem>
                       <MenuItem value="UTC">UTC</MenuItem>
                     </Select>
                   </FormControl>
@@ -647,8 +694,13 @@ const UserProfilePage = () => {
                   <Typography variant="h6" gutterBottom>
                     Change Password
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Ensure your account is using a long, random password to stay secure.
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Ensure your account is using a long, random password to stay
+                    secure.
                   </Typography>
                 </Grid>
 

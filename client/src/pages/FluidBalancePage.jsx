@@ -74,8 +74,12 @@ const FluidBalancePage = () => {
   const loadFluidBalance = React.useCallback(() => {
     if (selectedPatientId) {
       const params = { page: page + 1, limit: rowsPerPage, ...filters };
-      dispatch(fetchFluidBalanceByPatient({ patientId: selectedPatientId, params }));
-      dispatch(fetchFluidBalanceSummary({ patientId: selectedPatientId, params: {} }));
+      dispatch(
+        fetchFluidBalanceByPatient({ patientId: selectedPatientId, params })
+      );
+      dispatch(
+        fetchFluidBalanceSummary({ patientId: selectedPatientId, params: {} })
+      );
     }
   }, [dispatch, selectedPatientId, page, rowsPerPage, filters]);
 
@@ -189,7 +193,12 @@ const FluidBalancePage = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4">Fluid Balance</Typography>
         <Box display="flex" gap={1}>
           <Button
@@ -207,7 +216,11 @@ const FluidBalancePage = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => dispatch(clearError())}>
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          onClose={() => dispatch(clearError())}
+        >
           {error}
         </Alert>
       )}
@@ -251,7 +264,9 @@ const FluidBalancePage = () => {
                 <Select
                   value={filters.shiftTime || ""}
                   label="Shift"
-                  onChange={(e) => dispatch(setFilters({ shiftTime: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(setFilters({ shiftTime: e.target.value }))
+                  }
                 >
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="MORNING">Morning (6-14)</MenuItem>
@@ -296,9 +311,7 @@ const FluidBalancePage = () => {
               <CardContent>
                 <Typography
                   variant="h4"
-                  color={
-                    summary.balance >= 0 ? "success.main" : "error.main"
-                  }
+                  color={summary.balance >= 0 ? "success.main" : "error.main"}
                 >
                   {summary.balance > 0 ? "+" : ""}
                   {summary.balance || 0} mL
@@ -357,7 +370,9 @@ const FluidBalancePage = () => {
                             <Chip
                               label={record.recordType}
                               color={
-                                record.recordType === "INPUT" ? "primary" : "error"
+                                record.recordType === "INPUT"
+                                  ? "primary"
+                                  : "error"
                               }
                               size="small"
                             />
@@ -380,9 +395,12 @@ const FluidBalancePage = () => {
                               {new Date(record.recordedAt).toLocaleString()}
                             </Typography>
                             <Typography variant="caption" color="textSecondary">
-                              {formatDistanceToNow(new Date(record.recordedAt), {
-                                addSuffix: true,
-                              })}
+                              {formatDistanceToNow(
+                                new Date(record.recordedAt),
+                                {
+                                  addSuffix: true,
+                                }
+                              )}
                             </Typography>
                           </TableCell>
                           <TableCell>
@@ -420,7 +438,9 @@ const FluidBalancePage = () => {
                                   <Tooltip title="Verify">
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleVerifyRecord(record.id)}
+                                      onClick={() =>
+                                        handleVerifyRecord(record.id)
+                                      }
                                       color="success"
                                     >
                                       <CheckCircleIcon fontSize="small" />
@@ -432,7 +452,9 @@ const FluidBalancePage = () => {
                                 <Tooltip title="Delete">
                                   <IconButton
                                     size="small"
-                                    onClick={() => handleDeleteRecord(record.id)}
+                                    onClick={() =>
+                                      handleDeleteRecord(record.id)
+                                    }
                                     color="error"
                                   >
                                     <DeleteIcon fontSize="small" />

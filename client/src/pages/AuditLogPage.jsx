@@ -89,7 +89,9 @@ const AuditLogPage = () => {
   };
 
   const handlePageChange = (event, newPage) => {
-    dispatch(fetchAuditLogs({ ...filters, page: newPage + 1, limit: pagination.limit }));
+    dispatch(
+      fetchAuditLogs({ ...filters, page: newPage + 1, limit: pagination.limit })
+    );
   };
 
   const handleRowsPerPageChange = (event) => {
@@ -99,7 +101,14 @@ const AuditLogPage = () => {
 
   const handleApplyFilters = () => {
     dispatch(setFilters(localFilters));
-    dispatch(fetchAuditLogs({ ...filters, ...localFilters, page: 1, limit: pagination.limit }));
+    dispatch(
+      fetchAuditLogs({
+        ...filters,
+        ...localFilters,
+        page: 1,
+        limit: pagination.limit,
+      })
+    );
   };
 
   const handleResetFilters = () => {
@@ -116,7 +125,13 @@ const AuditLogPage = () => {
   };
 
   const handleRefresh = () => {
-    dispatch(fetchAuditLogs({ ...filters, page: pagination.page, limit: pagination.limit }));
+    dispatch(
+      fetchAuditLogs({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      })
+    );
     dispatch(fetchAuditStatistics());
     dispatch(fetchCriticalEvents({ limit: 10, hours: 24 }));
   };
@@ -172,7 +187,14 @@ const AuditLogPage = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" gutterBottom>
           Audit Logs
         </Typography>
@@ -257,7 +279,11 @@ const AuditLogPage = () => {
 
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="All Logs" />
-        <Tab label="Critical Events" icon={<WarningIcon />} iconPosition="end" />
+        <Tab
+          label="Critical Events"
+          icon={<WarningIcon />}
+          iconPosition="end"
+        />
         <Tab label="Failed Actions" icon={<ErrorIcon />} iconPosition="end" />
       </Tabs>
 
@@ -276,7 +302,9 @@ const AuditLogPage = () => {
                   fullWidth
                   label="Action"
                   value={localFilters.action}
-                  onChange={(e) => setLocalFilters({ ...localFilters, action: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({ ...localFilters, action: e.target.value })
+                  }
                   size="small"
                 >
                   <MenuItem value="">All</MenuItem>
@@ -294,7 +322,12 @@ const AuditLogPage = () => {
                   fullWidth
                   label="Category"
                   value={localFilters.actionCategory}
-                  onChange={(e) => setLocalFilters({ ...localFilters, actionCategory: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      actionCategory: e.target.value,
+                    })
+                  }
                   size="small"
                 >
                   <MenuItem value="">All</MenuItem>
@@ -313,7 +346,12 @@ const AuditLogPage = () => {
                   fullWidth
                   label="Severity"
                   value={localFilters.severity}
-                  onChange={(e) => setLocalFilters({ ...localFilters, severity: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      severity: e.target.value,
+                    })
+                  }
                   size="small"
                 >
                   <MenuItem value="">All</MenuItem>
@@ -329,7 +367,12 @@ const AuditLogPage = () => {
                   fullWidth
                   label="Status"
                   value={localFilters.success}
-                  onChange={(e) => setLocalFilters({ ...localFilters, success: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      success: e.target.value,
+                    })
+                  }
                   size="small"
                 >
                   <MenuItem value="">All</MenuItem>
@@ -343,7 +386,12 @@ const AuditLogPage = () => {
                   fullWidth
                   label="Start Date"
                   value={localFilters.startDate}
-                  onChange={(e) => setLocalFilters({ ...localFilters, startDate: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      startDate: e.target.value,
+                    })
+                  }
                   InputLabelProps={{ shrink: true }}
                   size="small"
                 />
@@ -354,13 +402,22 @@ const AuditLogPage = () => {
                   fullWidth
                   label="End Date"
                   value={localFilters.endDate}
-                  onChange={(e) => setLocalFilters({ ...localFilters, endDate: e.target.value })}
+                  onChange={(e) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      endDate: e.target.value,
+                    })
+                  }
                   InputLabelProps={{ shrink: true }}
                   size="small"
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button variant="contained" onClick={handleApplyFilters} sx={{ mr: 1 }}>
+                <Button
+                  variant="contained"
+                  onClick={handleApplyFilters}
+                  sx={{ mr: 1 }}
+                >
                   Apply Filters
                 </Button>
                 <Button variant="outlined" onClick={handleResetFilters}>
@@ -401,11 +458,15 @@ const AuditLogPage = () => {
                             {new Date(log.timestamp).toLocaleString()}
                           </Typography>
                           <Typography variant="caption" color="textSecondary">
-                            {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })}
+                            {formatDistanceToNow(new Date(log.timestamp), {
+                              addSuffix: true,
+                            })}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2">{log.userName || log.user?.username}</Typography>
+                          <Typography variant="body2">
+                            {log.userName || log.user?.username}
+                          </Typography>
                           <Typography variant="caption" color="textSecondary">
                             {log.userRole || log.user?.role}
                           </Typography>
@@ -421,7 +482,11 @@ const AuditLogPage = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" noWrap sx={{ maxWidth: 300 }}>
+                          <Typography
+                            variant="body2"
+                            noWrap
+                            sx={{ maxWidth: 300 }}
+                          >
                             {log.description}
                           </Typography>
                         </TableCell>
@@ -440,7 +505,10 @@ const AuditLogPage = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <IconButton size="small" onClick={() => handleViewDetails(log.id)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewDetails(log.id)}
+                          >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -479,7 +547,9 @@ const AuditLogPage = () => {
                         <TableCell>
                           {new Date(log.timestamp).toLocaleString()}
                         </TableCell>
-                        <TableCell>{log.userName || log.user?.username}</TableCell>
+                        <TableCell>
+                          {log.userName || log.user?.username}
+                        </TableCell>
                         <TableCell>
                           <Chip label={log.action} size="small" />
                         </TableCell>
@@ -492,7 +562,10 @@ const AuditLogPage = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <IconButton size="small" onClick={() => handleViewDetails(log.id)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewDetails(log.id)}
+                          >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -523,7 +596,9 @@ const AuditLogPage = () => {
                         <TableCell>
                           {new Date(log.timestamp).toLocaleString()}
                         </TableCell>
-                        <TableCell>{log.userName || log.user?.username}</TableCell>
+                        <TableCell>
+                          {log.userName || log.user?.username}
+                        </TableCell>
                         <TableCell>
                           <Chip label={log.action} size="small" />
                         </TableCell>
@@ -534,7 +609,10 @@ const AuditLogPage = () => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <IconButton size="small" onClick={() => handleViewDetails(log.id)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewDetails(log.id)}
+                          >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -549,7 +627,12 @@ const AuditLogPage = () => {
       </Paper>
 
       {/* Detail Dialog */}
-      <Dialog open={detailDialogOpen} onClose={handleCloseDetailDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={detailDialogOpen}
+        onClose={handleCloseDetailDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Audit Log Details</DialogTitle>
         <DialogContent>
           {selectedLog && (
@@ -589,7 +672,9 @@ const AuditLogPage = () => {
                 <Typography variant="subtitle2" color="textSecondary">
                   Description
                 </Typography>
-                <Typography variant="body1">{selectedLog.description}</Typography>
+                <Typography variant="body1">
+                  {selectedLog.description}
+                </Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="subtitle2" color="textSecondary">
@@ -613,7 +698,9 @@ const AuditLogPage = () => {
                 <Typography variant="subtitle2" color="textSecondary">
                   Duration
                 </Typography>
-                <Typography variant="body1">{selectedLog.duration}ms</Typography>
+                <Typography variant="body1">
+                  {selectedLog.duration}ms
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="subtitle2" color="textSecondary">
@@ -639,16 +726,17 @@ const AuditLogPage = () => {
                   </Typography>
                 </Grid>
               )}
-              {selectedLog.changedFields && selectedLog.changedFields.length > 0 && (
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    Changed Fields
-                  </Typography>
-                  <Typography variant="body1">
-                    {selectedLog.changedFields.join(", ")}
-                  </Typography>
-                </Grid>
-              )}
+              {selectedLog.changedFields &&
+                selectedLog.changedFields.length > 0 && (
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      Changed Fields
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedLog.changedFields.join(", ")}
+                    </Typography>
+                  </Grid>
+                )}
               {selectedLog.metadata && (
                 <Grid item xs={12}>
                   <Typography variant="subtitle2" color="textSecondary">

@@ -27,7 +27,13 @@ const Investigation = sequelize.define(
       comment: "User who ordered the investigation",
     },
     investigationType: {
-      type: DataTypes.ENUM("LABORATORY", "IMAGING", "PATHOLOGY", "PROCEDURE", "OTHER"),
+      type: DataTypes.ENUM(
+        "LABORATORY",
+        "IMAGING",
+        "PATHOLOGY",
+        "PROCEDURE",
+        "OTHER"
+      ),
       allowNull: false,
     },
     investigationCategory: {

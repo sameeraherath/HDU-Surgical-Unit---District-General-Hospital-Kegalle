@@ -1,8 +1,4 @@
-import {
-  Prescription,
-  Patient,
-  UserMySQLModel,
-} from "../config/mysqlDB.js";
+import { Prescription, Patient, UserMySQLModel } from "../config/mysqlDB.js";
 import { Op } from "sequelize";
 import { logMedication } from "../services/auditService.js";
 
@@ -150,7 +146,7 @@ export const getPrescriptionsByPatient = async (req, res) => {
     const { status, active, limit = 50, page = 1 } = req.query;
 
     const where = { patientId: parseInt(patientId) };
-    
+
     if (status) {
       where.status = status;
     } else if (active === "true") {

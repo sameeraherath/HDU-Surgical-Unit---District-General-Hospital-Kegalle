@@ -55,8 +55,15 @@ import {
 
 const TaskManagementPage = () => {
   const dispatch = useDispatch();
-  const { myTasks, createdTasks, overdueTasks, pagination, filters, loading, error } =
-    useSelector((state) => state.tasks);
+  const {
+    myTasks,
+    createdTasks,
+    overdueTasks,
+    pagination,
+    filters,
+    loading,
+    error,
+  } = useSelector((state) => state.tasks);
   const { user } = useSelector((state) => state.auth);
 
   const [currentTab, setCurrentTab] = useState(0);
@@ -273,9 +280,7 @@ const TaskManagementPage = () => {
                     size="small"
                   />
                 </TableCell>
-                <TableCell>
-                  {task.assignee?.username || "N/A"}
-                </TableCell>
+                <TableCell>{task.assignee?.username || "N/A"}</TableCell>
                 <TableCell>
                   <Typography variant="body2">
                     {new Date(task.dueDate).toLocaleDateString()}
@@ -375,7 +380,11 @@ const TaskManagementPage = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => dispatch(clearError())}>
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          onClose={() => dispatch(clearError())}
+        >
           {error}
         </Alert>
       )}
@@ -442,9 +451,15 @@ const TaskManagementPage = () => {
                 >
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="PATIENT_REVIEW">Patient Review</MenuItem>
-                  <MenuItem value="VITAL_SIGNS_CHECK">Vital Signs Check</MenuItem>
-                  <MenuItem value="MEDICATION_ADMINISTRATION">Medication Administration</MenuItem>
-                  <MenuItem value="INVESTIGATION_ORDER">Investigation Order</MenuItem>
+                  <MenuItem value="VITAL_SIGNS_CHECK">
+                    Vital Signs Check
+                  </MenuItem>
+                  <MenuItem value="MEDICATION_ADMINISTRATION">
+                    Medication Administration
+                  </MenuItem>
+                  <MenuItem value="INVESTIGATION_ORDER">
+                    Investigation Order
+                  </MenuItem>
                   <MenuItem value="DOCUMENTATION">Documentation</MenuItem>
                 </Select>
               </FormControl>
@@ -523,11 +538,15 @@ const TaskManagementPage = () => {
                   }
                 >
                   <MenuItem value="PATIENT_REVIEW">Patient Review</MenuItem>
-                  <MenuItem value="VITAL_SIGNS_CHECK">Vital Signs Check</MenuItem>
+                  <MenuItem value="VITAL_SIGNS_CHECK">
+                    Vital Signs Check
+                  </MenuItem>
                   <MenuItem value="MEDICATION_ADMINISTRATION">
                     Medication Administration
                   </MenuItem>
-                  <MenuItem value="INVESTIGATION_ORDER">Investigation Order</MenuItem>
+                  <MenuItem value="INVESTIGATION_ORDER">
+                    Investigation Order
+                  </MenuItem>
                   <MenuItem value="DOCUMENTATION">Documentation</MenuItem>
                   <MenuItem value="CONSULTATION">Consultation</MenuItem>
                   <MenuItem value="PROCEDURE">Procedure</MenuItem>
@@ -607,7 +626,9 @@ const TaskManagementPage = () => {
           <Button
             onClick={handleCreateTask}
             variant="contained"
-            disabled={!formData.title || !formData.assignedTo || !formData.dueDate}
+            disabled={
+              !formData.title || !formData.assignedTo || !formData.dueDate
+            }
           >
             Create
           </Button>

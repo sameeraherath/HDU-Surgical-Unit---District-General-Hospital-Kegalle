@@ -105,8 +105,8 @@ export const getInvestigationsByPatient = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    const { count, rows: investigations } =
-      await Investigation.findAndCountAll({
+    const { count, rows: investigations } = await Investigation.findAndCountAll(
+      {
         where,
         include: [
           {
@@ -124,7 +124,8 @@ export const getInvestigationsByPatient = async (req, res) => {
         limit: parseInt(limit),
         offset: parseInt(offset),
         order: [["orderDate", "DESC"]],
-      });
+      }
+    );
 
     res.json({
       investigations,
@@ -149,8 +150,8 @@ export const getPendingInvestigations = async (req, res) => {
     const { limit = 50, page = 1 } = req.query;
     const offset = (page - 1) * limit;
 
-    const { count, rows: investigations } =
-      await Investigation.findAndCountAll({
+    const { count, rows: investigations } = await Investigation.findAndCountAll(
+      {
         where: {
           status: {
             [Op.in]: ["ORDERED", "SPECIMEN_COLLECTED", "IN_PROGRESS"],
@@ -174,7 +175,8 @@ export const getPendingInvestigations = async (req, res) => {
           ["urgency", "DESC"],
           ["orderDate", "ASC"],
         ],
-      });
+      }
+    );
 
     res.json({
       investigations,
@@ -235,12 +237,9 @@ export const updateInvestigationStatus = async (req, res) => {
     // Send notification
     const io = req.app.get("io");
     if (io && status === "RESULTED") {
-      io.to(`user_${investigation.orderedBy}`).emit(
-        "investigation-resulted",
-        {
-          investigation,
-        }
-      );
+      io.to(`user_${investigation.orderedBy}`).emit("investigation-resulted", {
+        investigation,
+      });
     }
 
     res.json({

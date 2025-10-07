@@ -170,7 +170,10 @@ export const uploadProfilePicture = async (req, res) => {
     });
 
     // Delete old profile picture from Cloudinary if exists
-    if (profile.profilePictureUrl && profile.profilePictureUrl !== result.secure_url) {
+    if (
+      profile.profilePictureUrl &&
+      profile.profilePictureUrl !== result.secure_url
+    ) {
       try {
         const publicId = profile.profilePictureUrl
           .split("/")

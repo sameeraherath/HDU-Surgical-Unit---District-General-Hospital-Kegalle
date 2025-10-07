@@ -97,7 +97,12 @@ const PatientDetailPage = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <CircularProgress />
       </Box>
     );
@@ -119,13 +124,24 @@ const PatientDetailPage = () => {
     );
   }
 
-  const { patient, latestNote, investigations, prescriptions, tasks, fluidBalance } =
-    currentPatientSummary;
+  const {
+    patient,
+    latestNote,
+    investigations,
+    prescriptions,
+    tasks,
+    fluidBalance,
+  } = currentPatientSummary;
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Box>
           <Typography variant="h4">Patient Details</Typography>
           <Typography variant="body2" color="textSecondary">
@@ -159,7 +175,9 @@ const PatientDetailPage = () => {
               <Typography variant="caption" color="textSecondary">
                 BHT Number
               </Typography>
-              <Typography variant="body1">{patient?.bhtNumber || "N/A"}</Typography>
+              <Typography variant="body1">
+                {patient?.bhtNumber || "N/A"}
+              </Typography>
             </Grid>
             <Grid item xs={12} md={3}>
               <Typography variant="caption" color="textSecondary">
@@ -213,7 +231,8 @@ const PatientDetailPage = () => {
                 <ScienceIcon color="secondary" />
                 <Box>
                   <Typography variant="h6">
-                    {investigations?.pending || 0} / {investigations?.critical || 0}
+                    {investigations?.pending || 0} /{" "}
+                    {investigations?.critical || 0}
                   </Typography>
                   <Typography variant="caption" color="textSecondary">
                     Pending / Critical
@@ -261,10 +280,22 @@ const PatientDetailPage = () => {
       <Card>
         <Tabs value={currentTab} onChange={handleTabChange}>
           <Tab label="Latest Note" icon={<NoteIcon />} iconPosition="start" />
-          <Tab label="Investigations" icon={<ScienceIcon />} iconPosition="start" />
-          <Tab label="Prescriptions" icon={<MedicationIcon />} iconPosition="start" />
+          <Tab
+            label="Investigations"
+            icon={<ScienceIcon />}
+            iconPosition="start"
+          />
+          <Tab
+            label="Prescriptions"
+            icon={<MedicationIcon />}
+            iconPosition="start"
+          />
           <Tab label="Tasks" icon={<AssignmentIcon />} iconPosition="start" />
-          <Tab label="Fluid Balance" icon={<WaterDropIcon />} iconPosition="start" />
+          <Tab
+            label="Fluid Balance"
+            icon={<WaterDropIcon />}
+            iconPosition="start"
+          />
         </Tabs>
 
         <CardContent>
@@ -278,7 +309,9 @@ const PatientDetailPage = () => {
                       <Typography variant="caption" color="textSecondary">
                         Note Type
                       </Typography>
-                      <Typography variant="body1">{latestNote.noteType}</Typography>
+                      <Typography variant="body1">
+                        {latestNote.noteType}
+                      </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="caption" color="textSecondary">
@@ -512,7 +545,9 @@ const PatientDetailPage = () => {
                               size="small"
                             />
                           </TableCell>
-                          <TableCell>{task.assignee?.username || "N/A"}</TableCell>
+                          <TableCell>
+                            {task.assignee?.username || "N/A"}
+                          </TableCell>
                           <TableCell>
                             <Typography variant="body2">
                               {new Date(task.dueDate).toLocaleDateString()}
@@ -568,7 +603,9 @@ const PatientDetailPage = () => {
                           <Typography
                             variant="h6"
                             color={
-                              fluidBalance.balance >= 0 ? "success.main" : "error.main"
+                              fluidBalance.balance >= 0
+                                ? "success.main"
+                                : "error.main"
                             }
                           >
                             {fluidBalance.balance > 0 ? "+" : ""}

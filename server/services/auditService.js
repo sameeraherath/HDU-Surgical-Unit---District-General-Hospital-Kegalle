@@ -69,9 +69,18 @@ export const createAuditLog = async (auditData) => {
 /**
  * Log authentication events
  */
-export const logAuthentication = async (req, action, success, errorMessage = null) => {
-  const severity = success ? "LOW" : action === "LOGIN_FAILED" ? "MEDIUM" : "LOW";
-  
+export const logAuthentication = async (
+  req,
+  action,
+  success,
+  errorMessage = null
+) => {
+  const severity = success
+    ? "LOW"
+    : action === "LOGIN_FAILED"
+    ? "MEDIUM"
+    : "LOW";
+
   return createAuditLog({
     userId: req.user?.id || null,
     userRole: req.user?.role || null,
@@ -95,10 +104,22 @@ export const logAuthentication = async (req, action, success, errorMessage = nul
 /**
  * Log patient care events
  */
-export const logPatientCare = async (req, action, patientId, recordId, description, oldValues = null, newValues = null) => {
-  const changedFields = oldValues && newValues
-    ? Object.keys(newValues).filter(key => JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key]))
-    : null;
+export const logPatientCare = async (
+  req,
+  action,
+  patientId,
+  recordId,
+  description,
+  oldValues = null,
+  newValues = null
+) => {
+  const changedFields =
+    oldValues && newValues
+      ? Object.keys(newValues).filter(
+          (key) =>
+            JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key])
+        )
+      : null;
 
   return createAuditLog({
     userId: req.user?.id,
@@ -124,25 +145,37 @@ export const logPatientCare = async (req, action, patientId, recordId, descripti
 /**
  * Log vital signs events
  */
-export const logVitalSigns = async (req, action, patientId, recordId, oldValues = null, newValues = null) => {
-  const changedFields = oldValues && newValues
-    ? Object.keys(newValues).filter(key => JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key]))
-    : null;
+export const logVitalSigns = async (
+  req,
+  action,
+  patientId,
+  recordId,
+  oldValues = null,
+  newValues = null
+) => {
+  const changedFields =
+    oldValues && newValues
+      ? Object.keys(newValues).filter(
+          (key) =>
+            JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key])
+        )
+      : null;
 
-  const description = action === "VITAL_SIGNS_RECORD"
-    ? `Vital signs recorded for patient ${patientId}`
-    : `Vital signs updated for patient ${patientId}`;
+  const description =
+    action === "VITAL_SIGNS_RECORD"
+      ? `Vital signs recorded for patient ${patientId}`
+      : `Vital signs updated for patient ${patientId}`;
 
   // Check for critical changes
-  const isCritical = newValues && (
-    newValues.bloodPressureSystolic > 180 ||
-    newValues.bloodPressureSystolic < 90 ||
-    newValues.heartRate > 120 ||
-    newValues.heartRate < 50 ||
-    newValues.respiratoryRate > 30 ||
-    newValues.respiratoryRate < 10 ||
-    newValues.oxygenSaturation < 90
-  );
+  const isCritical =
+    newValues &&
+    (newValues.bloodPressureSystolic > 180 ||
+      newValues.bloodPressureSystolic < 90 ||
+      newValues.heartRate > 120 ||
+      newValues.heartRate < 50 ||
+      newValues.respiratoryRate > 30 ||
+      newValues.respiratoryRate < 10 ||
+      newValues.oxygenSaturation < 90);
 
   return createAuditLog({
     userId: req.user?.id,
@@ -169,7 +202,13 @@ export const logVitalSigns = async (req, action, patientId, recordId, oldValues 
 /**
  * Log medication events
  */
-export const logMedication = async (req, action, patientId, medicationData, description) => {
+export const logMedication = async (
+  req,
+  action,
+  patientId,
+  medicationData,
+  description
+) => {
   return createAuditLog({
     userId: req.user?.id,
     userRole: req.user?.role,
@@ -191,7 +230,13 @@ export const logMedication = async (req, action, patientId, medicationData, desc
 /**
  * Log documentation events
  */
-export const logDocumentation = async (req, action, patientId, documentData, description) => {
+export const logDocumentation = async (
+  req,
+  action,
+  patientId,
+  documentData,
+  description
+) => {
   return createAuditLog({
     userId: req.user?.id,
     userRole: req.user?.role,
@@ -215,10 +260,21 @@ export const logDocumentation = async (req, action, patientId, documentData, des
 /**
  * Log administrative actions
  */
-export const logAdministrative = async (req, action, description, severity = "MEDIUM", oldValues = null, newValues = null) => {
-  const changedFields = oldValues && newValues
-    ? Object.keys(newValues).filter(key => JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key]))
-    : null;
+export const logAdministrative = async (
+  req,
+  action,
+  description,
+  severity = "MEDIUM",
+  oldValues = null,
+  newValues = null
+) => {
+  const changedFields =
+    oldValues && newValues
+      ? Object.keys(newValues).filter(
+          (key) =>
+            JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key])
+        )
+      : null;
 
   return createAuditLog({
     userId: req.user?.id,
@@ -242,7 +298,14 @@ export const logAdministrative = async (req, action, description, severity = "ME
 /**
  * Log security events
  */
-export const logSecurity = async (req, action, description, severity = "HIGH", success = true, errorMessage = null) => {
+export const logSecurity = async (
+  req,
+  action,
+  description,
+  severity = "HIGH",
+  success = true,
+  errorMessage = null
+) => {
   return createAuditLog({
     userId: req.user?.id || null,
     userRole: req.user?.role || null,
@@ -263,7 +326,12 @@ export const logSecurity = async (req, action, description, severity = "HIGH", s
 /**
  * Log system events
  */
-export const logSystem = async (action, description, severity = "LOW", metadata = null) => {
+export const logSystem = async (
+  action,
+  description,
+  severity = "LOW",
+  metadata = null
+) => {
   return createAuditLog({
     action,
     actionCategory: "SYSTEM",
@@ -348,40 +416,41 @@ export const getAuditStatistics = async (filters = {}) => {
     if (endDate) where.timestamp.$lte = new Date(endDate);
   }
 
-  const [totalLogs, byCategory, bySeverity, failedActions, recentActions] = await Promise.all([
-    AuditLog.count({ where }),
-    AuditLog.findAll({
-      where,
-      attributes: [
-        "actionCategory",
-        [sequelize.fn("COUNT", sequelize.col("id")), "count"],
-      ],
-      group: ["actionCategory"],
-      raw: true,
-    }),
-    AuditLog.findAll({
-      where,
-      attributes: [
-        "severity",
-        [sequelize.fn("COUNT", sequelize.col("id")), "count"],
-      ],
-      group: ["severity"],
-      raw: true,
-    }),
-    AuditLog.count({ where: { ...where, success: false } }),
-    AuditLog.findAll({
-      where,
-      limit: 10,
-      order: [["timestamp", "DESC"]],
-      include: [
-        {
-          model: UserMySQLModel,
-          as: "user",
-          attributes: ["username", "role"],
-        },
-      ],
-    }),
-  ]);
+  const [totalLogs, byCategory, bySeverity, failedActions, recentActions] =
+    await Promise.all([
+      AuditLog.count({ where }),
+      AuditLog.findAll({
+        where,
+        attributes: [
+          "actionCategory",
+          [sequelize.fn("COUNT", sequelize.col("id")), "count"],
+        ],
+        group: ["actionCategory"],
+        raw: true,
+      }),
+      AuditLog.findAll({
+        where,
+        attributes: [
+          "severity",
+          [sequelize.fn("COUNT", sequelize.col("id")), "count"],
+        ],
+        group: ["severity"],
+        raw: true,
+      }),
+      AuditLog.count({ where: { ...where, success: false } }),
+      AuditLog.findAll({
+        where,
+        limit: 10,
+        order: [["timestamp", "DESC"]],
+        include: [
+          {
+            model: UserMySQLModel,
+            as: "user",
+            attributes: ["username", "role"],
+          },
+        ],
+      }),
+    ]);
 
   return {
     totalLogs,

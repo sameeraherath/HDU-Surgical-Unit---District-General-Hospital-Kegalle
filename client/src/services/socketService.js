@@ -34,7 +34,7 @@ export const initializeSocket = (token) => {
   // Listen for notifications
   socket.on("notification", (notification) => {
     console.log("Received notification:", notification);
-    
+
     // Add to Redux store
     store.dispatch(addRealTimeNotification(notification));
 
@@ -85,7 +85,7 @@ export const getSocket = () => {
 const playNotificationSound = (priority) => {
   try {
     const audio = new Audio();
-    
+
     // Different sounds for different priorities
     switch (priority) {
       case "urgent":
@@ -101,7 +101,7 @@ const playNotificationSound = (priority) => {
       default:
         audio.src = "/sounds/default.mp3";
     }
-    
+
     audio.volume = 0.5;
     audio.play().catch((err) => {
       console.error("Error playing notification sound:", err);

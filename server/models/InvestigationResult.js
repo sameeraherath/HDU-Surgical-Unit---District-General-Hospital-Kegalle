@@ -26,7 +26,13 @@ const InvestigationResult = sequelize.define(
       },
     },
     resultType: {
-      type: DataTypes.ENUM("NUMERIC", "TEXT", "IMAGE", "DOCUMENT", "STRUCTURED"),
+      type: DataTypes.ENUM(
+        "NUMERIC",
+        "TEXT",
+        "IMAGE",
+        "DOCUMENT",
+        "STRUCTURED"
+      ),
       defaultValue: "TEXT",
     },
     // Numeric results
@@ -61,7 +67,13 @@ const InvestigationResult = sequelize.define(
       defaultValue: false,
     },
     abnormalityType: {
-      type: DataTypes.ENUM("NORMAL", "LOW", "HIGH", "CRITICAL_LOW", "CRITICAL_HIGH"),
+      type: DataTypes.ENUM(
+        "NORMAL",
+        "LOW",
+        "HIGH",
+        "CRITICAL_LOW",
+        "CRITICAL_HIGH"
+      ),
       defaultValue: "NORMAL",
     },
     // Text results

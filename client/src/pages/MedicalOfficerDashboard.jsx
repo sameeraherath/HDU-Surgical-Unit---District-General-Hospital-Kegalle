@@ -216,9 +216,7 @@ const MedicalOfficerDashboard = () => {
           <StatCard
             title="Patients Need Attention"
             value={patientsNeedingAttention}
-            icon={
-              <LocalHospitalIcon sx={{ fontSize: 40, color: "#c62828" }} />
-            }
+            icon={<LocalHospitalIcon sx={{ fontSize: 40, color: "#c62828" }} />}
             color="#c62828"
           />
         </Grid>

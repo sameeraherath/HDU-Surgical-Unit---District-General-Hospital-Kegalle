@@ -2,19 +2,15 @@ import apiClient from "./apiClient";
 
 // Create a new task
 export const createTask = async (taskData) => {
-  const response = await apiClient.post(
-    "/api/medical-officer/tasks",
-    taskData
-  );
+  const response = await apiClient.post("/api/medical-officer/tasks", taskData);
   return response.data;
 };
 
 // Get my tasks (assigned to me)
 export const getMyTasks = async (params = {}) => {
-  const response = await apiClient.get(
-    "/api/medical-officer/tasks/my-tasks",
-    { params }
-  );
+  const response = await apiClient.get("/api/medical-officer/tasks/my-tasks", {
+    params,
+  });
   return response.data;
 };
 
@@ -38,10 +34,9 @@ export const getTasksByPatient = async (patientId, params = {}) => {
 
 // Get overdue tasks
 export const getOverdueTasks = async (params = {}) => {
-  const response = await apiClient.get(
-    "/api/medical-officer/tasks/overdue",
-    { params }
-  );
+  const response = await apiClient.get("/api/medical-officer/tasks/overdue", {
+    params,
+  });
   return response.data;
 };
 

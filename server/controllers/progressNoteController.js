@@ -1,8 +1,4 @@
-import {
-  ProgressNote,
-  Patient,
-  UserMySQLModel,
-} from "../config/mysqlDB.js";
+import { ProgressNote, Patient, UserMySQLModel } from "../config/mysqlDB.js";
 import { Op } from "sequelize";
 import { logPatientCare } from "../services/auditService.js";
 
@@ -283,10 +279,7 @@ export const deleteProgressNote = async (req, res) => {
     }
 
     // Check if user is the author or a consultant
-    if (
-      progressNote.userId !== req.user.id &&
-      req.user.role !== "Consultant"
-    ) {
+    if (progressNote.userId !== req.user.id && req.user.role !== "Consultant") {
       return res.status(403).json({
         message: "Access denied. Only the author or consultant can delete.",
       });

@@ -91,8 +91,8 @@ const GlobalAppBar = ({ role }) => {
           <NotificationBell />
 
           <IconButton color="inherit" onClick={handleAvatarClick}>
-            <Avatar 
-              alt={user?.username || "User"} 
+            <Avatar
+              alt={user?.username || "User"}
               src={profile?.profile?.profilePictureUrl}
             >
               {user?.username?.charAt(0).toUpperCase()}

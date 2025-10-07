@@ -43,7 +43,14 @@ const FluidBalance = sequelize.define(
       comment: "Type of fluid input",
     },
     inputRoute: {
-      type: DataTypes.ENUM("ORAL", "IV", "NG_TUBE", "PEG", "CENTRAL_LINE", "OTHER"),
+      type: DataTypes.ENUM(
+        "ORAL",
+        "IV",
+        "NG_TUBE",
+        "PEG",
+        "CENTRAL_LINE",
+        "OTHER"
+      ),
     },
     // Output details
     outputType: {

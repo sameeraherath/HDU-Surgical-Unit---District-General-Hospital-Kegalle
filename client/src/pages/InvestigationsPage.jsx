@@ -101,7 +101,9 @@ const InvestigationsPage = () => {
   const loadInvestigations = React.useCallback(() => {
     const params = { page: page + 1, limit: rowsPerPage, ...filters };
     if (currentTab === 0 && selectedPatientId) {
-      dispatch(fetchInvestigationsByPatient({ patientId: selectedPatientId, params }));
+      dispatch(
+        fetchInvestigationsByPatient({ patientId: selectedPatientId, params })
+      );
     } else if (currentTab === 1) {
       dispatch(fetchPendingInvestigations(params));
     } else if (currentTab === 2) {
@@ -282,7 +284,12 @@ const InvestigationsPage = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4">Investigations</Typography>
         <Box display="flex" gap={1}>
           <Button
@@ -299,7 +306,11 @@ const InvestigationsPage = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => dispatch(clearError())}>
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          onClose={() => dispatch(clearError())}
+        >
           {error}
         </Alert>
       )}
@@ -360,11 +371,15 @@ const InvestigationsPage = () => {
                 <Select
                   value={filters.status || ""}
                   label="Status"
-                  onChange={(e) => dispatch(setFilters({ status: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(setFilters({ status: e.target.value }))
+                  }
                 >
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="ORDERED">Ordered</MenuItem>
-                  <MenuItem value="SPECIMEN_COLLECTED">Specimen Collected</MenuItem>
+                  <MenuItem value="SPECIMEN_COLLECTED">
+                    Specimen Collected
+                  </MenuItem>
                   <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
                   <MenuItem value="COMPLETED">Completed</MenuItem>
                   <MenuItem value="REVIEWED">Reviewed</MenuItem>
@@ -377,7 +392,9 @@ const InvestigationsPage = () => {
                 <Select
                   value={filters.urgency || ""}
                   label="Urgency"
-                  onChange={(e) => dispatch(setFilters({ urgency: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(setFilters({ urgency: e.target.value }))
+                  }
                 >
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="ROUTINE">Routine</MenuItem>
@@ -438,7 +455,10 @@ const InvestigationsPage = () => {
                               {inv.testName}
                             </Typography>
                             {inv.specimen && (
-                              <Typography variant="caption" color="textSecondary">
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
+                              >
                                 Specimen: {inv.specimen}
                               </Typography>
                             )}
@@ -467,7 +487,9 @@ const InvestigationsPage = () => {
                               })}
                             </Typography>
                           </TableCell>
-                          <TableCell>{inv.orderedBy?.username || "N/A"}</TableCell>
+                          <TableCell>
+                            {inv.orderedBy?.username || "N/A"}
+                          </TableCell>
                           <TableCell>
                             <Box display="flex" gap={0.5}>
                               <Tooltip title="View Details">
@@ -485,7 +507,9 @@ const InvestigationsPage = () => {
                                   <Tooltip title="Add Result">
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleOpenResultDialog(inv)}
+                                      onClick={() =>
+                                        handleOpenResultDialog(inv)
+                                      }
                                       color="info"
                                     >
                                       <ScienceIcon fontSize="small" />
@@ -497,7 +521,9 @@ const InvestigationsPage = () => {
                                   <Tooltip title="Review">
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleOpenReviewDialog(inv)}
+                                      onClick={() =>
+                                        handleOpenReviewDialog(inv)
+                                      }
                                       color="success"
                                     >
                                       <CheckCircleIcon fontSize="small" />
@@ -510,7 +536,9 @@ const InvestigationsPage = () => {
                                   <Tooltip title="Cancel">
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleCancelInvestigation(inv.id)}
+                                      onClick={() =>
+                                        handleCancelInvestigation(inv.id)
+                                      }
                                       color="error"
                                     >
                                       <CancelIcon fontSize="small" />
@@ -570,7 +598,10 @@ const InvestigationsPage = () => {
                   value={orderData.investigationType}
                   label="Investigation Type"
                   onChange={(e) =>
-                    setOrderData({ ...orderData, investigationType: e.target.value })
+                    setOrderData({
+                      ...orderData,
+                      investigationType: e.target.value,
+                    })
                   }
                 >
                   <MenuItem value="LABORATORY">Laboratory</MenuItem>
@@ -643,7 +674,10 @@ const InvestigationsPage = () => {
                 rows={2}
                 value={orderData.specialInstructions}
                 onChange={(e) =>
-                  setOrderData({ ...orderData, specialInstructions: e.target.value })
+                  setOrderData({
+                    ...orderData,
+                    specialInstructions: e.target.value,
+                  })
                 }
                 placeholder="Any special preparation or handling requirements..."
               />
@@ -828,7 +862,10 @@ const InvestigationsPage = () => {
                 label="Reference Range"
                 value={resultData.referenceRange}
                 onChange={(e) =>
-                  setResultData({ ...resultData, referenceRange: e.target.value })
+                  setResultData({
+                    ...resultData,
+                    referenceRange: e.target.value,
+                  })
                 }
               />
             </Grid>
@@ -873,7 +910,10 @@ const InvestigationsPage = () => {
                 rows={3}
                 value={resultData.interpretation}
                 onChange={(e) =>
-                  setResultData({ ...resultData, interpretation: e.target.value })
+                  setResultData({
+                    ...resultData,
+                    interpretation: e.target.value,
+                  })
                 }
                 placeholder="Clinical interpretation of the results..."
               />

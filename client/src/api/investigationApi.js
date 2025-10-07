@@ -37,7 +37,10 @@ export const getCriticalInvestigations = async (params = {}) => {
 };
 
 // Update investigation status
-export const updateInvestigationStatus = async (investigationId, statusData) => {
+export const updateInvestigationStatus = async (
+  investigationId,
+  statusData
+) => {
   const response = await apiClient.put(
     `/api/medical-officer/investigations/${investigationId}/status`,
     statusData
@@ -46,7 +49,10 @@ export const updateInvestigationStatus = async (investigationId, statusData) => 
 };
 
 // Cancel an investigation
-export const cancelInvestigation = async (investigationId, cancellationData) => {
+export const cancelInvestigation = async (
+  investigationId,
+  cancellationData
+) => {
   const response = await apiClient.put(
     `/api/medical-officer/investigations/${investigationId}/cancel`,
     cancellationData

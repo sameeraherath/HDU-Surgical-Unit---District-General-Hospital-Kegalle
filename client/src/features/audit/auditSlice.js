@@ -9,7 +9,9 @@ export const fetchAuditLogs = createAsyncThunk(
       const data = await auditApi.getAuditLogs(filters);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -21,7 +23,9 @@ export const fetchAuditLogById = createAsyncThunk(
       const data = await auditApi.getAuditLogById(id);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -33,7 +37,9 @@ export const fetchAuditHistory = createAsyncThunk(
       const data = await auditApi.getAuditHistory(tableName, recordId);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -45,7 +51,9 @@ export const fetchAuditStatistics = createAsyncThunk(
       const data = await auditApi.getAuditStatistics(filters);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -57,7 +65,9 @@ export const fetchUserActivityTimeline = createAsyncThunk(
       const data = await auditApi.getUserActivityTimeline(userId, page, limit);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -66,10 +76,16 @@ export const fetchPatientActivityTimeline = createAsyncThunk(
   "audit/fetchPatientActivityTimeline",
   async ({ patientId, page, limit }, { rejectWithValue }) => {
     try {
-      const data = await auditApi.getPatientActivityTimeline(patientId, page, limit);
+      const data = await auditApi.getPatientActivityTimeline(
+        patientId,
+        page,
+        limit
+      );
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -81,7 +97,9 @@ export const fetchCriticalEvents = createAsyncThunk(
       const data = await auditApi.getCriticalEvents(limit, hours);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -93,7 +111,9 @@ export const fetchFailedActions = createAsyncThunk(
       const data = await auditApi.getFailedActions(page, limit, hours);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -103,7 +123,7 @@ export const exportAuditLogs = createAsyncThunk(
   async ({ startDate, endDate, format }, { rejectWithValue }) => {
     try {
       const data = await auditApi.exportAuditLogs(startDate, endDate, format);
-      
+
       if (format === "csv") {
         // Create download link for CSV
         const url = window.URL.createObjectURL(new Blob([data]));
@@ -115,10 +135,12 @@ export const exportAuditLogs = createAsyncThunk(
         link.remove();
         return { message: "Export successful" };
       }
-      
+
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: error.message });
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
@@ -213,7 +235,8 @@ const auditSlice = createSlice({
       })
       .addCase(fetchAuditHistory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch audit history";
+        state.error =
+          action.payload?.message || "Failed to fetch audit history";
       })
 
       // Fetch audit statistics
@@ -242,7 +265,8 @@ const auditSlice = createSlice({
       })
       .addCase(fetchUserActivityTimeline.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch user timeline";
+        state.error =
+          action.payload?.message || "Failed to fetch user timeline";
       })
 
       // Fetch patient activity timeline
@@ -257,7 +281,8 @@ const auditSlice = createSlice({
       })
       .addCase(fetchPatientActivityTimeline.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch patient timeline";
+        state.error =
+          action.payload?.message || "Failed to fetch patient timeline";
       })
 
       // Fetch critical events
@@ -271,7 +296,8 @@ const auditSlice = createSlice({
       })
       .addCase(fetchCriticalEvents.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch critical events";
+        state.error =
+          action.payload?.message || "Failed to fetch critical events";
       })
 
       // Fetch failed actions
@@ -286,7 +312,8 @@ const auditSlice = createSlice({
       })
       .addCase(fetchFailedActions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch failed actions";
+        state.error =
+          action.payload?.message || "Failed to fetch failed actions";
       })
 
       // Export audit logs
@@ -304,5 +331,6 @@ const auditSlice = createSlice({
   },
 });
 
-export const { setFilters, resetFilters, clearError, clearSelectedLog } = auditSlice.actions;
+export const { setFilters, resetFilters, clearError, clearSelectedLog } =
+  auditSlice.actions;
 export default auditSlice.reducer;

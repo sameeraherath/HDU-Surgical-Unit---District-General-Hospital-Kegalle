@@ -58,7 +58,8 @@ export const createTask = async (req, res) => {
       userId: req.user.id,
       action: "TASK_CREATE",
       description: `Created task: ${title} for ${assignee.username}`,
-      severity: priority === "CRITICAL" || priority === "URGENT" ? "HIGH" : "MEDIUM",
+      severity:
+        priority === "CRITICAL" || priority === "URGENT" ? "HIGH" : "MEDIUM",
       newValues: task.toJSON(),
       req,
     });

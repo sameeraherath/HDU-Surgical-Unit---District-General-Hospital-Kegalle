@@ -89,7 +89,9 @@ const PrescriptionsPage = () => {
   const loadPrescriptions = React.useCallback(() => {
     const params = { page: page + 1, limit: rowsPerPage, ...filters };
     if (currentTab === 0 && selectedPatientId) {
-      dispatch(fetchPrescriptionsByPatient({ patientId: selectedPatientId, params }));
+      dispatch(
+        fetchPrescriptionsByPatient({ patientId: selectedPatientId, params })
+      );
     } else if (currentTab === 1) {
       dispatch(fetchActivePrescriptions(params));
     } else if (currentTab === 2) {
@@ -237,7 +239,12 @@ const PrescriptionsPage = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4">Prescriptions</Typography>
         <Box display="flex" gap={1}>
           <Button
@@ -254,7 +261,11 @@ const PrescriptionsPage = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => dispatch(clearError())}>
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          onClose={() => dispatch(clearError())}
+        >
           {error}
         </Alert>
       )}
@@ -293,7 +304,9 @@ const PrescriptionsPage = () => {
                 <Select
                   value={filters.status || ""}
                   label="Status"
-                  onChange={(e) => dispatch(setFilters({ status: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(setFilters({ status: e.target.value }))
+                  }
                 >
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="ACTIVE">Active</MenuItem>
@@ -373,7 +386,9 @@ const PrescriptionsPage = () => {
                               size="small"
                             />
                           </TableCell>
-                          <TableCell>{rx.prescribedBy?.username || "N/A"}</TableCell>
+                          <TableCell>
+                            {rx.prescribedBy?.username || "N/A"}
+                          </TableCell>
                           <TableCell>
                             <Box display="flex" gap={0.5}>
                               <Tooltip title="View Details">
@@ -385,35 +400,43 @@ const PrescriptionsPage = () => {
                                   <VisibilityIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              {user?.role === "Pharmacist" && rx.status === "ACTIVE" && (
-                                <Tooltip title="Verify">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleVerifyPrescription(rx.id)}
-                                    color="success"
-                                  >
-                                    <CheckCircleIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              {user?.role === "Pharmacist" && rx.status === "VERIFIED" && (
-                                <Tooltip title="Dispense">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDispensePrescription(rx.id)}
-                                    color="info"
-                                  >
-                                    <PharmacyIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
+                              {user?.role === "Pharmacist" &&
+                                rx.status === "ACTIVE" && (
+                                  <Tooltip title="Verify">
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        handleVerifyPrescription(rx.id)
+                                      }
+                                      color="success"
+                                    >
+                                      <CheckCircleIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              {user?.role === "Pharmacist" &&
+                                rx.status === "VERIFIED" && (
+                                  <Tooltip title="Dispense">
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        handleDispensePrescription(rx.id)
+                                      }
+                                      color="info"
+                                    >
+                                      <PharmacyIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
                               {(user?.id === rx.prescribedBy ||
                                 user?.role === "Consultant") &&
                                 rx.status === "ACTIVE" && (
                                   <Tooltip title="Discontinue">
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleOpenDiscontinueDialog(rx)}
+                                      onClick={() =>
+                                        handleOpenDiscontinueDialog(rx)
+                                      }
                                       color="error"
                                     >
                                       <BlockIcon fontSize="small" />
@@ -595,7 +618,10 @@ const PrescriptionsPage = () => {
                 rows={2}
                 value={formData.specialInstructions}
                 onChange={(e) =>
-                  setFormData({ ...formData, specialInstructions: e.target.value })
+                  setFormData({
+                    ...formData,
+                    specialInstructions: e.target.value,
+                  })
                 }
                 placeholder="e.g., Take with food, Avoid alcohol..."
               />
@@ -677,7 +703,8 @@ const PrescriptionsPage = () => {
                     Duration
                   </Typography>
                   <Typography variant="body1">
-                    {selectedPrescription.duration} {selectedPrescription.durationUnit}
+                    {selectedPrescription.duration}{" "}
+                    {selectedPrescription.durationUnit}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -685,7 +712,9 @@ const PrescriptionsPage = () => {
                     Start Date
                   </Typography>
                   <Typography variant="body1">
-                    {new Date(selectedPrescription.startDate).toLocaleDateString()}
+                    {new Date(
+                      selectedPrescription.startDate
+                    ).toLocaleDateString()}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -693,7 +722,9 @@ const PrescriptionsPage = () => {
                     End Date
                   </Typography>
                   <Typography variant="body1">
-                    {new Date(selectedPrescription.endDate).toLocaleDateString()}
+                    {new Date(
+                      selectedPrescription.endDate
+                    ).toLocaleDateString()}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>

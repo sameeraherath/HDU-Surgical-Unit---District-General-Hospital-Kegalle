@@ -12,7 +12,7 @@ const MainLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  
+
   // Initialize Socket.IO connection
   useSocket();
 

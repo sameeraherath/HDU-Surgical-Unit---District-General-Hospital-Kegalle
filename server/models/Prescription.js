@@ -139,7 +139,13 @@ const Prescription = sequelize.define(
       comment: "Special instructions for patient",
     },
     foodRelation: {
-      type: DataTypes.ENUM("BEFORE_FOOD", "AFTER_FOOD", "WITH_FOOD", "EMPTY_STOMACH", "ANY_TIME"),
+      type: DataTypes.ENUM(
+        "BEFORE_FOOD",
+        "AFTER_FOOD",
+        "WITH_FOOD",
+        "EMPTY_STOMACH",
+        "ANY_TIME"
+      ),
     },
     // Quantity
     quantity: {

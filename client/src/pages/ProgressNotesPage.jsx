@@ -191,7 +191,12 @@ const ProgressNotesPage = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4">Progress Notes</Typography>
         <Box display="flex" gap={1}>
           <Button
@@ -209,7 +214,11 @@ const ProgressNotesPage = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => dispatch(clearError())}>
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          onClose={() => dispatch(clearError())}
+        >
           {error}
         </Alert>
       )}
@@ -242,9 +251,13 @@ const ProgressNotesPage = () => {
                   }
                 >
                   <MenuItem value="">All</MenuItem>
-                  <MenuItem value="DAILY_PROGRESS_NOTE">Daily Progress</MenuItem>
+                  <MenuItem value="DAILY_PROGRESS_NOTE">
+                    Daily Progress
+                  </MenuItem>
                   <MenuItem value="ADMISSION_NOTE">Admission</MenuItem>
-                  <MenuItem value="DISCHARGE_SUMMARY">Discharge Summary</MenuItem>
+                  <MenuItem value="DISCHARGE_SUMMARY">
+                    Discharge Summary
+                  </MenuItem>
                   <MenuItem value="CONSULTATION_NOTE">Consultation</MenuItem>
                   <MenuItem value="OPERATIVE_NOTE">Operative</MenuItem>
                   <MenuItem value="PROCEDURE_NOTE">Procedure</MenuItem>
@@ -257,7 +270,9 @@ const ProgressNotesPage = () => {
                 <Select
                   value={filters.status || ""}
                   label="Status"
-                  onChange={(e) => dispatch(setFilters({ status: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(setFilters({ status: e.target.value }))
+                  }
                 >
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="ACTIVE">Active</MenuItem>
@@ -329,7 +344,9 @@ const ProgressNotesPage = () => {
                               size="small"
                             />
                           </TableCell>
-                          <TableCell>{note.author?.username || "N/A"}</TableCell>
+                          <TableCell>
+                            {note.author?.username || "N/A"}
+                          </TableCell>
                           <TableCell>
                             <Typography
                               variant="body2"
@@ -359,7 +376,9 @@ const ProgressNotesPage = () => {
                                   <Tooltip title="Review Note">
                                     <IconButton
                                       size="small"
-                                      onClick={() => handleOpenReviewDialog(note)}
+                                      onClick={() =>
+                                        handleOpenReviewDialog(note)
+                                      }
                                       color="success"
                                     >
                                       <CheckCircleIcon fontSize="small" />
@@ -434,9 +453,13 @@ const ProgressNotesPage = () => {
                     setFormData({ ...formData, noteType: e.target.value })
                   }
                 >
-                  <MenuItem value="DAILY_PROGRESS_NOTE">Daily Progress</MenuItem>
+                  <MenuItem value="DAILY_PROGRESS_NOTE">
+                    Daily Progress
+                  </MenuItem>
                   <MenuItem value="ADMISSION_NOTE">Admission</MenuItem>
-                  <MenuItem value="DISCHARGE_SUMMARY">Discharge Summary</MenuItem>
+                  <MenuItem value="DISCHARGE_SUMMARY">
+                    Discharge Summary
+                  </MenuItem>
                   <MenuItem value="CONSULTATION_NOTE">Consultation</MenuItem>
                   <MenuItem value="OPERATIVE_NOTE">Operative</MenuItem>
                   <MenuItem value="PROCEDURE_NOTE">Procedure</MenuItem>
@@ -541,7 +564,9 @@ const ProgressNotesPage = () => {
                   <Typography variant="caption" color="textSecondary">
                     Note Type
                   </Typography>
-                  <Typography variant="body1">{selectedNote.noteType}</Typography>
+                  <Typography variant="body1">
+                    {selectedNote.noteType}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="textSecondary">
@@ -659,7 +684,11 @@ const ProgressNotesPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseReviewDialog}>Cancel</Button>
-          <Button onClick={handleReviewNote} variant="contained" color="success">
+          <Button
+            onClick={handleReviewNote}
+            variant="contained"
+            color="success"
+          >
             Approve & Review
           </Button>
         </DialogActions>

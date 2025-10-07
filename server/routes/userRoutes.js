@@ -32,7 +32,12 @@ const upload = multer({
 // Profile routes
 router.get("/profile", authenticateJWT, getUserProfile);
 router.put("/profile", authenticateJWT, updateUserProfile);
-router.post("/profile/picture", authenticateJWT, upload.single("profilePicture"), uploadProfilePicture);
+router.post(
+  "/profile/picture",
+  authenticateJWT,
+  upload.single("profilePicture"),
+  uploadProfilePicture
+);
 router.delete("/profile/picture", authenticateJWT, deleteProfilePicture);
 
 // Preferences routes

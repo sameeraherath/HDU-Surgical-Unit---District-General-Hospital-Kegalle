@@ -50,7 +50,7 @@ const io = new Server(httpServer, {
 // Socket.IO authentication middleware
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
-  
+
   if (!token) {
     return next(new Error("Authentication error"));
   }
@@ -68,10 +68,10 @@ io.use((socket, next) => {
 // Socket.IO connection handling
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.userId}`);
-  
+
   // Join user-specific room
   socket.join(`user_${socket.userId}`);
-  
+
   // Join role-specific room
   socket.join(`role_${socket.userRole}`);
 

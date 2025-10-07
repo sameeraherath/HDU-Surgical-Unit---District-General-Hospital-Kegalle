@@ -41,7 +41,8 @@ export const fetchPendingInvestigations = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch pending investigations"
+        error.response?.data?.message ||
+          "Failed to fetch pending investigations"
       );
     }
   }

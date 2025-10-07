@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "../features/ui/uiSlice";
 import { useAuth } from "../hooks/useAuth";
 import { fetchUserProfile } from "../features/userProfile/userProfileSlice";
+import NotificationBell from "./NotificationBell";
 
 const GlobalAppBar = ({ role }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -86,6 +87,8 @@ const GlobalAppBar = ({ role }) => {
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
             {appBarTitle}
           </Typography>
+
+          <NotificationBell />
 
           <IconButton color="inherit" onClick={handleAvatarClick}>
             <Avatar 

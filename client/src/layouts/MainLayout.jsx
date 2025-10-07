@@ -6,11 +6,15 @@ import GlobalAlertBanner from "../components/GlobalAlertBanner";
 import GlobalSpinner from "../components/GlobalSpinner";
 import { Box, Container } from "@mui/material";
 import { setAppBarTitle } from "../features/ui/uiSlice";
+import { useSocket } from "../hooks/useSocket";
 
 const MainLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  
+  // Initialize Socket.IO connection
+  useSocket();
 
   useEffect(() => {
     const routeTitles = {

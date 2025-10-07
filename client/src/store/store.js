@@ -7,6 +7,12 @@ import patientReducer from "../features/patients/patientSlice";
 import userProfileReducer from "../features/userProfile/userProfileSlice";
 import notificationsReducer from "../features/notifications/notificationsSlice";
 import auditReducer from "../features/audit/auditSlice";
+import progressNotesReducer from "../features/progressNotes/progressNoteSlice";
+import investigationsReducer from "../features/investigations/investigationSlice";
+import prescriptionsReducer from "../features/prescriptions/prescriptionSlice";
+import tasksReducer from "../features/tasks/taskSlice";
+import fluidBalanceReducer from "../features/fluidBalance/fluidBalanceSlice";
+import medicalOfficerReducer from "../features/medicalOfficer/medicalOfficerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +24,12 @@ export const store = configureStore({
     userProfile: userProfileReducer,
     notifications: notificationsReducer,
     audit: auditReducer,
+    progressNotes: progressNotesReducer,
+    investigations: investigationsReducer,
+    prescriptions: prescriptionsReducer,
+    tasks: tasksReducer,
+    fluidBalance: fluidBalanceReducer,
+    medicalOfficer: medicalOfficerReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

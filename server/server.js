@@ -18,6 +18,13 @@ import prescriptionRoutes from "./routes/prescriptionRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import fluidBalanceRoutes from "./routes/fluidBalanceRoutes.js";
 import medicalOfficerRoutes from "./routes/medicalOfficerRoutes.js";
+// Phase 3: Consultant Dashboard routes
+import wardRoundRoutes from "./routes/wardRoundRoutes.js";
+import dischargePlanRoutes from "./routes/dischargePlanRoutes.js";
+import teachingNoteRoutes from "./routes/teachingNoteRoutes.js";
+import consultationRoutes from "./routes/consultationRoutes.js";
+import clinicalAuditRoutes from "./routes/clinicalAuditRoutes.js";
+import consultantRoutes from "./routes/consultantRoutes.js";
 import { connectMySql, sequelize } from "./config/mysqlDB.js";
 import { auditMiddleware } from "./middleware/auditMiddleware.js";
 import path from "path";
@@ -101,6 +108,14 @@ app.use("/api/medical-officer/prescriptions", prescriptionRoutes);
 app.use("/api/medical-officer/tasks", taskRoutes);
 app.use("/api/medical-officer/fluid-balance", fluidBalanceRoutes);
 app.use("/api/medical-officer", medicalOfficerRoutes);
+
+// Phase 3: Consultant Dashboard routes
+app.use("/api/consultant/ward-rounds", wardRoundRoutes);
+app.use("/api/consultant/discharge-plans", dischargePlanRoutes);
+app.use("/api/consultant/teaching-notes", teachingNoteRoutes);
+app.use("/api/consultant/consultations", consultationRoutes);
+app.use("/api/consultant/clinical-audits", clinicalAuditRoutes);
+app.use("/api/consultant", consultantRoutes);
 
 httpServer.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);

@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as teachingNoteApi from '../../api/teachingNoteApi';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as teachingNoteApi from "../../api/teachingNoteApi";
 
 // Async thunks
 export const fetchAllTeachingNotes = createAsyncThunk(
-  'teachingNotes/fetchAll',
+  "teachingNotes/fetchAll",
   async (params, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.getAllTeachingNotes(params);
@@ -14,10 +14,13 @@ export const fetchAllTeachingNotes = createAsyncThunk(
 );
 
 export const fetchTeachingNotesByConsultant = createAsyncThunk(
-  'teachingNotes/fetchByConsultant',
+  "teachingNotes/fetchByConsultant",
   async ({ consultantId, params }, { rejectWithValue }) => {
     try {
-      return await teachingNoteApi.getTeachingNotesByConsultant(consultantId, params);
+      return await teachingNoteApi.getTeachingNotesByConsultant(
+        consultantId,
+        params
+      );
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -25,7 +28,7 @@ export const fetchTeachingNotesByConsultant = createAsyncThunk(
 );
 
 export const fetchTeachingNotesByPatient = createAsyncThunk(
-  'teachingNotes/fetchByPatient',
+  "teachingNotes/fetchByPatient",
   async (patientId, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.getTeachingNotesByPatient(patientId);
@@ -36,7 +39,7 @@ export const fetchTeachingNotesByPatient = createAsyncThunk(
 );
 
 export const fetchTeachingNoteById = createAsyncThunk(
-  'teachingNotes/fetchById',
+  "teachingNotes/fetchById",
   async (id, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.getTeachingNoteById(id);
@@ -47,7 +50,7 @@ export const fetchTeachingNoteById = createAsyncThunk(
 );
 
 export const createTeachingNote = createAsyncThunk(
-  'teachingNotes/create',
+  "teachingNotes/create",
   async (teachingNoteData, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.createTeachingNote(teachingNoteData);
@@ -58,7 +61,7 @@ export const createTeachingNote = createAsyncThunk(
 );
 
 export const updateTeachingNote = createAsyncThunk(
-  'teachingNotes/update',
+  "teachingNotes/update",
   async ({ id, teachingNoteData }, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.updateTeachingNote(id, teachingNoteData);
@@ -69,7 +72,7 @@ export const updateTeachingNote = createAsyncThunk(
 );
 
 export const deleteTeachingNote = createAsyncThunk(
-  'teachingNotes/delete',
+  "teachingNotes/delete",
   async (id, { rejectWithValue }) => {
     try {
       await teachingNoteApi.deleteTeachingNote(id);
@@ -81,7 +84,7 @@ export const deleteTeachingNote = createAsyncThunk(
 );
 
 export const searchTeachingNotes = createAsyncThunk(
-  'teachingNotes/search',
+  "teachingNotes/search",
   async (searchQuery, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.searchTeachingNotes(searchQuery);
@@ -92,7 +95,7 @@ export const searchTeachingNotes = createAsyncThunk(
 );
 
 export const fetchTeachingStats = createAsyncThunk(
-  'teachingNotes/fetchStats',
+  "teachingNotes/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
       return await teachingNoteApi.getTeachingStats();
@@ -127,7 +130,7 @@ const initialState = {
 
 // Slice
 const teachingNoteSlice = createSlice({
-  name: 'teachingNotes',
+  name: "teachingNotes",
   initialState,
   reducers: {
     setFilters: (state, action) => {
@@ -203,7 +206,8 @@ const teachingNoteSlice = createSlice({
       })
       .addCase(fetchTeachingNoteById.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentTeachingNote = action.payload.teachingNote || action.payload;
+        state.currentTeachingNote =
+          action.payload.teachingNote || action.payload;
       })
       .addCase(fetchTeachingNoteById.rejected, (state, action) => {
         state.loading = false;
@@ -216,7 +220,9 @@ const teachingNoteSlice = createSlice({
       })
       .addCase(createTeachingNote.fulfilled, (state, action) => {
         state.loading = false;
-        state.teachingNotes.unshift(action.payload.teachingNote || action.payload);
+        state.teachingNotes.unshift(
+          action.payload.teachingNote || action.payload
+        );
       })
       .addCase(createTeachingNote.rejected, (state, action) => {
         state.loading = false;
@@ -230,7 +236,9 @@ const teachingNoteSlice = createSlice({
       .addCase(updateTeachingNote.fulfilled, (state, action) => {
         state.loading = false;
         const updatedNote = action.payload.teachingNote || action.payload;
-        const index = state.teachingNotes.findIndex((tn) => tn.id === updatedNote.id);
+        const index = state.teachingNotes.findIndex(
+          (tn) => tn.id === updatedNote.id
+        );
         if (index !== -1) {
           state.teachingNotes[index] = updatedNote;
         }
@@ -249,7 +257,9 @@ const teachingNoteSlice = createSlice({
       })
       .addCase(deleteTeachingNote.fulfilled, (state, action) => {
         state.loading = false;
-        state.teachingNotes = state.teachingNotes.filter((tn) => tn.id !== action.payload);
+        state.teachingNotes = state.teachingNotes.filter(
+          (tn) => tn.id !== action.payload
+        );
         if (state.currentTeachingNote?.id === action.payload) {
           state.currentTeachingNote = null;
         }

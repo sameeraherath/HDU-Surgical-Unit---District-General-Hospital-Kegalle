@@ -411,7 +411,10 @@ exports.getConsultationStats = async (req, res) => {
       where,
       attributes: [
         "status",
-        [Consultation.sequelize.fn("COUNT", Consultation.sequelize.col("id")), "count"],
+        [
+          Consultation.sequelize.fn("COUNT", Consultation.sequelize.col("id")),
+          "count",
+        ],
       ],
       group: ["status"],
       raw: true,
@@ -421,7 +424,10 @@ exports.getConsultationStats = async (req, res) => {
       where,
       attributes: [
         "urgency",
-        [Consultation.sequelize.fn("COUNT", Consultation.sequelize.col("id")), "count"],
+        [
+          Consultation.sequelize.fn("COUNT", Consultation.sequelize.col("id")),
+          "count",
+        ],
       ],
       group: ["urgency"],
       raw: true,
@@ -431,7 +437,10 @@ exports.getConsultationStats = async (req, res) => {
       where,
       attributes: [
         "consultationType",
-        [Consultation.sequelize.fn("COUNT", Consultation.sequelize.col("id")), "count"],
+        [
+          Consultation.sequelize.fn("COUNT", Consultation.sequelize.col("id")),
+          "count",
+        ],
       ],
       group: ["consultationType"],
       raw: true,

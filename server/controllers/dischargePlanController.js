@@ -488,7 +488,13 @@ exports.getDischargeStats = async (req, res) => {
       where,
       attributes: [
         "status",
-        [DischargePlan.sequelize.fn("COUNT", DischargePlan.sequelize.col("id")), "count"],
+        [
+          DischargePlan.sequelize.fn(
+            "COUNT",
+            DischargePlan.sequelize.col("id")
+          ),
+          "count",
+        ],
       ],
       group: ["status"],
       raw: true,
@@ -498,7 +504,13 @@ exports.getDischargeStats = async (req, res) => {
       where,
       attributes: [
         "dischargeDestination",
-        [DischargePlan.sequelize.fn("COUNT", DischargePlan.sequelize.col("id")), "count"],
+        [
+          DischargePlan.sequelize.fn(
+            "COUNT",
+            DischargePlan.sequelize.col("id")
+          ),
+          "count",
+        ],
       ],
       group: ["dischargeDestination"],
       raw: true,

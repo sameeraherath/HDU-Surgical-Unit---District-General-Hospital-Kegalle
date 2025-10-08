@@ -332,7 +332,10 @@ exports.getWardRoundStats = async (req, res) => {
       where,
       attributes: [
         "patientStatus",
-        [WardRound.sequelize.fn("COUNT", WardRound.sequelize.col("id")), "count"],
+        [
+          WardRound.sequelize.fn("COUNT", WardRound.sequelize.col("id")),
+          "count",
+        ],
       ],
       group: ["patientStatus"],
       raw: true,

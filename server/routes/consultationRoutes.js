@@ -23,7 +23,10 @@ router.get("/my-consultations", consultationController.getMyConsultations);
 router.get("/stats", consultationController.getConsultationStats);
 
 // Get consultations by patient
-router.get("/patient/:patientId", consultationController.getConsultationsByPatient);
+router.get(
+  "/patient/:patientId",
+  consultationController.getConsultationsByPatient
+);
 
 // Get single consultation
 router.get("/:id", consultationController.getConsultationById);

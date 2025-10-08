@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 
 /**
  * Clinical Audit API Client
@@ -7,19 +7,30 @@ import apiClient from './apiClient';
 
 // Create a new clinical audit
 export const createClinicalAudit = async (auditData) => {
-  const response = await apiClient.post('/consultant/clinical-audits', auditData);
+  const response = await apiClient.post(
+    "/consultant/clinical-audits",
+    auditData
+  );
   return response.data;
 };
 
 // Get all clinical audits with pagination and filters
 export const getAllClinicalAudits = async (params = {}) => {
-  const response = await apiClient.get('/consultant/clinical-audits', { params });
+  const response = await apiClient.get("/consultant/clinical-audits", {
+    params,
+  });
   return response.data;
 };
 
 // Get clinical audits by consultant
-export const getClinicalAuditsByConsultant = async (consultantId, params = {}) => {
-  const response = await apiClient.get(`/consultant/clinical-audits/consultant/${consultantId}`, { params });
+export const getClinicalAuditsByConsultant = async (
+  consultantId,
+  params = {}
+) => {
+  const response = await apiClient.get(
+    `/consultant/clinical-audits/consultant/${consultantId}`,
+    { params }
+  );
   return response.data;
 };
 
@@ -31,19 +42,28 @@ export const getClinicalAuditById = async (id) => {
 
 // Update a clinical audit
 export const updateClinicalAudit = async (id, auditData) => {
-  const response = await apiClient.put(`/consultant/clinical-audits/${id}`, auditData);
+  const response = await apiClient.put(
+    `/consultant/clinical-audits/${id}`,
+    auditData
+  );
   return response.data;
 };
 
 // Update audit status
 export const updateAuditStatus = async (id, statusData) => {
-  const response = await apiClient.patch(`/consultant/clinical-audits/${id}/status`, statusData);
+  const response = await apiClient.patch(
+    `/consultant/clinical-audits/${id}/status`,
+    statusData
+  );
   return response.data;
 };
 
 // Record audit presentation
 export const recordPresentation = async (id, presentationData) => {
-  const response = await apiClient.post(`/consultant/clinical-audits/${id}/presentation`, presentationData);
+  const response = await apiClient.post(
+    `/consultant/clinical-audits/${id}/presentation`,
+    presentationData
+  );
   return response.data;
 };
 
@@ -55,7 +75,7 @@ export const deleteClinicalAudit = async (id) => {
 
 // Get clinical audit statistics
 export const getAuditStats = async () => {
-  const response = await apiClient.get('/consultant/clinical-audits/stats');
+  const response = await apiClient.get("/consultant/clinical-audits/stats");
   return response.data;
 };
 

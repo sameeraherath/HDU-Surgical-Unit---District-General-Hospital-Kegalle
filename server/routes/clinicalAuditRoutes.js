@@ -17,7 +17,10 @@ router.get("/", clinicalAuditController.getAllClinicalAudits);
 router.get("/stats", clinicalAuditController.getAuditStats);
 
 // Get clinical audits by consultant
-router.get("/consultant/:consultantId", clinicalAuditController.getClinicalAuditsByConsultant);
+router.get(
+  "/consultant/:consultantId",
+  clinicalAuditController.getClinicalAuditsByConsultant
+);
 
 // Get single clinical audit
 router.get("/:id", clinicalAuditController.getClinicalAuditById);

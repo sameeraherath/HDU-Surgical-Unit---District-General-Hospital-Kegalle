@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as consultantApi from '../../api/consultantApi';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as consultantApi from "../../api/consultantApi";
 
 // Async thunks
 export const fetchDashboardStats = createAsyncThunk(
-  'consultant/fetchDashboardStats',
+  "consultant/fetchDashboardStats",
   async (_, { rejectWithValue }) => {
     try {
       return await consultantApi.getDashboardStats();
@@ -14,7 +14,7 @@ export const fetchDashboardStats = createAsyncThunk(
 );
 
 export const fetchPatientsNeedingAttention = createAsyncThunk(
-  'consultant/fetchPatientsNeedingAttention',
+  "consultant/fetchPatientsNeedingAttention",
   async (_, { rejectWithValue }) => {
     try {
       return await consultantApi.getPatientsNeedingAttention();
@@ -25,7 +25,7 @@ export const fetchPatientsNeedingAttention = createAsyncThunk(
 );
 
 export const fetchRecentActivity = createAsyncThunk(
-  'consultant/fetchRecentActivity',
+  "consultant/fetchRecentActivity",
   async (params, { rejectWithValue }) => {
     try {
       return await consultantApi.getRecentActivity(params);
@@ -36,7 +36,7 @@ export const fetchRecentActivity = createAsyncThunk(
 );
 
 export const fetchWorkloadMetrics = createAsyncThunk(
-  'consultant/fetchWorkloadMetrics',
+  "consultant/fetchWorkloadMetrics",
   async (_, { rejectWithValue }) => {
     try {
       return await consultantApi.getWorkloadMetrics();
@@ -47,7 +47,7 @@ export const fetchWorkloadMetrics = createAsyncThunk(
 );
 
 export const fetchUpcomingDischarges = createAsyncThunk(
-  'consultant/fetchUpcomingDischarges',
+  "consultant/fetchUpcomingDischarges",
   async (params, { rejectWithValue }) => {
     try {
       return await consultantApi.getUpcomingDischarges(params);
@@ -58,7 +58,7 @@ export const fetchUpcomingDischarges = createAsyncThunk(
 );
 
 export const refreshAllData = createAsyncThunk(
-  'consultant/refreshAllData',
+  "consultant/refreshAllData",
   async (params, { rejectWithValue }) => {
     try {
       return await consultantApi.refreshAllData(params);
@@ -93,7 +93,7 @@ const initialState = {
     pendingConsultations: 0,
     pendingDischarges: 0,
     workloadScore: 0,
-    workloadLevel: 'LOW',
+    workloadLevel: "LOW",
   },
   upcomingDischarges: [],
   loading: false,
@@ -103,7 +103,7 @@ const initialState = {
 
 // Slice
 const consultantSlice = createSlice({
-  name: 'consultant',
+  name: "consultant",
   initialState,
   reducers: {
     clearDashboardData: (state) => {
@@ -140,7 +140,8 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchPatientsNeedingAttention.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientsNeedingAttention = action.payload.patients || action.payload;
+        state.patientsNeedingAttention =
+          action.payload.patients || action.payload;
       })
       .addCase(fetchPatientsNeedingAttention.rejected, (state, action) => {
         state.loading = false;
@@ -179,7 +180,8 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchUpcomingDischarges.fulfilled, (state, action) => {
         state.loading = false;
-        state.upcomingDischarges = action.payload.dischargePlans || action.payload;
+        state.upcomingDischarges =
+          action.payload.dischargePlans || action.payload;
       })
       .addCase(fetchUpcomingDischarges.rejected, (state, action) => {
         state.loading = false;
@@ -194,10 +196,12 @@ const consultantSlice = createSlice({
         state.loading = false;
         const data = action.payload;
         if (data.dashboardStats) state.dashboardStats = data.dashboardStats;
-        if (data.patientsNeedingAttention) state.patientsNeedingAttention = data.patientsNeedingAttention;
+        if (data.patientsNeedingAttention)
+          state.patientsNeedingAttention = data.patientsNeedingAttention;
         if (data.recentActivity) state.recentActivity = data.recentActivity;
         if (data.workloadMetrics) state.workloadMetrics = data.workloadMetrics;
-        if (data.upcomingDischarges) state.upcomingDischarges = data.upcomingDischarges;
+        if (data.upcomingDischarges)
+          state.upcomingDischarges = data.upcomingDischarges;
         state.lastRefreshed = new Date().toISOString();
       })
       .addCase(refreshAllData.rejected, (state, action) => {

@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 
 /**
  * Ward Round API Client
@@ -7,25 +7,30 @@ import apiClient from './apiClient';
 
 // Create a new ward round
 export const createWardRound = async (wardRoundData) => {
-  const response = await apiClient.post('/consultant/ward-rounds', wardRoundData);
+  const response = await apiClient.post(
+    "/consultant/ward-rounds",
+    wardRoundData
+  );
   return response.data;
 };
 
 // Get all ward rounds with pagination and filters
 export const getAllWardRounds = async (params = {}) => {
-  const response = await apiClient.get('/consultant/ward-rounds', { params });
+  const response = await apiClient.get("/consultant/ward-rounds", { params });
   return response.data;
 };
 
 // Get ward rounds for a specific patient
 export const getWardRoundsByPatient = async (patientId) => {
-  const response = await apiClient.get(`/consultant/ward-rounds/patient/${patientId}`);
+  const response = await apiClient.get(
+    `/consultant/ward-rounds/patient/${patientId}`
+  );
   return response.data;
 };
 
 // Get today's ward rounds for the logged-in consultant
 export const getTodaysWardRounds = async () => {
-  const response = await apiClient.get('/consultant/ward-rounds/today');
+  const response = await apiClient.get("/consultant/ward-rounds/today");
   return response.data;
 };
 
@@ -37,13 +42,19 @@ export const getWardRoundById = async (id) => {
 
 // Update a ward round
 export const updateWardRound = async (id, wardRoundData) => {
-  const response = await apiClient.put(`/consultant/ward-rounds/${id}`, wardRoundData);
+  const response = await apiClient.put(
+    `/consultant/ward-rounds/${id}`,
+    wardRoundData
+  );
   return response.data;
 };
 
 // Review a ward round (senior consultant)
 export const reviewWardRound = async (id, reviewData) => {
-  const response = await apiClient.post(`/consultant/ward-rounds/${id}/review`, reviewData);
+  const response = await apiClient.post(
+    `/consultant/ward-rounds/${id}/review`,
+    reviewData
+  );
   return response.data;
 };
 
@@ -55,7 +66,7 @@ export const deleteWardRound = async (id) => {
 
 // Get ward round statistics
 export const getWardRoundStats = async () => {
-  const response = await apiClient.get('/consultant/ward-rounds/stats');
+  const response = await apiClient.get("/consultant/ward-rounds/stats");
   return response.data;
 };
 

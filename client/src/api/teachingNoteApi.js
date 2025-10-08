@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 
 /**
  * Teaching Note API Client
@@ -7,25 +7,38 @@ import apiClient from './apiClient';
 
 // Create a new teaching note
 export const createTeachingNote = async (teachingNoteData) => {
-  const response = await apiClient.post('/consultant/teaching-notes', teachingNoteData);
+  const response = await apiClient.post(
+    "/consultant/teaching-notes",
+    teachingNoteData
+  );
   return response.data;
 };
 
 // Get all teaching notes with pagination and filters
 export const getAllTeachingNotes = async (params = {}) => {
-  const response = await apiClient.get('/consultant/teaching-notes', { params });
+  const response = await apiClient.get("/consultant/teaching-notes", {
+    params,
+  });
   return response.data;
 };
 
 // Get teaching notes by consultant
-export const getTeachingNotesByConsultant = async (consultantId, params = {}) => {
-  const response = await apiClient.get(`/consultant/teaching-notes/consultant/${consultantId}`, { params });
+export const getTeachingNotesByConsultant = async (
+  consultantId,
+  params = {}
+) => {
+  const response = await apiClient.get(
+    `/consultant/teaching-notes/consultant/${consultantId}`,
+    { params }
+  );
   return response.data;
 };
 
 // Get teaching notes by patient (case-based teaching)
 export const getTeachingNotesByPatient = async (patientId) => {
-  const response = await apiClient.get(`/consultant/teaching-notes/patient/${patientId}`);
+  const response = await apiClient.get(
+    `/consultant/teaching-notes/patient/${patientId}`
+  );
   return response.data;
 };
 
@@ -37,7 +50,10 @@ export const getTeachingNoteById = async (id) => {
 
 // Update a teaching note
 export const updateTeachingNote = async (id, teachingNoteData) => {
-  const response = await apiClient.put(`/consultant/teaching-notes/${id}`, teachingNoteData);
+  const response = await apiClient.put(
+    `/consultant/teaching-notes/${id}`,
+    teachingNoteData
+  );
   return response.data;
 };
 
@@ -49,15 +65,15 @@ export const deleteTeachingNote = async (id) => {
 
 // Search teaching notes
 export const searchTeachingNotes = async (searchQuery) => {
-  const response = await apiClient.get('/consultant/teaching-notes/search', {
-    params: { q: searchQuery }
+  const response = await apiClient.get("/consultant/teaching-notes/search", {
+    params: { q: searchQuery },
   });
   return response.data;
 };
 
 // Get teaching note statistics
 export const getTeachingStats = async () => {
-  const response = await apiClient.get('/consultant/teaching-notes/stats');
+  const response = await apiClient.get("/consultant/teaching-notes/stats");
   return response.data;
 };
 

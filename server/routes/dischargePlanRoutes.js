@@ -20,7 +20,10 @@ router.get("/pending", dischargePlanController.getPendingDischargePlans);
 router.get("/stats", dischargePlanController.getDischargeStats);
 
 // Get discharge plan by patient
-router.get("/patient/:patientId", dischargePlanController.getDischargePlanByPatient);
+router.get(
+  "/patient/:patientId",
+  dischargePlanController.getDischargePlanByPatient
+);
 
 // Get single discharge plan
 router.get("/:id", dischargePlanController.getDischargePlanById);
@@ -41,6 +44,9 @@ router.post("/:id/complete", dischargePlanController.completeDischargePlan);
 router.post("/:id/cancel", dischargePlanController.cancelDischargePlan);
 
 // Update checklist
-router.patch("/:id/checklist", dischargePlanController.updateDischargeChecklist);
+router.patch(
+  "/:id/checklist",
+  dischargePlanController.updateDischargeChecklist
+);
 
 module.exports = router;

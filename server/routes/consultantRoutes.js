@@ -11,7 +11,10 @@ router.use(authenticateJWT);
 router.get("/stats/overview", consultantController.getDashboardStats);
 
 // Patients needing attention
-router.get("/stats/patients-needing-attention", consultantController.getPatientsNeedingAttention);
+router.get(
+  "/stats/patients-needing-attention",
+  consultantController.getPatientsNeedingAttention
+);
 
 // Recent activity
 router.get("/stats/recent-activity", consultantController.getRecentActivity);
@@ -20,7 +23,10 @@ router.get("/stats/recent-activity", consultantController.getRecentActivity);
 router.get("/stats/workload", consultantController.getWorkloadMetrics);
 
 // Upcoming discharges
-router.get("/stats/upcoming-discharges", consultantController.getUpcomingDischarges);
+router.get(
+  "/stats/upcoming-discharges",
+  consultantController.getUpcomingDischarges
+);
 
 // Refresh all data
 router.get("/stats/refresh", consultantController.refreshAllData);

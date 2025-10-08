@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as wardRoundApi from '../../api/wardRoundApi';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as wardRoundApi from "../../api/wardRoundApi";
 
 // Async thunks
 export const fetchAllWardRounds = createAsyncThunk(
-  'wardRounds/fetchAll',
+  "wardRounds/fetchAll",
   async (params, { rejectWithValue }) => {
     try {
       return await wardRoundApi.getAllWardRounds(params);
@@ -14,7 +14,7 @@ export const fetchAllWardRounds = createAsyncThunk(
 );
 
 export const fetchWardRoundsByPatient = createAsyncThunk(
-  'wardRounds/fetchByPatient',
+  "wardRounds/fetchByPatient",
   async (patientId, { rejectWithValue }) => {
     try {
       return await wardRoundApi.getWardRoundsByPatient(patientId);
@@ -25,7 +25,7 @@ export const fetchWardRoundsByPatient = createAsyncThunk(
 );
 
 export const fetchTodaysWardRounds = createAsyncThunk(
-  'wardRounds/fetchTodays',
+  "wardRounds/fetchTodays",
   async (_, { rejectWithValue }) => {
     try {
       return await wardRoundApi.getTodaysWardRounds();
@@ -36,7 +36,7 @@ export const fetchTodaysWardRounds = createAsyncThunk(
 );
 
 export const fetchWardRoundById = createAsyncThunk(
-  'wardRounds/fetchById',
+  "wardRounds/fetchById",
   async (id, { rejectWithValue }) => {
     try {
       return await wardRoundApi.getWardRoundById(id);
@@ -47,7 +47,7 @@ export const fetchWardRoundById = createAsyncThunk(
 );
 
 export const createWardRound = createAsyncThunk(
-  'wardRounds/create',
+  "wardRounds/create",
   async (wardRoundData, { rejectWithValue }) => {
     try {
       return await wardRoundApi.createWardRound(wardRoundData);
@@ -58,7 +58,7 @@ export const createWardRound = createAsyncThunk(
 );
 
 export const updateWardRound = createAsyncThunk(
-  'wardRounds/update',
+  "wardRounds/update",
   async ({ id, wardRoundData }, { rejectWithValue }) => {
     try {
       return await wardRoundApi.updateWardRound(id, wardRoundData);
@@ -69,7 +69,7 @@ export const updateWardRound = createAsyncThunk(
 );
 
 export const reviewWardRound = createAsyncThunk(
-  'wardRounds/review',
+  "wardRounds/review",
   async ({ id, reviewData }, { rejectWithValue }) => {
     try {
       return await wardRoundApi.reviewWardRound(id, reviewData);
@@ -80,7 +80,7 @@ export const reviewWardRound = createAsyncThunk(
 );
 
 export const deleteWardRound = createAsyncThunk(
-  'wardRounds/delete',
+  "wardRounds/delete",
   async (id, { rejectWithValue }) => {
     try {
       await wardRoundApi.deleteWardRound(id);
@@ -92,7 +92,7 @@ export const deleteWardRound = createAsyncThunk(
 );
 
 export const fetchWardRoundStats = createAsyncThunk(
-  'wardRounds/fetchStats',
+  "wardRounds/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
       return await wardRoundApi.getWardRoundStats();
@@ -128,7 +128,7 @@ const initialState = {
 
 // Slice
 const wardRoundSlice = createSlice({
-  name: 'wardRounds',
+  name: "wardRounds",
   initialState,
   reducers: {
     setFilters: (state, action) => {
@@ -225,7 +225,9 @@ const wardRoundSlice = createSlice({
       .addCase(updateWardRound.fulfilled, (state, action) => {
         state.loading = false;
         const updatedWardRound = action.payload.wardRound || action.payload;
-        const index = state.wardRounds.findIndex((wr) => wr.id === updatedWardRound.id);
+        const index = state.wardRounds.findIndex(
+          (wr) => wr.id === updatedWardRound.id
+        );
         if (index !== -1) {
           state.wardRounds[index] = updatedWardRound;
         }
@@ -245,7 +247,9 @@ const wardRoundSlice = createSlice({
       .addCase(reviewWardRound.fulfilled, (state, action) => {
         state.loading = false;
         const reviewedWardRound = action.payload.wardRound || action.payload;
-        const index = state.wardRounds.findIndex((wr) => wr.id === reviewedWardRound.id);
+        const index = state.wardRounds.findIndex(
+          (wr) => wr.id === reviewedWardRound.id
+        );
         if (index !== -1) {
           state.wardRounds[index] = reviewedWardRound;
         }
@@ -264,7 +268,9 @@ const wardRoundSlice = createSlice({
       })
       .addCase(deleteWardRound.fulfilled, (state, action) => {
         state.loading = false;
-        state.wardRounds = state.wardRounds.filter((wr) => wr.id !== action.payload);
+        state.wardRounds = state.wardRounds.filter(
+          (wr) => wr.id !== action.payload
+        );
         if (state.currentWardRound?.id === action.payload) {
           state.currentWardRound = null;
         }

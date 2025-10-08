@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as clinicalAuditApi from '../../api/clinicalAuditApi';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as clinicalAuditApi from "../../api/clinicalAuditApi";
 
 // Async thunks
 export const fetchAllClinicalAudits = createAsyncThunk(
-  'clinicalAudits/fetchAll',
+  "clinicalAudits/fetchAll",
   async (params, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.getAllClinicalAudits(params);
@@ -14,10 +14,13 @@ export const fetchAllClinicalAudits = createAsyncThunk(
 );
 
 export const fetchClinicalAuditsByConsultant = createAsyncThunk(
-  'clinicalAudits/fetchByConsultant',
+  "clinicalAudits/fetchByConsultant",
   async ({ consultantId, params }, { rejectWithValue }) => {
     try {
-      return await clinicalAuditApi.getClinicalAuditsByConsultant(consultantId, params);
+      return await clinicalAuditApi.getClinicalAuditsByConsultant(
+        consultantId,
+        params
+      );
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -25,7 +28,7 @@ export const fetchClinicalAuditsByConsultant = createAsyncThunk(
 );
 
 export const fetchClinicalAuditById = createAsyncThunk(
-  'clinicalAudits/fetchById',
+  "clinicalAudits/fetchById",
   async (id, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.getClinicalAuditById(id);
@@ -36,7 +39,7 @@ export const fetchClinicalAuditById = createAsyncThunk(
 );
 
 export const createClinicalAudit = createAsyncThunk(
-  'clinicalAudits/create',
+  "clinicalAudits/create",
   async (auditData, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.createClinicalAudit(auditData);
@@ -47,7 +50,7 @@ export const createClinicalAudit = createAsyncThunk(
 );
 
 export const updateClinicalAudit = createAsyncThunk(
-  'clinicalAudits/update',
+  "clinicalAudits/update",
   async ({ id, auditData }, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.updateClinicalAudit(id, auditData);
@@ -58,7 +61,7 @@ export const updateClinicalAudit = createAsyncThunk(
 );
 
 export const updateAuditStatus = createAsyncThunk(
-  'clinicalAudits/updateStatus',
+  "clinicalAudits/updateStatus",
   async ({ id, statusData }, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.updateAuditStatus(id, statusData);
@@ -69,7 +72,7 @@ export const updateAuditStatus = createAsyncThunk(
 );
 
 export const recordPresentation = createAsyncThunk(
-  'clinicalAudits/recordPresentation',
+  "clinicalAudits/recordPresentation",
   async ({ id, presentationData }, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.recordPresentation(id, presentationData);
@@ -80,7 +83,7 @@ export const recordPresentation = createAsyncThunk(
 );
 
 export const deleteClinicalAudit = createAsyncThunk(
-  'clinicalAudits/delete',
+  "clinicalAudits/delete",
   async (id, { rejectWithValue }) => {
     try {
       await clinicalAuditApi.deleteClinicalAudit(id);
@@ -92,7 +95,7 @@ export const deleteClinicalAudit = createAsyncThunk(
 );
 
 export const fetchAuditStats = createAsyncThunk(
-  'clinicalAudits/fetchStats',
+  "clinicalAudits/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
       return await clinicalAuditApi.getAuditStats();
@@ -124,7 +127,7 @@ const initialState = {
 
 // Slice
 const clinicalAuditSlice = createSlice({
-  name: 'clinicalAudits',
+  name: "clinicalAudits",
   initialState,
   reducers: {
     setFilters: (state, action) => {

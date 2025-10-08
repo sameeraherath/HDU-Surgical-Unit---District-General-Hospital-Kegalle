@@ -304,7 +304,10 @@ exports.getTeachingStats = async (req, res) => {
       where,
       attributes: [
         "sessionType",
-        [TeachingNote.sequelize.fn("COUNT", TeachingNote.sequelize.col("id")), "count"],
+        [
+          TeachingNote.sequelize.fn("COUNT", TeachingNote.sequelize.col("id")),
+          "count",
+        ],
       ],
       group: ["sessionType"],
       raw: true,

@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as consultationApi from '../../api/consultationApi';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as consultationApi from "../../api/consultationApi";
 
 // Async thunks
 export const fetchAllConsultations = createAsyncThunk(
-  'consultations/fetchAll',
+  "consultations/fetchAll",
   async (params, { rejectWithValue }) => {
     try {
       return await consultationApi.getAllConsultations(params);
@@ -14,7 +14,7 @@ export const fetchAllConsultations = createAsyncThunk(
 );
 
 export const fetchPendingConsultations = createAsyncThunk(
-  'consultations/fetchPending',
+  "consultations/fetchPending",
   async (_, { rejectWithValue }) => {
     try {
       return await consultationApi.getPendingConsultations();
@@ -25,7 +25,7 @@ export const fetchPendingConsultations = createAsyncThunk(
 );
 
 export const fetchMyConsultations = createAsyncThunk(
-  'consultations/fetchMy',
+  "consultations/fetchMy",
   async (params, { rejectWithValue }) => {
     try {
       return await consultationApi.getMyConsultations(params);
@@ -36,7 +36,7 @@ export const fetchMyConsultations = createAsyncThunk(
 );
 
 export const fetchConsultationsByPatient = createAsyncThunk(
-  'consultations/fetchByPatient',
+  "consultations/fetchByPatient",
   async (patientId, { rejectWithValue }) => {
     try {
       return await consultationApi.getConsultationsByPatient(patientId);
@@ -47,7 +47,7 @@ export const fetchConsultationsByPatient = createAsyncThunk(
 );
 
 export const fetchConsultationById = createAsyncThunk(
-  'consultations/fetchById',
+  "consultations/fetchById",
   async (id, { rejectWithValue }) => {
     try {
       return await consultationApi.getConsultationById(id);
@@ -58,7 +58,7 @@ export const fetchConsultationById = createAsyncThunk(
 );
 
 export const createConsultation = createAsyncThunk(
-  'consultations/create',
+  "consultations/create",
   async (consultationData, { rejectWithValue }) => {
     try {
       return await consultationApi.createConsultation(consultationData);
@@ -69,7 +69,7 @@ export const createConsultation = createAsyncThunk(
 );
 
 export const assignConsultation = createAsyncThunk(
-  'consultations/assign',
+  "consultations/assign",
   async ({ id, assignmentData }, { rejectWithValue }) => {
     try {
       return await consultationApi.assignConsultation(id, assignmentData);
@@ -80,7 +80,7 @@ export const assignConsultation = createAsyncThunk(
 );
 
 export const updateConsultationStatus = createAsyncThunk(
-  'consultations/updateStatus',
+  "consultations/updateStatus",
   async ({ id, statusData }, { rejectWithValue }) => {
     try {
       return await consultationApi.updateConsultationStatus(id, statusData);
@@ -91,7 +91,7 @@ export const updateConsultationStatus = createAsyncThunk(
 );
 
 export const completeConsultation = createAsyncThunk(
-  'consultations/complete',
+  "consultations/complete",
   async ({ id, completionData }, { rejectWithValue }) => {
     try {
       return await consultationApi.completeConsultation(id, completionData);
@@ -102,7 +102,7 @@ export const completeConsultation = createAsyncThunk(
 );
 
 export const cancelConsultation = createAsyncThunk(
-  'consultations/cancel',
+  "consultations/cancel",
   async ({ id, cancelData }, { rejectWithValue }) => {
     try {
       return await consultationApi.cancelConsultation(id, cancelData);
@@ -113,7 +113,7 @@ export const cancelConsultation = createAsyncThunk(
 );
 
 export const fetchConsultationStats = createAsyncThunk(
-  'consultations/fetchStats',
+  "consultations/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
       return await consultationApi.getConsultationStats();
@@ -149,7 +149,7 @@ const initialState = {
 
 // Slice
 const consultationSlice = createSlice({
-  name: 'consultations',
+  name: "consultations",
   initialState,
   reducers: {
     setFilters: (state, action) => {
@@ -193,7 +193,8 @@ const consultationSlice = createSlice({
       })
       .addCase(fetchPendingConsultations.fulfilled, (state, action) => {
         state.loading = false;
-        state.pendingConsultations = action.payload.consultations || action.payload;
+        state.pendingConsultations =
+          action.payload.consultations || action.payload;
       })
       .addCase(fetchPendingConsultations.rejected, (state, action) => {
         state.loading = false;
@@ -222,7 +223,8 @@ const consultationSlice = createSlice({
       })
       .addCase(fetchConsultationsByPatient.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientConsultations = action.payload.consultations || action.payload;
+        state.patientConsultations =
+          action.payload.consultations || action.payload;
       })
       .addCase(fetchConsultationsByPatient.rejected, (state, action) => {
         state.loading = false;
@@ -235,7 +237,8 @@ const consultationSlice = createSlice({
       })
       .addCase(fetchConsultationById.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentConsultation = action.payload.consultation || action.payload;
+        state.currentConsultation =
+          action.payload.consultation || action.payload;
       })
       .addCase(fetchConsultationById.rejected, (state, action) => {
         state.loading = false;
@@ -248,7 +251,9 @@ const consultationSlice = createSlice({
       })
       .addCase(createConsultation.fulfilled, (state, action) => {
         state.loading = false;
-        state.consultations.unshift(action.payload.consultation || action.payload);
+        state.consultations.unshift(
+          action.payload.consultation || action.payload
+        );
       })
       .addCase(createConsultation.rejected, (state, action) => {
         state.loading = false;
@@ -261,8 +266,11 @@ const consultationSlice = createSlice({
       })
       .addCase(assignConsultation.fulfilled, (state, action) => {
         state.loading = false;
-        const assignedConsultation = action.payload.consultation || action.payload;
-        const index = state.consultations.findIndex((c) => c.id === assignedConsultation.id);
+        const assignedConsultation =
+          action.payload.consultation || action.payload;
+        const index = state.consultations.findIndex(
+          (c) => c.id === assignedConsultation.id
+        );
         if (index !== -1) {
           state.consultations[index] = assignedConsultation;
         }
@@ -284,8 +292,11 @@ const consultationSlice = createSlice({
       })
       .addCase(updateConsultationStatus.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedConsultation = action.payload.consultation || action.payload;
-        const index = state.consultations.findIndex((c) => c.id === updatedConsultation.id);
+        const updatedConsultation =
+          action.payload.consultation || action.payload;
+        const index = state.consultations.findIndex(
+          (c) => c.id === updatedConsultation.id
+        );
         if (index !== -1) {
           state.consultations[index] = updatedConsultation;
         }
@@ -304,13 +315,16 @@ const consultationSlice = createSlice({
       })
       .addCase(completeConsultation.fulfilled, (state, action) => {
         state.loading = false;
-        const completedConsultation = action.payload.consultation || action.payload;
-        const index = state.consultations.findIndex((c) => c.id === completedConsultation.id);
+        const completedConsultation =
+          action.payload.consultation || action.payload;
+        const index = state.consultations.findIndex(
+          (c) => c.id === completedConsultation.id
+        );
         if (index !== -1) {
           state.consultations[index] = completedConsultation;
         }
         state.myConsultations = state.myConsultations.filter(
-          (c) => c.id !== completedConsultation.id || c.status !== 'COMPLETED'
+          (c) => c.id !== completedConsultation.id || c.status !== "COMPLETED"
         );
         if (state.currentConsultation?.id === completedConsultation.id) {
           state.currentConsultation = completedConsultation;
@@ -327,8 +341,11 @@ const consultationSlice = createSlice({
       })
       .addCase(cancelConsultation.fulfilled, (state, action) => {
         state.loading = false;
-        const cancelledConsultation = action.payload.consultation || action.payload;
-        const index = state.consultations.findIndex((c) => c.id === cancelledConsultation.id);
+        const cancelledConsultation =
+          action.payload.consultation || action.payload;
+        const index = state.consultations.findIndex(
+          (c) => c.id === cancelledConsultation.id
+        );
         if (index !== -1) {
           state.consultations[index] = cancelledConsultation;
         }

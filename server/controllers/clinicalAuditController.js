@@ -49,13 +49,7 @@ exports.createClinicalAudit = async (req, res) => {
 // Get all clinical audits (with filters)
 exports.getAllClinicalAudits = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 20,
-      auditType,
-      status,
-      consultantId,
-    } = req.query;
+    const { page = 1, limit = 20, auditType, status, consultantId } = req.query;
 
     const where = {};
 
@@ -306,7 +300,13 @@ exports.getAuditStats = async (req, res) => {
       where,
       attributes: [
         "auditType",
-        [ClinicalAudit.sequelize.fn("COUNT", ClinicalAudit.sequelize.col("id")), "count"],
+        [
+          ClinicalAudit.sequelize.fn(
+            "COUNT",
+            ClinicalAudit.sequelize.col("id")
+          ),
+          "count",
+        ],
       ],
       group: ["auditType"],
       raw: true,
@@ -316,7 +316,13 @@ exports.getAuditStats = async (req, res) => {
       where,
       attributes: [
         "status",
-        [ClinicalAudit.sequelize.fn("COUNT", ClinicalAudit.sequelize.col("id")), "count"],
+        [
+          ClinicalAudit.sequelize.fn(
+            "COUNT",
+            ClinicalAudit.sequelize.col("id")
+          ),
+          "count",
+        ],
       ],
       group: ["status"],
       raw: true,
@@ -336,7 +342,13 @@ exports.getAuditStats = async (req, res) => {
         complianceRate: { [Op.ne]: null },
       },
       attributes: [
-        [ClinicalAudit.sequelize.fn("AVG", ClinicalAudit.sequelize.col("complianceRate")), "avg"],
+        [
+          ClinicalAudit.sequelize.fn(
+            "AVG",
+            ClinicalAudit.sequelize.col("complianceRate")
+          ),
+          "avg",
+        ],
       ],
       raw: true,
     });

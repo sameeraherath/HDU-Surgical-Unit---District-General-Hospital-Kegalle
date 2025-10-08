@@ -119,7 +119,9 @@ exports.getPatientsNeedingAttention = async (req, res) => {
     const wardRounds = await WardRound.findAll({
       where: {
         consultantId,
-        patientStatus: { [Op.in]: ["CRITICAL", "DETERIORATING", "FOR_DISCHARGE"] },
+        patientStatus: {
+          [Op.in]: ["CRITICAL", "DETERIORATING", "FOR_DISCHARGE"],
+        },
         roundDate: {
           [Op.gte]: new Date(Date.now() - 48 * 60 * 60 * 1000), // Last 48 hours
         },
@@ -319,10 +321,19 @@ exports.getUpcomingDischarges = async (req, res) => {
 exports.refreshAllData = async (req, res) => {
   try {
     // Call all stat functions and combine results
-    const dashboardStats = await exports.getDashboardStats(req, { json: (data) => data });
-    const patientsNeedingAttention = await exports.getPatientsNeedingAttention(req, { json: (data) => data });
-    const recentActivity = await exports.getRecentActivity(req, { json: (data) => data });
-    const workloadMetrics = await exports.getWorkloadMetrics(req, { json: (data) => data });
+    const dashboardStats = await exports.getDashboardStats(req, {
+      json: (data) => data,
+    });
+    const patientsNeedingAttention = await exports.getPatientsNeedingAttention(
+      req,
+      { json: (data) => data }
+    );
+    const recentActivity = await exports.getRecentActivity(req, {
+      json: (data) => data,
+    });
+    const workloadMetrics = await exports.getWorkloadMetrics(req, {
+      json: (data) => data,
+    });
 
     res.json({
       success: true,

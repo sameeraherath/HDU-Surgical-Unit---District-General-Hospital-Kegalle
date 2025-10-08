@@ -20,10 +20,16 @@ router.get("/search", teachingNoteController.searchTeachingNotes);
 router.get("/stats", teachingNoteController.getTeachingStats);
 
 // Get teaching notes by consultant
-router.get("/consultant/:consultantId", teachingNoteController.getTeachingNotesByConsultant);
+router.get(
+  "/consultant/:consultantId",
+  teachingNoteController.getTeachingNotesByConsultant
+);
 
 // Get teaching notes by patient
-router.get("/patient/:patientId", teachingNoteController.getTeachingNotesByPatient);
+router.get(
+  "/patient/:patientId",
+  teachingNoteController.getTeachingNotesByPatient
+);
 
 // Get single teaching note
 router.get("/:id", teachingNoteController.getTeachingNoteById);

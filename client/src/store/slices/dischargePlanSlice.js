@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as dischargePlanApi from '../../api/dischargePlanApi';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as dischargePlanApi from "../../api/dischargePlanApi";
 
 // Async thunks
 export const fetchAllDischargePlans = createAsyncThunk(
-  'dischargePlans/fetchAll',
+  "dischargePlans/fetchAll",
   async (params, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.getAllDischargePlans(params);
@@ -14,7 +14,7 @@ export const fetchAllDischargePlans = createAsyncThunk(
 );
 
 export const fetchDischargePlanByPatient = createAsyncThunk(
-  'dischargePlans/fetchByPatient',
+  "dischargePlans/fetchByPatient",
   async (patientId, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.getDischargePlanByPatient(patientId);
@@ -25,7 +25,7 @@ export const fetchDischargePlanByPatient = createAsyncThunk(
 );
 
 export const fetchPendingDischargePlans = createAsyncThunk(
-  'dischargePlans/fetchPending',
+  "dischargePlans/fetchPending",
   async (_, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.getPendingDischargePlans();
@@ -36,7 +36,7 @@ export const fetchPendingDischargePlans = createAsyncThunk(
 );
 
 export const fetchDischargePlanById = createAsyncThunk(
-  'dischargePlans/fetchById',
+  "dischargePlans/fetchById",
   async (id, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.getDischargePlanById(id);
@@ -47,7 +47,7 @@ export const fetchDischargePlanById = createAsyncThunk(
 );
 
 export const createDischargePlan = createAsyncThunk(
-  'dischargePlans/create',
+  "dischargePlans/create",
   async (dischargePlanData, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.createDischargePlan(dischargePlanData);
@@ -58,7 +58,7 @@ export const createDischargePlan = createAsyncThunk(
 );
 
 export const updateDischargePlan = createAsyncThunk(
-  'dischargePlans/update',
+  "dischargePlans/update",
   async ({ id, dischargePlanData }, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.updateDischargePlan(id, dischargePlanData);
@@ -69,7 +69,7 @@ export const updateDischargePlan = createAsyncThunk(
 );
 
 export const submitForApproval = createAsyncThunk(
-  'dischargePlans/submitForApproval',
+  "dischargePlans/submitForApproval",
   async (id, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.submitForApproval(id);
@@ -80,7 +80,7 @@ export const submitForApproval = createAsyncThunk(
 );
 
 export const approveDischargePlan = createAsyncThunk(
-  'dischargePlans/approve',
+  "dischargePlans/approve",
   async ({ id, approvalData }, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.approveDischargePlan(id, approvalData);
@@ -91,7 +91,7 @@ export const approveDischargePlan = createAsyncThunk(
 );
 
 export const completeDischargePlan = createAsyncThunk(
-  'dischargePlans/complete',
+  "dischargePlans/complete",
   async ({ id, completionData }, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.completeDischargePlan(id, completionData);
@@ -102,7 +102,7 @@ export const completeDischargePlan = createAsyncThunk(
 );
 
 export const cancelDischargePlan = createAsyncThunk(
-  'dischargePlans/cancel',
+  "dischargePlans/cancel",
   async ({ id, cancelData }, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.cancelDischargePlan(id, cancelData);
@@ -113,7 +113,7 @@ export const cancelDischargePlan = createAsyncThunk(
 );
 
 export const updateDischargeChecklist = createAsyncThunk(
-  'dischargePlans/updateChecklist',
+  "dischargePlans/updateChecklist",
   async ({ id, checklistData }, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.updateDischargeChecklist(id, checklistData);
@@ -124,7 +124,7 @@ export const updateDischargeChecklist = createAsyncThunk(
 );
 
 export const fetchDischargeStats = createAsyncThunk(
-  'dischargePlans/fetchStats',
+  "dischargePlans/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
       return await dischargePlanApi.getDischargeStats();
@@ -157,7 +157,7 @@ const initialState = {
 
 // Slice
 const dischargePlanSlice = createSlice({
-  name: 'dischargePlans',
+  name: "dischargePlans",
   initialState,
   reducers: {
     setFilters: (state, action) => {
@@ -201,7 +201,8 @@ const dischargePlanSlice = createSlice({
       })
       .addCase(fetchPendingDischargePlans.fulfilled, (state, action) => {
         state.loading = false;
-        state.pendingDischargePlans = action.payload.dischargePlans || action.payload;
+        state.pendingDischargePlans =
+          action.payload.dischargePlans || action.payload;
       })
       .addCase(fetchPendingDischargePlans.rejected, (state, action) => {
         state.loading = false;
@@ -214,7 +215,8 @@ const dischargePlanSlice = createSlice({
       })
       .addCase(fetchDischargePlanByPatient.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientDischargePlan = action.payload.dischargePlan || action.payload;
+        state.patientDischargePlan =
+          action.payload.dischargePlan || action.payload;
       })
       .addCase(fetchDischargePlanByPatient.rejected, (state, action) => {
         state.loading = false;
@@ -227,7 +229,8 @@ const dischargePlanSlice = createSlice({
       })
       .addCase(fetchDischargePlanById.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentDischargePlan = action.payload.dischargePlan || action.payload;
+        state.currentDischargePlan =
+          action.payload.dischargePlan || action.payload;
       })
       .addCase(fetchDischargePlanById.rejected, (state, action) => {
         state.loading = false;
@@ -240,7 +243,9 @@ const dischargePlanSlice = createSlice({
       })
       .addCase(createDischargePlan.fulfilled, (state, action) => {
         state.loading = false;
-        state.dischargePlans.unshift(action.payload.dischargePlan || action.payload);
+        state.dischargePlans.unshift(
+          action.payload.dischargePlan || action.payload
+        );
       })
       .addCase(createDischargePlan.rejected, (state, action) => {
         state.loading = false;
@@ -254,7 +259,9 @@ const dischargePlanSlice = createSlice({
       .addCase(updateDischargePlan.fulfilled, (state, action) => {
         state.loading = false;
         const updatedPlan = action.payload.dischargePlan || action.payload;
-        const index = state.dischargePlans.findIndex((dp) => dp.id === updatedPlan.id);
+        const index = state.dischargePlans.findIndex(
+          (dp) => dp.id === updatedPlan.id
+        );
         if (index !== -1) {
           state.dischargePlans[index] = updatedPlan;
         }
@@ -274,7 +281,9 @@ const dischargePlanSlice = createSlice({
       .addCase(submitForApproval.fulfilled, (state, action) => {
         state.loading = false;
         const submittedPlan = action.payload.dischargePlan || action.payload;
-        const index = state.dischargePlans.findIndex((dp) => dp.id === submittedPlan.id);
+        const index = state.dischargePlans.findIndex(
+          (dp) => dp.id === submittedPlan.id
+        );
         if (index !== -1) {
           state.dischargePlans[index] = submittedPlan;
         }
@@ -294,7 +303,9 @@ const dischargePlanSlice = createSlice({
       .addCase(approveDischargePlan.fulfilled, (state, action) => {
         state.loading = false;
         const approvedPlan = action.payload.dischargePlan || action.payload;
-        const index = state.dischargePlans.findIndex((dp) => dp.id === approvedPlan.id);
+        const index = state.dischargePlans.findIndex(
+          (dp) => dp.id === approvedPlan.id
+        );
         if (index !== -1) {
           state.dischargePlans[index] = approvedPlan;
         }
@@ -317,7 +328,9 @@ const dischargePlanSlice = createSlice({
       .addCase(completeDischargePlan.fulfilled, (state, action) => {
         state.loading = false;
         const completedPlan = action.payload.dischargePlan || action.payload;
-        const index = state.dischargePlans.findIndex((dp) => dp.id === completedPlan.id);
+        const index = state.dischargePlans.findIndex(
+          (dp) => dp.id === completedPlan.id
+        );
         if (index !== -1) {
           state.dischargePlans[index] = completedPlan;
         }
@@ -337,7 +350,9 @@ const dischargePlanSlice = createSlice({
       .addCase(cancelDischargePlan.fulfilled, (state, action) => {
         state.loading = false;
         const cancelledPlan = action.payload.dischargePlan || action.payload;
-        const index = state.dischargePlans.findIndex((dp) => dp.id === cancelledPlan.id);
+        const index = state.dischargePlans.findIndex(
+          (dp) => dp.id === cancelledPlan.id
+        );
         if (index !== -1) {
           state.dischargePlans[index] = cancelledPlan;
         }
@@ -357,7 +372,9 @@ const dischargePlanSlice = createSlice({
       .addCase(updateDischargeChecklist.fulfilled, (state, action) => {
         state.loading = false;
         const updatedPlan = action.payload.dischargePlan || action.payload;
-        const index = state.dischargePlans.findIndex((dp) => dp.id === updatedPlan.id);
+        const index = state.dischargePlans.findIndex(
+          (dp) => dp.id === updatedPlan.id
+        );
         if (index !== -1) {
           state.dischargePlans[index] = updatedPlan;
         }

@@ -24,11 +24,11 @@ export const initializeSocket = (token) => {
 
   socket.on("connect", () => {
     console.log("✅ Socket.IO connected");
-    
+
     // Auto-join user and role rooms after connection
     const state = store.getState();
     const user = state.auth?.user;
-    
+
     if (user) {
       joinRooms({
         userId: user.id,
@@ -126,7 +126,9 @@ export const initializeSocket = (token) => {
     const isAbnormal = result.isAbnormal;
     store.dispatch(
       showToast({
-        message: `Investigation result: ${result.testName}${isAbnormal ? " (ABNORMAL)" : ""}`,
+        message: `Investigation result: ${result.testName}${
+          isAbnormal ? " (ABNORMAL)" : ""
+        }`,
         severity: isAbnormal ? "warning" : "success",
       })
     );
@@ -144,7 +146,7 @@ export const initializeSocket = (token) => {
       })
     );
     playNotificationSound("urgent");
-    
+
     // Show desktop notification for critical results
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("🚨 CRITICAL Investigation Result", {
@@ -192,7 +194,9 @@ export const initializeSocket = (token) => {
     console.log("⚠️ Abnormal fluid balance:", data);
     store.dispatch(
       showToast({
-        message: `⚠️ Abnormal fluid balance for Patient ${data.patientId}: ${data.balance > 0 ? '+' : ''}${data.balance}mL`,
+        message: `⚠️ Abnormal fluid balance for Patient ${data.patientId}: ${
+          data.balance > 0 ? "+" : ""
+        }${data.balance}mL`,
         severity: "warning",
       })
     );
@@ -234,17 +238,17 @@ export const joinRooms = ({ userId, role, patientIds = [] }) => {
     console.warn("Socket not connected, cannot join rooms");
     return;
   }
-  
+
   if (userId) {
     socket.emit("joinRoom", `user:${userId}`);
     console.log(`🔑 Joined room: user:${userId}`);
   }
-  
+
   if (role) {
     socket.emit("joinRoom", `role:${role}`);
     console.log(`👥 Joined room: role:${role}`);
   }
-  
+
   if (Array.isArray(patientIds) && patientIds.length > 0) {
     patientIds.forEach((pid) => {
       socket.emit("joinRoom", `patient:${pid}`);
@@ -259,17 +263,17 @@ export const leaveRooms = ({ userId, role, patientIds = [] }) => {
     console.warn("Socket not connected, cannot leave rooms");
     return;
   }
-  
+
   if (userId) {
     socket.emit("leaveRoom", `user:${userId}`);
     console.log(`🔓 Left room: user:${userId}`);
   }
-  
+
   if (role) {
     socket.emit("leaveRoom", `role:${role}`);
     console.log(`👋 Left room: role:${role}`);
   }
-  
+
   if (Array.isArray(patientIds) && patientIds.length > 0) {
     patientIds.forEach((pid) => {
       socket.emit("leaveRoom", `patient:${pid}`);

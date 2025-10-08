@@ -13,6 +13,13 @@ import prescriptionsReducer from "../features/prescriptions/prescriptionSlice";
 import tasksReducer from "../features/tasks/taskSlice";
 import fluidBalanceReducer from "../features/fluidBalance/fluidBalanceSlice";
 import medicalOfficerReducer from "../features/medicalOfficer/medicalOfficerSlice";
+// Phase 3: Consultant Dashboard slices
+import wardRoundsReducer from "./slices/wardRoundSlice";
+import dischargePlansReducer from "./slices/dischargePlanSlice";
+import teachingNotesReducer from "./slices/teachingNoteSlice";
+import consultationsReducer from "./slices/consultationSlice";
+import clinicalAuditsReducer from "./slices/clinicalAuditSlice";
+import consultantReducer from "./slices/consultantSlice";
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +37,13 @@ export const store = configureStore({
     tasks: tasksReducer,
     fluidBalance: fluidBalanceReducer,
     medicalOfficer: medicalOfficerReducer,
+    // Phase 3: Consultant Dashboard
+    wardRounds: wardRoundsReducer,
+    dischargePlans: dischargePlansReducer,
+    teachingNotes: teachingNotesReducer,
+    consultations: consultationsReducer,
+    clinicalAudits: clinicalAuditsReducer,
+    consultant: consultantReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

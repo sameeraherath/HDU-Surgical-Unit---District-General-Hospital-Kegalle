@@ -1,8 +1,9 @@
 // server/routes/consultationRoutes.js
-const express = require("express");
+import express from "express";
+import * as consultationController from "../controllers/consultationController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
 const router = express.Router();
-const consultationController = require("../controllers/consultationController");
-const { authenticateJWT } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateJWT);
@@ -43,4 +44,4 @@ router.post("/:id/complete", consultationController.completeConsultation);
 // Cancel consultation
 router.post("/:id/cancel", consultationController.cancelConsultation);
 
-module.exports = router;
+export default router;

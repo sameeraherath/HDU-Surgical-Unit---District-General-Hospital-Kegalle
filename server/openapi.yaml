@@ -1,0 +1,2413 @@
+openapi: 3.0.3
+info:
+  title: Hospital Management System API - HDU Surgical Unit
+  description: |
+    Comprehensive API documentation for the Hospital Management System serving the High Dependency Unit (HDU) Surgical Unit at District General Hospital, Kegalle.
+
+    ## Overview
+    This API provides endpoints for managing hospital operations including:
+    - Patient admission and management
+    - Medical documentation (progress notes, prescriptions, investigations)
+    - Ward rounds and discharge planning
+    - Teaching sessions and clinical audits
+    - Real-time notifications and audit logging
+
+    ## Authentication
+    All endpoints (except `/auth/register` and `/auth/login`) require JWT authentication.
+    Include the token in the Authorization header: `Bearer <token>`
+
+    ## Base URL
+    - Development: `http://localhost:5000/api`
+    - Production: `https://your-domain.com/api`
+
+  version: 1.0.0
+  contact:
+    name: HDU Development Team
+    email: support@hdu-kegalle.lk
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000/api
+    description: Development server
+  - url: https://api.hdu-kegalle.lk/api
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication and registration
+  - name: Beds
+    description: Bed management and allocation
+  - name: Documents
+    description: Patient document upload and retrieval
+  - name: Critical Factors
+    description: Vital signs and patient monitoring
+  - name: Progress Notes
+    description: Medical progress documentation
+  - name: Investigations
+    description: Laboratory and imaging investigations
+  - name: Prescriptions
+    description: Medication management
+  - name: Tasks
+    description: Medical task management
+  - name: Fluid Balance
+    description: Fluid intake/output records
+  - name: Ward Rounds
+    description: Consultant ward round documentation
+  - name: Discharge Plans
+    description: Patient discharge planning
+  - name: Teaching Notes
+    description: Academic teaching sessions
+  - name: Consultations
+    description: Inter-departmental consultations
+  - name: Clinical Audits
+    description: Quality improvement audits
+  - name: Notifications
+    description: User notifications
+  - name: Audit Logs
+    description: System audit logging
+  - name: Users
+    description: User profile management
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+        error:
+          type: string
+          example: "Detailed error information"
+
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation successful"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "john_doe"
+        role:
+          type: string
+          enum: [Nurse, House Officer, Medical Officer, Consultant, Admin]
+          example: "Medical Officer"
+        fullName:
+          type: string
+          example: "Dr. John Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@hospital.lk"
+        contactNumber:
+          type: string
+          example: "+94771234567"
+
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientNumber:
+          type: string
+          example: "P2024001"
+        fullName:
+          type: string
+          example: "Jane Smith"
+        nicPassport:
+          type: string
+          example: "199012345678"
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1990-05-15"
+        age:
+          type: integer
+          example: 34
+        gender:
+          type: string
+          enum: [Male, Female, Other]
+          example: "Female"
+        contactNumber:
+          type: string
+          example: "+94771234567"
+        address:
+          type: string
+          example: "123 Main Street, Kegalle"
+
+    ProgressNote:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        noteType:
+          type: string
+          enum:
+            [
+              DAILY_NOTE,
+              ADMISSION_NOTE,
+              CONSULTATION_NOTE,
+              OPERATIVE_NOTE,
+              PROCEDURE_NOTE,
+              DISCHARGE_SUMMARY,
+            ]
+          example: "DAILY_NOTE"
+        subjective:
+          type: string
+          example: "Patient complains of mild chest pain"
+        objective:
+          type: string
+          example: "Vital signs stable, BP 120/80, HR 75"
+        assessment:
+          type: string
+          example: "Angina pectoris, stable condition"
+        plan:
+          type: string
+          example: "Continue current medications, monitor closely"
+        createdBy:
+          type: integer
+          example: 5
+        reviewedBy:
+          type: integer
+          nullable: true
+        reviewedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    Investigation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        investigationType:
+          type: string
+          enum: [LABORATORY, IMAGING, CARDIOLOGY, ENDOSCOPY, OTHER]
+          example: "LABORATORY"
+        testName:
+          type: string
+          example: "Complete Blood Count"
+        urgency:
+          type: string
+          enum: [ROUTINE, URGENT, STAT]
+          example: "ROUTINE"
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+          example: "MEDIUM"
+        status:
+          type: string
+          enum: [PENDING, IN_PROGRESS, COMPLETED, CANCELLED]
+          example: "PENDING"
+        orderedBy:
+          type: integer
+          example: 5
+        orderedAt:
+          type: string
+          format: date-time
+
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        medicationName:
+          type: string
+          example: "Aspirin"
+        medicationType:
+          type: string
+          enum: [TABLET, CAPSULE, SYRUP, INJECTION, TOPICAL, INHALER, OTHER]
+          example: "TABLET"
+        dosage:
+          type: string
+          example: "100mg"
+        route:
+          type: string
+          enum: [ORAL, IV, IM, SC, TOPICAL, INHALATION, RECTAL, OTHER]
+          example: "ORAL"
+        frequency:
+          type: string
+          example: "Once daily"
+        duration:
+          type: string
+          example: "7 days"
+        status:
+          type: string
+          enum: [ACTIVE, COMPLETED, DISCONTINUED, CANCELLED]
+          example: "ACTIVE"
+        prescribedBy:
+          type: integer
+          example: 5
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        taskType:
+          type: string
+          enum:
+            [
+              PATIENT_REVIEW,
+              INVESTIGATION_FOLLOW_UP,
+              MEDICATION_REVIEW,
+              WOUND_CARE,
+              PROCEDURE,
+              CONSULTATION,
+              DISCHARGE_PLANNING,
+              OTHER,
+            ]
+          example: "PATIENT_REVIEW"
+        title:
+          type: string
+          example: "Review patient vitals"
+        description:
+          type: string
+          example: "Check BP and HR every 4 hours"
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+          example: "MEDIUM"
+        status:
+          type: string
+          enum: [PENDING, IN_PROGRESS, COMPLETED, CANCELLED]
+          example: "PENDING"
+        dueDate:
+          type: string
+          format: date-time
+        assignedTo:
+          type: integer
+          example: 6
+        createdBy:
+          type: integer
+          example: 5
+
+    WardRound:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        consultantId:
+          type: integer
+          example: 3
+        roundDate:
+          type: string
+          format: date
+        patientStatus:
+          type: string
+          example: "Stable, improving"
+        clinicalFindings:
+          type: string
+          example: "Patient alert and oriented, wound healing well"
+        assessment:
+          type: string
+          example: "Post-operative recovery on track"
+        plan:
+          type: string
+          example: "Continue antibiotics, remove drain tomorrow"
+        teachingPoints:
+          type: string
+          nullable: true
+
+    DischargePlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        consultantId:
+          type: integer
+          example: 3
+        plannedDischargeDate:
+          type: string
+          format: date
+        dischargeDiagnosis:
+          type: string
+          example: "Post-operative appendectomy, recovered"
+        dischargeInstructions:
+          type: string
+          example: "Continue oral antibiotics for 5 days"
+        followUpRequired:
+          type: boolean
+          example: true
+        followUpDate:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum: [PLANNING, PENDING_APPROVAL, APPROVED, COMPLETED, CANCELLED]
+          example: "PLANNING"
+
+    FluidBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        recordDate:
+          type: string
+          format: date-time
+        entryType:
+          type: string
+          enum: [INTAKE, OUTPUT]
+          example: "INTAKE"
+        fluidType:
+          type: string
+          example: "IV Normal Saline"
+        amount:
+          type: number
+          example: 1000
+        unit:
+          type: string
+          example: "ml"
+        notes:
+          type: string
+          example: "Given over 8 hours"
+
+    TeachingNote:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        consultantId:
+          type: integer
+          example: 3
+        sessionDate:
+          type: string
+          format: date-time
+        topic:
+          type: string
+          example: "Post-operative complications"
+        content:
+          type: string
+          example: "Discussion on early identification and management"
+        attendees:
+          type: array
+          items:
+            type: integer
+          example: [5, 6, 7]
+
+    Consultation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        patientId:
+          type: integer
+          example: 1
+        consultingDepartment:
+          type: string
+          example: "Cardiology"
+        reason:
+          type: string
+          example: "Chest pain evaluation"
+        urgency:
+          type: string
+          enum: [ROUTINE, URGENT, EMERGENCY]
+          example: "URGENT"
+        status:
+          type: string
+          enum: [REQUESTED, IN_PROGRESS, COMPLETED, CANCELLED]
+          example: "REQUESTED"
+        requestedBy:
+          type: integer
+          example: 5
+
+    ClinicalAudit:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        auditTitle:
+          type: string
+          example: "Surgical Site Infection Rates"
+        auditType:
+          type: string
+          example: "QUALITY_IMPROVEMENT"
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        description:
+          type: string
+          example: "Quarterly review of SSI rates"
+        findings:
+          type: string
+          example: "3% infection rate observed"
+        recommendations:
+          type: string
+          example: "Enhanced pre-operative antibiotics protocol"
+        createdBy:
+          type: integer
+          example: 3
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Creates a new user account. Admin privileges may be required for certain roles.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - role
+                - fullName
+                - email
+              properties:
+                username:
+                  type: string
+                  example: "john_doe"
+                password:
+                  type: string
+                  format: password
+                  example: "SecurePass123!"
+                role:
+                  type: string
+                  enum:
+                    [Nurse, House Officer, Medical Officer, Consultant, Admin]
+                  example: "Medical Officer"
+                fullName:
+                  type: string
+                  example: "Dr. John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john.doe@hospital.lk"
+                contactNumber:
+                  type: string
+                  example: "+94771234567"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Registration successful"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates a user and returns a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "john_doe"
+                password:
+                  type: string
+                  format: password
+                  example: "SecurePass123!"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  role:
+                    type: string
+                    example: "Medical Officer"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # Bed Management Endpoints
+  /beds:
+    get:
+      tags:
+        - Beds
+      summary: Get all beds
+      description: Retrieves all bed information with optional filters
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [AVAILABLE, OCCUPIED, RESERVED, MAINTENANCE]
+          description: Filter by bed status
+        - name: wardType
+          in: query
+          schema:
+            type: string
+          description: Filter by ward type
+      responses:
+        "200":
+          description: Beds retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  beds:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        bedNumber:
+                          type: string
+                        wardType:
+                          type: string
+                        status:
+                          type: string
+                        currentPatientId:
+                          type: integer
+                          nullable: true
+
+  /beds/{id}/assign:
+    post:
+      tags:
+        - Beds
+      summary: Assign a bed to a patient
+      description: Assigns a bed to a patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Bed ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                notes:
+                  type: string
+                  example: "Patient requires close monitoring"
+      responses:
+        "200":
+          description: Bed assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  /beds/{id}/release:
+    post:
+      tags:
+        - Beds
+      summary: Release a bed
+      description: Releases a bed from current patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Bed ID
+      responses:
+        "200":
+          description: Bed released successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Progress Notes Endpoints
+  /medical-officer/progress-notes:
+    post:
+      tags:
+        - Progress Notes
+      summary: Create a new progress note
+      description: Creates a new medical progress note for a patient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - noteType
+                - subjective
+                - objective
+                - assessment
+                - plan
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                noteType:
+                  type: string
+                  enum:
+                    [
+                      DAILY_NOTE,
+                      ADMISSION_NOTE,
+                      CONSULTATION_NOTE,
+                      OPERATIVE_NOTE,
+                      PROCEDURE_NOTE,
+                      DISCHARGE_SUMMARY,
+                    ]
+                  example: "DAILY_NOTE"
+                subjective:
+                  type: string
+                  example: "Patient complains of mild chest pain"
+                objective:
+                  type: string
+                  example: "Vital signs stable, BP 120/80, HR 75"
+                assessment:
+                  type: string
+                  example: "Angina pectoris, stable condition"
+                plan:
+                  type: string
+                  example: "Continue current medications, monitor closely"
+      responses:
+        "201":
+          description: Progress note created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Progress note created successfully"
+                  note:
+                    $ref: "#/components/schemas/ProgressNote"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /medical-officer/progress-notes/{patientId}:
+    get:
+      tags:
+        - Progress Notes
+      summary: Get progress notes for a patient
+      description: Retrieves all progress notes for a specific patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Patient ID
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Items per page
+        - name: noteType
+          in: query
+          schema:
+            type: string
+            enum:
+              [
+                DAILY_NOTE,
+                ADMISSION_NOTE,
+                CONSULTATION_NOTE,
+                OPERATIVE_NOTE,
+                PROCEDURE_NOTE,
+                DISCHARGE_SUMMARY,
+              ]
+          description: Filter by note type
+      responses:
+        "200":
+          description: Progress notes retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  count:
+                    type: integer
+                    example: 15
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 15
+                  notes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ProgressNote"
+        "404":
+          description: Patient not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /medical-officer/progress-notes/{id}:
+    put:
+      tags:
+        - Progress Notes
+      summary: Update a progress note
+      description: Updates an existing progress note
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Progress note ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subjective:
+                  type: string
+                objective:
+                  type: string
+                assessment:
+                  type: string
+                plan:
+                  type: string
+      responses:
+        "200":
+          description: Progress note updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Progress note updated successfully"
+                  note:
+                    $ref: "#/components/schemas/ProgressNote"
+        "404":
+          description: Progress note not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      tags:
+        - Progress Notes
+      summary: Delete a progress note
+      description: Deletes a progress note
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Progress note ID
+      responses:
+        "200":
+          description: Progress note deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "404":
+          description: Progress note not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /medical-officer/progress-notes/{id}/review:
+    put:
+      tags:
+        - Progress Notes
+      summary: Review a progress note
+      description: Consultant reviews and approves a progress note
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Progress note ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reviewComments:
+                  type: string
+                  example: "Reviewed and approved. Good documentation."
+      responses:
+        "200":
+          description: Progress note reviewed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Progress note reviewed successfully"
+
+  # Investigations Endpoints
+  /medical-officer/investigations:
+    post:
+      tags:
+        - Investigations
+      summary: Order a new investigation
+      description: Creates a new investigation order for a patient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - investigationType
+                - testName
+                - urgency
+                - priority
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                investigationType:
+                  type: string
+                  enum: [LABORATORY, IMAGING, CARDIOLOGY, ENDOSCOPY, OTHER]
+                  example: "LABORATORY"
+                testName:
+                  type: string
+                  example: "Complete Blood Count"
+                testDetails:
+                  type: string
+                  example: "CBC with differential"
+                urgency:
+                  type: string
+                  enum: [ROUTINE, URGENT, STAT]
+                  example: "ROUTINE"
+                priority:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH, CRITICAL]
+                  example: "MEDIUM"
+                clinicalIndication:
+                  type: string
+                  example: "Fever and elevated WBC count"
+                specialInstructions:
+                  type: string
+                  example: "Fasting sample required"
+      responses:
+        "201":
+          description: Investigation ordered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Investigation ordered successfully"
+                  investigation:
+                    $ref: "#/components/schemas/Investigation"
+
+  /medical-officer/investigations/pending:
+    get:
+      tags:
+        - Investigations
+      summary: Get pending investigations
+      description: Retrieves all pending investigations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Pending investigations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  count:
+                    type: integer
+                  investigations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Investigation"
+
+  /medical-officer/investigations/{patientId}:
+    get:
+      tags:
+        - Investigations
+      summary: Get investigations for a patient
+      description: Retrieves all investigations for a specific patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Investigations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  investigations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Investigation"
+
+  /medical-officer/investigations/{id}/result:
+    post:
+      tags:
+        - Investigations
+      summary: Add investigation result
+      description: Adds result to an investigation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - resultValue
+              properties:
+                resultValue:
+                  type: string
+                  example: "WBC: 7500/µL, RBC: 4.5M/µL"
+                resultNotes:
+                  type: string
+                  example: "All values within normal range"
+                interpretedBy:
+                  type: integer
+                  example: 5
+      responses:
+        "200":
+          description: Result added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Prescriptions Endpoints
+  /medical-officer/prescriptions:
+    post:
+      tags:
+        - Prescriptions
+      summary: Create a new prescription
+      description: Creates a new medication prescription for a patient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - medicationName
+                - dosage
+                - route
+                - frequency
+                - duration
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                medicationName:
+                  type: string
+                  example: "Aspirin"
+                genericName:
+                  type: string
+                  example: "Acetylsalicylic acid"
+                medicationType:
+                  type: string
+                  enum:
+                    [TABLET, CAPSULE, SYRUP, INJECTION, TOPICAL, INHALER, OTHER]
+                  example: "TABLET"
+                dosage:
+                  type: string
+                  example: "100mg"
+                route:
+                  type: string
+                  enum: [ORAL, IV, IM, SC, TOPICAL, INHALATION, RECTAL, OTHER]
+                  example: "ORAL"
+                frequency:
+                  type: string
+                  example: "Once daily"
+                duration:
+                  type: string
+                  example: "7 days"
+                indication:
+                  type: string
+                  example: "Post-operative pain management"
+                specialInstructions:
+                  type: string
+                  example: "Take with food"
+      responses:
+        "201":
+          description: Prescription created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  prescription:
+                    $ref: "#/components/schemas/Prescription"
+
+  /medical-officer/prescriptions/active:
+    get:
+      tags:
+        - Prescriptions
+      summary: Get active prescriptions
+      description: Retrieves all active prescriptions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Active prescriptions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  prescriptions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Prescription"
+
+  /medical-officer/prescriptions/{patientId}:
+    get:
+      tags:
+        - Prescriptions
+      summary: Get prescriptions for a patient
+      description: Retrieves all prescriptions for a specific patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Prescriptions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  prescriptions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Prescription"
+
+  /medical-officer/prescriptions/{id}:
+    put:
+      tags:
+        - Prescriptions
+      summary: Update a prescription
+      description: Updates an existing prescription
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dosage:
+                  type: string
+                frequency:
+                  type: string
+                duration:
+                  type: string
+                specialInstructions:
+                  type: string
+      responses:
+        "200":
+          description: Prescription updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  /medical-officer/prescriptions/{id}/discontinue:
+    put:
+      tags:
+        - Prescriptions
+      summary: Discontinue a prescription
+      description: Marks a prescription as discontinued
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  example: "Completed course of treatment"
+      responses:
+        "200":
+          description: Prescription discontinued successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Tasks Endpoints
+  /medical-officer/tasks:
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+      description: Creates a new medical task
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - taskType
+                - title
+                - priority
+                - dueDate
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                assignedTo:
+                  type: integer
+                  example: 6
+                taskType:
+                  type: string
+                  enum:
+                    [
+                      PATIENT_REVIEW,
+                      INVESTIGATION_FOLLOW_UP,
+                      MEDICATION_REVIEW,
+                      WOUND_CARE,
+                      PROCEDURE,
+                      CONSULTATION,
+                      DISCHARGE_PLANNING,
+                      OTHER,
+                    ]
+                  example: "PATIENT_REVIEW"
+                title:
+                  type: string
+                  example: "Review patient vitals"
+                description:
+                  type: string
+                  example: "Check BP and HR every 4 hours"
+                priority:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH, URGENT]
+                  example: "MEDIUM"
+                dueDate:
+                  type: string
+                  format: date-time
+                  example: "2024-01-20T14:00:00Z"
+      responses:
+        "201":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  task:
+                    $ref: "#/components/schemas/Task"
+
+  /medical-officer/tasks/my-tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get tasks assigned to me
+      description: Retrieves all tasks assigned to the authenticated user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, IN_PROGRESS, COMPLETED, CANCELLED]
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, URGENT]
+      responses:
+        "200":
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  tasks:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Task"
+
+  /medical-officer/tasks/{patientId}:
+    get:
+      tags:
+        - Tasks
+      summary: Get tasks for a patient
+      description: Retrieves all tasks for a specific patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  tasks:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Task"
+
+  /medical-officer/tasks/{id}:
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+      description: Updates an existing task
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                priority:
+                  type: string
+                dueDate:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  /medical-officer/tasks/{id}/status:
+    put:
+      tags:
+        - Tasks
+      summary: Update task status
+      description: Updates the status of a task
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [PENDING, IN_PROGRESS, COMPLETED, CANCELLED]
+                completionNotes:
+                  type: string
+      responses:
+        "200":
+          description: Task status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Fluid Balance Endpoints
+  /medical-officer/fluid-balance:
+    post:
+      tags:
+        - Fluid Balance
+      summary: Create a fluid balance record
+      description: Records fluid intake or output for a patient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - entryType
+                - fluidType
+                - amount
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                entryType:
+                  type: string
+                  enum: [INTAKE, OUTPUT]
+                  example: "INTAKE"
+                fluidType:
+                  type: string
+                  example: "IV Normal Saline"
+                amount:
+                  type: number
+                  example: 1000
+                unit:
+                  type: string
+                  example: "ml"
+                notes:
+                  type: string
+                  example: "Given over 8 hours"
+      responses:
+        "201":
+          description: Fluid balance record created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  record:
+                    $ref: "#/components/schemas/FluidBalance"
+
+  /medical-officer/fluid-balance/{patientId}:
+    get:
+      tags:
+        - Fluid Balance
+      summary: Get fluid balance records for a patient
+      description: Retrieves fluid balance records for a specific patient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Fluid balance records retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  records:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FluidBalance"
+
+  # Ward Rounds Endpoints
+  /consultant/ward-rounds:
+    post:
+      tags:
+        - Ward Rounds
+      summary: Create a new ward round
+      description: Documents a consultant ward round visit
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - roundDate
+                - patientStatus
+                - clinicalFindings
+                - assessment
+                - plan
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                roundDate:
+                  type: string
+                  format: date
+                  example: "2024-01-15"
+                patientStatus:
+                  type: string
+                  example: "Stable, improving"
+                clinicalFindings:
+                  type: string
+                  example: "Patient alert and oriented, wound healing well"
+                assessment:
+                  type: string
+                  example: "Post-operative recovery on track"
+                plan:
+                  type: string
+                  example: "Continue antibiotics, remove drain tomorrow"
+                teachingPoints:
+                  type: string
+                  example: "Discussed surgical technique with house officers"
+      responses:
+        "201":
+          description: Ward round created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/WardRound"
+
+    get:
+      tags:
+        - Ward Rounds
+      summary: Get all ward rounds
+      description: Retrieves all ward rounds with optional filters
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: patientId
+          in: query
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Ward rounds retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  wardRounds:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/WardRound"
+
+  /consultant/ward-rounds/today:
+    get:
+      tags:
+        - Ward Rounds
+      summary: Get today's ward rounds
+      description: Retrieves all ward rounds for the current day
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Today's ward rounds retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  wardRounds:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/WardRound"
+
+  /consultant/ward-rounds/{id}:
+    put:
+      tags:
+        - Ward Rounds
+      summary: Update a ward round
+      description: Updates an existing ward round record
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patientStatus:
+                  type: string
+                clinicalFindings:
+                  type: string
+                assessment:
+                  type: string
+                plan:
+                  type: string
+                teachingPoints:
+                  type: string
+      responses:
+        "200":
+          description: Ward round updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Discharge Plans Endpoints
+  /consultant/discharge-plans:
+    post:
+      tags:
+        - Discharge Plans
+      summary: Create a discharge plan
+      description: Creates a new discharge plan for a patient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - plannedDischargeDate
+                - dischargeDiagnosis
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                plannedDischargeDate:
+                  type: string
+                  format: date
+                  example: "2024-01-20"
+                dischargeDiagnosis:
+                  type: string
+                  example: "Post-operative appendectomy, recovered"
+                dischargeInstructions:
+                  type: string
+                  example: "Continue oral antibiotics for 5 days"
+                followUpRequired:
+                  type: boolean
+                  example: true
+                followUpDate:
+                  type: string
+                  format: date
+                  example: "2024-01-27"
+      responses:
+        "201":
+          description: Discharge plan created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/DischargePlan"
+
+  /consultant/discharge-plans/pending:
+    get:
+      tags:
+        - Discharge Plans
+      summary: Get pending discharge plans
+      description: Retrieves all discharge plans awaiting approval
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Pending discharge plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  dischargePlans:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DischargePlan"
+
+  /consultant/discharge-plans/{id}/approve:
+    put:
+      tags:
+        - Discharge Plans
+      summary: Approve a discharge plan
+      description: Approves a discharge plan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Discharge plan approved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Teaching Notes Endpoints
+  /consultant/teaching-notes:
+    post:
+      tags:
+        - Teaching Notes
+      summary: Create a teaching note
+      description: Documents an academic teaching session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - topic
+                - content
+              properties:
+                topic:
+                  type: string
+                  example: "Post-operative complications"
+                content:
+                  type: string
+                  example: "Discussion on early identification and management"
+                sessionDate:
+                  type: string
+                  format: date-time
+                attendees:
+                  type: array
+                  items:
+                    type: integer
+                  example: [5, 6, 7]
+      responses:
+        "201":
+          description: Teaching note created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/TeachingNote"
+
+    get:
+      tags:
+        - Teaching Notes
+      summary: Get all teaching notes
+      description: Retrieves all teaching notes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Teaching notes retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  teachingNotes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TeachingNote"
+
+  # Consultations Endpoints
+  /consultations:
+    post:
+      tags:
+        - Consultations
+      summary: Request a consultation
+      description: Creates a new consultation request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - consultingDepartment
+                - reason
+                - urgency
+              properties:
+                patientId:
+                  type: integer
+                  example: 1
+                consultingDepartment:
+                  type: string
+                  example: "Cardiology"
+                reason:
+                  type: string
+                  example: "Chest pain evaluation"
+                urgency:
+                  type: string
+                  enum: [ROUTINE, URGENT, EMERGENCY]
+                  example: "URGENT"
+                clinicalSummary:
+                  type: string
+                  example: "55yo male with post-op chest pain"
+      responses:
+        "201":
+          description: Consultation requested successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  consultation:
+                    $ref: "#/components/schemas/Consultation"
+
+    get:
+      tags:
+        - Consultations
+      summary: Get all consultations
+      description: Retrieves all consultation requests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [REQUESTED, IN_PROGRESS, COMPLETED, CANCELLED]
+      responses:
+        "200":
+          description: Consultations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  consultations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Consultation"
+
+  # Clinical Audits Endpoints
+  /clinical-audits:
+    post:
+      tags:
+        - Clinical Audits
+      summary: Create a clinical audit
+      description: Creates a new clinical audit record
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - auditTitle
+                - auditType
+                - startDate
+              properties:
+                auditTitle:
+                  type: string
+                  example: "Surgical Site Infection Rates"
+                auditType:
+                  type: string
+                  example: "QUALITY_IMPROVEMENT"
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                description:
+                  type: string
+                  example: "Quarterly review of SSI rates"
+      responses:
+        "201":
+          description: Clinical audit created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  audit:
+                    $ref: "#/components/schemas/ClinicalAudit"
+
+    get:
+      tags:
+        - Clinical Audits
+      summary: Get all clinical audits
+      description: Retrieves all clinical audit records
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Clinical audits retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  audits:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ClinicalAudit"
+
+  # Notifications Endpoints
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get user notifications
+      description: Retrieves all notifications for the authenticated user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: isRead
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        type:
+                          type: string
+                        title:
+                          type: string
+                        message:
+                          type: string
+                        isRead:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+
+  /notifications/{id}/read:
+    put:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      description: Marks a specific notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  /notifications/mark-all-read:
+    put:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      description: Marks all notifications as read for the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # Users Endpoints
+  /users/profile:
+    get:
+      tags:
+        - Users
+      summary: Get user profile
+      description: Retrieves the profile of the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    $ref: "#/components/schemas/User"
+
+    put:
+      tags:
+        - Users
+      summary: Update user profile
+      description: Updates the profile of the authenticated user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                contactNumber:
+                  type: string
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+
+  # Audit Logs Endpoints
+  /audit-logs:
+    get:
+      tags:
+        - Audit Logs
+      summary: Get audit logs
+      description: Retrieves system audit logs (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: action
+          in: query
+          schema:
+            type: string
+          description: Filter by action type
+        - name: userId
+          in: query
+          schema:
+            type: integer
+          description: Filter by user ID
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Audit logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        userId:
+                          type: integer
+                        action:
+                          type: string
+                        resourceType:
+                          type: string
+                        resourceId:
+                          type: integer
+                        timestamp:
+                          type: string
+                          format: date-time
+                        ipAddress:
+                          type: string
+
+security:
+  - bearerAuth: []

@@ -1,8 +1,9 @@
 // server/routes/clinicalAuditRoutes.js
-const express = require("express");
+import express from "express";
+import * as clinicalAuditController from "../controllers/clinicalAuditController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
 const router = express.Router();
-const clinicalAuditController = require("../controllers/clinicalAuditController");
-const { authenticateJWT } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateJWT);
@@ -37,4 +38,4 @@ router.post("/:id/presentation", clinicalAuditController.recordPresentation);
 // Delete clinical audit
 router.delete("/:id", clinicalAuditController.deleteClinicalAudit);
 
-module.exports = router;
+export default router;

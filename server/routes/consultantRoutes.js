@@ -1,8 +1,9 @@
 // server/routes/consultantRoutes.js
-const express = require("express");
+import express from "express";
+import * as consultantController from "../controllers/consultantController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
 const router = express.Router();
-const consultantController = require("../controllers/consultantController");
-const { authenticateJWT } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateJWT);
@@ -31,4 +32,4 @@ router.get(
 // Refresh all data
 router.get("/stats/refresh", consultantController.refreshAllData);
 
-module.exports = router;
+export default router;

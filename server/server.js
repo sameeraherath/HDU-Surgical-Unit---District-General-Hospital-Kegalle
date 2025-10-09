@@ -27,6 +27,7 @@ import clinicalAuditRoutes from "./routes/clinicalAuditRoutes.js";
 import consultantRoutes from "./routes/consultantRoutes.js";
 import { connectMySql, sequelize } from "./config/mysqlDB.js";
 import { auditMiddleware } from "./middleware/auditMiddleware.js";
+import { setupSwagger } from "./swagger.js";
 import path from "path";
 
 dotenv.config();
@@ -44,6 +45,9 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// Setup Swagger API Documentation
+setupSwagger(app);
 
 // Socket.IO setup
 const io = new Server(httpServer, {

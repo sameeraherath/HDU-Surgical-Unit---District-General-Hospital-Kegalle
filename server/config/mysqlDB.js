@@ -19,6 +19,11 @@ import InvestigationResult from "../models/InvestigationResult.js";
 import Prescription from "../models/Prescription.js";
 import Task from "../models/Task.js";
 import FluidBalance from "../models/FluidBalance.js";
+import WardRound from "../models/WardRound.js";
+import DischargePlan from "../models/DischargePlan.js";
+import TeachingNote from "../models/TeachingNote.js";
+import Consultation from "../models/Consultation.js";
+import ClinicalAudit from "../models/ClinicalAudit.js";
 
 const BedMySQL = defineBed(sequelize);
 const Patient = definePatient(sequelize);
@@ -35,40 +40,50 @@ const Notification = defineNotification(sequelize);
 const NotificationSettings = defineNotificationSettings(sequelize);
 
 const defineAssociations = () => {
-  Patient.hasMany(Admission, { foreignKey: "patientId", as: "admissions" });
-  Admission.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
+  // Disable automatic index creation for foreign keys to avoid "too many keys" error
+  const associationOptions = { constraints: false };
+  
+  Patient.hasMany(Admission, { foreignKey: "patientId", as: "admissions", constraints: false });
+  Admission.belongsTo(Patient, { foreignKey: "patientId", as: "patient", constraints: false });
 
   Patient.hasMany(EmergencyContact, {
     foreignKey: "patientId",
     as: "emergencyContacts",
+    constraints: false,
   });
   EmergencyContact.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   Patient.hasMany(MedicalRecord, {
     foreignKey: "patientId",
     as: "medicalRecords",
+    constraints: false,
   });
-  MedicalRecord.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
+  MedicalRecord.belongsTo(Patient, { foreignKey: "patientId", as: "patient", constraints: false });
 
   Patient.hasMany(PatientDocument, {
     foreignKey: "patientId",
     as: "documents",
+    constraints: false,
   });
   PatientDocument.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   Patient.hasMany(CriticalFactor, {
     foreignKey: "patientId",
     as: "criticalFactors",
+    constraints: false,
   });
   CriticalFactor.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(CriticalFactor, {
@@ -165,18 +180,20 @@ const defineAssociations = () => {
     constraints: false,
   });
 
-  Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
-  BedMySQL.belongsTo(Patient, { foreignKey: "patientId" });
+  Patient.hasOne(BedMySQL, { foreignKey: "patientId", constraints: false });
+  BedMySQL.belongsTo(Patient, { foreignKey: "patientId", constraints: false });
 
   // Phase 2: Medical Officer Dashboard associations
   // Progress Notes
   Patient.hasMany(ProgressNote, {
     foreignKey: "patientId",
     as: "progressNotes",
+    constraints: false,
   });
   ProgressNote.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(ProgressNote, {
@@ -200,10 +217,12 @@ const defineAssociations = () => {
   Patient.hasMany(Investigation, {
     foreignKey: "patientId",
     as: "investigations",
+    constraints: false,
   });
   Investigation.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(Investigation, {
@@ -239,19 +258,23 @@ const defineAssociations = () => {
   Investigation.hasMany(InvestigationResult, {
     foreignKey: "investigationId",
     as: "results",
+    constraints: false,
   });
   InvestigationResult.belongsTo(Investigation, {
     foreignKey: "investigationId",
     as: "investigation",
+    constraints: false,
   });
 
   Patient.hasMany(InvestigationResult, {
     foreignKey: "patientId",
     as: "investigationResults",
+    constraints: false,
   });
   InvestigationResult.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   InvestigationResult.belongsTo(UserMySQLModel, {
@@ -264,10 +287,12 @@ const defineAssociations = () => {
   Patient.hasMany(Prescription, {
     foreignKey: "patientId",
     as: "prescriptions",
+    constraints: false,
   });
   Prescription.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(Prescription, {
@@ -303,10 +328,12 @@ const defineAssociations = () => {
   Patient.hasMany(Task, {
     foreignKey: "patientId",
     as: "tasks",
+    constraints: false,
   });
   Task.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(Task, {
@@ -346,16 +373,19 @@ const defineAssociations = () => {
   Task.belongsTo(Task, {
     foreignKey: "parentTaskId",
     as: "parentTask",
+    constraints: false,
   });
 
   // Fluid Balance
   Patient.hasMany(FluidBalance, {
     foreignKey: "patientId",
     as: "fluidBalanceRecords",
+    constraints: false,
   });
   FluidBalance.belongsTo(Patient, {
     foreignKey: "patientId",
     as: "patient",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(FluidBalance, {
@@ -372,6 +402,122 @@ const defineAssociations = () => {
   FluidBalance.belongsTo(UserMySQLModel, {
     foreignKey: "verifiedBy",
     as: "verifier",
+    constraints: false,
+  });
+
+  // Phase 3: Consultant Dashboard associations
+  // Ward Rounds
+  Patient.hasMany(WardRound, {
+    foreignKey: "patientId",
+    as: "wardRounds",
+    constraints: false,
+  });
+  WardRound.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+    constraints: false,
+  });
+
+  UserMySQLModel.hasMany(WardRound, {
+    foreignKey: "consultantId",
+    as: "wardRounds",
+    constraints: false,
+  });
+  WardRound.belongsTo(UserMySQLModel, {
+    foreignKey: "consultantId",
+    as: "consultant",
+    constraints: false,
+  });
+
+  // Discharge Plans
+  Patient.hasOne(DischargePlan, {
+    foreignKey: "patientId",
+    as: "dischargePlan",
+    constraints: false,
+  });
+  DischargePlan.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+    constraints: false,
+  });
+
+  UserMySQLModel.hasMany(DischargePlan, {
+    foreignKey: "consultantId",
+    as: "dischargePlans",
+    constraints: false,
+  });
+  DischargePlan.belongsTo(UserMySQLModel, {
+    foreignKey: "consultantId",
+    as: "consultant",
+    constraints: false,
+  });
+
+  // Teaching Notes
+  UserMySQLModel.hasMany(TeachingNote, {
+    foreignKey: "consultantId",
+    as: "teachingNotes",
+    constraints: false,
+  });
+  TeachingNote.belongsTo(UserMySQLModel, {
+    foreignKey: "consultantId",
+    as: "consultant",
+    constraints: false,
+  });
+
+  Patient.hasMany(TeachingNote, {
+    foreignKey: "patientId",
+    as: "teachingNotes",
+    constraints: false,
+  });
+  TeachingNote.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+    constraints: false,
+  });
+
+  // Consultations
+  Patient.hasMany(Consultation, {
+    foreignKey: "patientId",
+    as: "consultations",
+    constraints: false,
+  });
+  Consultation.belongsTo(Patient, {
+    foreignKey: "patientId",
+    as: "patient",
+    constraints: false,
+  });
+
+  UserMySQLModel.hasMany(Consultation, {
+    foreignKey: "requestedById",
+    as: "requestedConsultations",
+    constraints: false,
+  });
+  Consultation.belongsTo(UserMySQLModel, {
+    foreignKey: "requestedById",
+    as: "requestedBy",
+    constraints: false,
+  });
+
+  UserMySQLModel.hasMany(Consultation, {
+    foreignKey: "consultantId",
+    as: "consultations",
+    constraints: false,
+  });
+  Consultation.belongsTo(UserMySQLModel, {
+    foreignKey: "consultantId",
+    as: "consultant",
+    constraints: false,
+  });
+
+  // Clinical Audits
+  UserMySQLModel.hasMany(ClinicalAudit, {
+    foreignKey: "consultantId",
+    as: "clinicalAudits",
+    constraints: false,
+  });
+  ClinicalAudit.belongsTo(UserMySQLModel, {
+    foreignKey: "consultantId",
+    as: "consultant",
     constraints: false,
   });
 };
@@ -405,6 +551,11 @@ const connectMySql = async () => {
       await Prescription.sync({ alter: true });
       await Task.sync({ alter: true });
       await FluidBalance.sync({ alter: true });
+      await WardRound.sync({ alter: true });
+      await DischargePlan.sync({ alter: true });
+      await TeachingNote.sync({ alter: true });
+      await Consultation.sync({ alter: true });
+      await ClinicalAudit.sync({ alter: true });
     });
 
     console.log("All models synchronized successfully");
@@ -445,4 +596,9 @@ export {
   Prescription,
   Task,
   FluidBalance,
+  WardRound,
+  DischargePlan,
+  TeachingNote,
+  Consultation,
+  ClinicalAudit,
 };

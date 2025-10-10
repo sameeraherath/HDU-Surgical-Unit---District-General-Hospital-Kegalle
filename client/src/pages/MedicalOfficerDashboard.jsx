@@ -19,7 +19,6 @@ import {
   Alert,
 } from "@mui/material";
 import {
-  Refresh as RefreshIcon,
   Person as PersonIcon,
   Assignment as AssignmentIcon,
   Science as ScienceIcon,
@@ -29,7 +28,7 @@ import {
   Warning as WarningIcon,
   TrendingUp as TrendingUpIcon,
 } from "@mui/icons-material";
-import { fetchDashboardOverview } from "../features/medicalOfficer/medicalOfficerSlice";
+import { fetchDashboardOverview, clearError } from "../features/medicalOfficer/medicalOfficerSlice";
 import { fetchTaskStatistics } from "../features/tasks/taskSlice";
 
 const MedicalOfficerDashboard = () => {
@@ -39,7 +38,7 @@ const MedicalOfficerDashboard = () => {
   const { dashboardOverview, loading, error } = useSelector(
     (state) => state.medicalOfficer
   );
-  const { statistics: taskStats } = useSelector((state) => state.tasks);
+  const { statistics: taskStats = {} } = useSelector((state) => state.tasks);
   const { user } = useSelector((state) => state.auth);
 
   const loadDashboardData = () => {
@@ -52,9 +51,6 @@ const MedicalOfficerDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleRefresh = () => {
-    loadDashboardData();
-  };
 
   const StatCard = ({ title, value, icon, color, onClick }) => (
     <Card
@@ -109,29 +105,40 @@ const MedicalOfficerDashboard = () => {
     );
   }
 
-  const { overview, patientsNeedingAttention, recentPatients } =
-    dashboardOverview;
+  const { overview = {}, patientsNeedingAttention = 0, recentPatients = [] } =
+    dashboardOverview || {};
+
+  // Provide fallback values for task statistics
+  const taskStatsData = {
+    totalTasks: taskStats.totalTasks || 0,
+    pendingTasks: taskStats.pendingTasks || 0,
+    inProgressTasks: taskStats.inProgressTasks || 0,
+    completedTasks: taskStats.completedTasks || 0,
+    overdueTasks: taskStats.overdueTasks || 0,
+    urgentTasks: taskStats.urgentTasks || 0,
+  };
+
+  // Provide fallback values for overview data
+  const overviewData = {
+    activePatientsCount: overview.activePatientsCount || 0,
+    todayTasks: overview.todayTasks || 0,
+    overdueTasks: overview.overdueTasks || 0,
+    pendingInvestigations: overview.pendingInvestigations || 0,
+    criticalInvestigations: overview.criticalInvestigations || 0,
+    activePrescriptions: overview.activePrescriptions || 0,
+    todayNotes: overview.todayNotes || 0,
+  };
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Medical Officer Dashboard
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Welcome back, Dr. {user?.username}
-          </Typography>
-        </Box>
-        <IconButton onClick={handleRefresh} color="primary">
-          <RefreshIcon />
-        </IconButton>
+      <Box mb={3}>
+        <Typography variant="h4" gutterBottom>
+          Medical Officer Dashboard
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Welcome back, Dr. {user?.username}
+        </Typography>
       </Box>
 
       {error && (
@@ -145,7 +152,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Active Patients"
-            value={overview.activePatientsCount}
+            value={overviewData.activePatientsCount}
             icon={<PersonIcon sx={{ fontSize: 40, color: "#1976d2" }} />}
             color="#1976d2"
             onClick={() => navigate("/medical-officer/patients")}
@@ -154,7 +161,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Today's Tasks"
-            value={overview.todayTasks}
+            value={overviewData.todayTasks}
             icon={<TaskIcon sx={{ fontSize: 40, color: "#2e7d32" }} />}
             color="#2e7d32"
             onClick={() => navigate("/medical-officer/tasks")}
@@ -163,7 +170,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Overdue Tasks"
-            value={overview.overdueTasks}
+            value={overviewData.overdueTasks}
             icon={<WarningIcon sx={{ fontSize: 40, color: "#ed6c02" }} />}
             color="#ed6c02"
             onClick={() => navigate("/medical-officer/tasks?filter=overdue")}
@@ -172,7 +179,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Pending Investigations"
-            value={overview.pendingInvestigations}
+            value={overviewData.pendingInvestigations}
             icon={<ScienceIcon sx={{ fontSize: 40, color: "#9c27b0" }} />}
             color="#9c27b0"
             onClick={() =>
@@ -187,7 +194,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Critical Investigations"
-            value={overview.criticalInvestigations}
+            value={overviewData.criticalInvestigations}
             icon={<WarningIcon sx={{ fontSize: 40, color: "#d32f2f" }} />}
             color="#d32f2f"
             onClick={() =>
@@ -198,7 +205,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Active Prescriptions"
-            value={overview.activePrescriptions}
+            value={overviewData.activePrescriptions}
             icon={<MedicationIcon sx={{ fontSize: 40, color: "#0288d1" }} />}
             color="#0288d1"
             onClick={() => navigate("/medical-officer/prescriptions")}
@@ -207,7 +214,7 @@ const MedicalOfficerDashboard = () => {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Today's Notes"
-            value={overview.todayNotes}
+            value={overviewData.todayNotes}
             icon={<AssignmentIcon sx={{ fontSize: 40, color: "#7b1fa2" }} />}
             color="#7b1fa2"
             onClick={() => navigate("/medical-officer/progress-notes")}
@@ -313,13 +320,13 @@ const MedicalOfficerDashboard = () => {
                 <ListItem>
                   <ListItemText primary="Total Tasks" />
                   <Typography variant="h6" color="primary">
-                    {taskStats.totalTasks}
+                    {taskStatsData.totalTasks}
                   </Typography>
                 </ListItem>
                 <ListItem>
                   <ListItemText primary="Pending" />
                   <Chip
-                    label={taskStats.pendingTasks}
+                    label={taskStatsData.pendingTasks}
                     color="info"
                     size="small"
                   />
@@ -327,7 +334,7 @@ const MedicalOfficerDashboard = () => {
                 <ListItem>
                   <ListItemText primary="In Progress" />
                   <Chip
-                    label={taskStats.inProgressTasks}
+                    label={taskStatsData.inProgressTasks}
                     color="warning"
                     size="small"
                   />
@@ -335,7 +342,7 @@ const MedicalOfficerDashboard = () => {
                 <ListItem>
                   <ListItemText primary="Completed" />
                   <Chip
-                    label={taskStats.completedTasks}
+                    label={taskStatsData.completedTasks}
                     color="success"
                     size="small"
                   />
@@ -343,7 +350,7 @@ const MedicalOfficerDashboard = () => {
                 <ListItem>
                   <ListItemText primary="Overdue" />
                   <Chip
-                    label={taskStats.overdueTasks}
+                    label={taskStatsData.overdueTasks}
                     color="error"
                     size="small"
                   />
@@ -351,7 +358,7 @@ const MedicalOfficerDashboard = () => {
                 <ListItem>
                   <ListItemText primary="Urgent Tasks" />
                   <Chip
-                    label={taskStats.urgentTasks}
+                    label={taskStatsData.urgentTasks}
                     color="error"
                     size="small"
                   />
@@ -371,54 +378,6 @@ const MedicalOfficerDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Quick Actions */}
-      <Box mt={3}>
-        <Typography variant="h6" gutterBottom>
-          Quick Actions
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<AssignmentIcon />}
-              onClick={() => navigate("/medical-officer/progress-notes/new")}
-            >
-              New Progress Note
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<ScienceIcon />}
-              onClick={() => navigate("/medical-officer/investigations/new")}
-            >
-              Order Investigation
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<MedicationIcon />}
-              onClick={() => navigate("/medical-officer/prescriptions/new")}
-            >
-              New Prescription
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<TaskIcon />}
-              onClick={() => navigate("/medical-officer/tasks/new")}
-            >
-              Create Task
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
     </Box>
   );
 };

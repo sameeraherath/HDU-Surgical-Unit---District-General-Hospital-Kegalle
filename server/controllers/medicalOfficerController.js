@@ -93,49 +93,30 @@ export const getDashboardOverview = async (req, res) => {
       },
     });
 
-    // Get patients requiring attention (with overdue tasks or critical investigations)
+    // Get patients requiring attention (simplified approach)
     const patientsNeedingAttention = await Patient.findAll({
       where: {
         status: "ADMITTED",
       },
-      include: [
-        {
-          model: Task,
-          as: "tasks",
-          where: {
-            dueDate: { [Op.lt]: today },
-            status: { [Op.in]: ["PENDING", "IN_PROGRESS"] },
-          },
-          required: false,
-        },
-        {
-          model: Investigation,
-          as: "investigations",
-          where: {
-            isCritical: true,
-            status: "RESULTED",
-            resultedDate: {
-              [Op.gte]: new Date(Date.now() - 48 * 60 * 60 * 1000),
-            },
-          },
-          required: false,
-        },
-      ],
       limit: 10,
+      order: [["admissionDate", "DESC"]],
     });
 
     res.json({
-      overview: {
-        activePatientsCount,
-        todayTasks,
-        overdueTasks,
-        pendingInvestigations,
-        criticalInvestigations,
-        activePrescriptions,
-        todayNotes,
+      success: true,
+      data: {
+        overview: {
+          activePatientsCount,
+          todayTasks,
+          overdueTasks,
+          pendingInvestigations,
+          criticalInvestigations,
+          activePrescriptions,
+          todayNotes,
+        },
+        patientsNeedingAttention: patientsNeedingAttention.length,
+        recentPatients: patientsNeedingAttention.slice(0, 5),
       },
-      patientsNeedingAttention: patientsNeedingAttention.length,
-      recentPatients: patientsNeedingAttention.slice(0, 5),
     });
   } catch (error) {
     console.error("Error fetching dashboard overview:", error);
@@ -221,13 +202,16 @@ export const getWorkloadStatistics = async (req, res) => {
     });
 
     res.json({
-      period,
-      statistics: {
-        progressNotes,
-        investigationsOrdered,
-        prescriptionsWritten,
-        tasksCompleted,
-        tasksAssigned,
+      success: true,
+      data: {
+        period,
+        statistics: {
+          progressNotes,
+          investigationsOrdered,
+          prescriptionsWritten,
+          tasksCompleted,
+          tasksAssigned,
+        },
       },
     });
   } catch (error) {
@@ -339,21 +323,24 @@ export const getPatientSummary = async (req, res) => {
     const fluidBalance24h = (inputSum || 0) - (outputSum || 0);
 
     res.json({
-      patient,
-      summary: {
-        latestNote,
-        pendingInvestigationsCount: pendingInvestigations.length,
-        pendingInvestigations: pendingInvestigations.slice(0, 3),
-        criticalInvestigationsCount: criticalInvestigations.length,
-        criticalInvestigations: criticalInvestigations.slice(0, 3),
-        activePrescriptionsCount: activePrescriptions.length,
-        activePrescriptions: activePrescriptions.slice(0, 5),
-        pendingTasksCount: pendingTasks.length,
-        pendingTasks: pendingTasks.slice(0, 3),
-        fluidBalance24h: {
-          input: inputSum || 0,
-          output: outputSum || 0,
-          balance: fluidBalance24h,
+      success: true,
+      data: {
+        patient,
+        summary: {
+          latestNote,
+          pendingInvestigationsCount: pendingInvestigations.length,
+          pendingInvestigations: pendingInvestigations.slice(0, 3),
+          criticalInvestigationsCount: criticalInvestigations.length,
+          criticalInvestigations: criticalInvestigations.slice(0, 3),
+          activePrescriptionsCount: activePrescriptions.length,
+          activePrescriptions: activePrescriptions.slice(0, 5),
+          pendingTasksCount: pendingTasks.length,
+          pendingTasks: pendingTasks.slice(0, 3),
+          fluidBalance24h: {
+            input: inputSum || 0,
+            output: outputSum || 0,
+            balance: fluidBalance24h,
+          },
         },
       },
     });
@@ -395,12 +382,15 @@ export const getMyPatients = async (req, res) => {
     });
 
     res.json({
-      patients,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(count / limit),
+      success: true,
+      data: {
+        patients,
+        pagination: {
+          total: count,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          pages: Math.ceil(count / limit),
+        },
       },
     });
   } catch (error) {

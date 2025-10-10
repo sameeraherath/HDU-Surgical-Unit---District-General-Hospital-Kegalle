@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -7,7 +7,6 @@ import {
   Typography,
   Card,
   CardContent,
-  IconButton,
   Button,
   CircularProgress,
   Chip,
@@ -24,7 +23,6 @@ import {
   AssessmentOutlined,
   ExitToAppOutlined,
   WarningOutlined,
-  RefreshOutlined,
   TrendingUpOutlined,
   PeopleOutline,
 } from "@mui/icons-material";
@@ -34,13 +32,11 @@ import {
   fetchPatientsNeedingAttention,
   fetchRecentActivity,
   fetchWorkloadMetrics,
-  refreshAllData,
 } from "../../store/slices/consultantSlice";
 
 const ConsultantDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [refreshing, setRefreshing] = useState(false);
 
   const {
     dashboardStats,
@@ -59,17 +55,6 @@ const ConsultantDashboard = () => {
     dispatch(fetchRecentActivity());
     dispatch(fetchWorkloadMetrics());
   }, [dispatch]);
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await dispatch(refreshAllData()).unwrap();
-    } catch (err) {
-      console.error("Failed to refresh data:", err);
-    } finally {
-      setRefreshing(false);
-    }
-  };
 
   const getWorkloadColor = (level) => {
     switch (level) {
@@ -191,16 +176,6 @@ const ConsultantDashboard = () => {
               `Last updated: ${new Date(lastRefreshed).toLocaleString()}`}
           </Typography>
         </Box>
-        <Button
-          variant="outlined"
-          startIcon={
-            refreshing ? <CircularProgress size={20} /> : <RefreshOutlined />
-          }
-          onClick={handleRefresh}
-          disabled={refreshing}
-        >
-          Refresh
-        </Button>
       </Box>
 
       {error && (
@@ -210,7 +185,7 @@ const ConsultantDashboard = () => {
       )}
 
       {/* Workload Metrics */}
-      <Paper sx={{ p: 2, mb: 3, bgcolor: "background.default" }}>
+      <Paper sx={{ p: 2, mb: 3, bgcolor: "background.default", border: "1px solid #e0e0e0" }}>
         <Box
           sx={{
             display: "flex",
@@ -222,13 +197,13 @@ const ConsultantDashboard = () => {
             <TrendingUpOutlined color="primary" />
             <Typography variant="h6">Workload Status</Typography>
             <Chip
-              label={workloadMetrics.workloadLevel}
-              color={getWorkloadColor(workloadMetrics.workloadLevel)}
+              label={workloadMetrics.workloadLevel || "NORMAL"}
+              color={getWorkloadColor(workloadMetrics.workloadLevel || "NORMAL")}
               size="small"
             />
           </Box>
           <Typography variant="body2" color="textSecondary">
-            Score: {workloadMetrics.workloadScore}
+            Score: {workloadMetrics.workloadScore || 0}
           </Typography>
         </Box>
         <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -237,21 +212,21 @@ const ConsultantDashboard = () => {
               Active Patients
             </Typography>
             <Typography variant="h6">
-              {workloadMetrics.activePatients}
+              {workloadMetrics.activePatientsCount}
             </Typography>
           </Grid>
           <Grid item xs={3}>
             <Typography variant="body2" color="textSecondary">
               Pending Tasks
             </Typography>
-            <Typography variant="h6">{workloadMetrics.pendingTasks}</Typography>
+            <Typography variant="h6">{workloadMetrics.pendingTasksCount}</Typography>
           </Grid>
           <Grid item xs={3}>
             <Typography variant="body2" color="textSecondary">
               Pending Consultations
             </Typography>
             <Typography variant="h6">
-              {workloadMetrics.pendingConsultations}
+              {workloadMetrics.pendingConsultationsCount}
             </Typography>
           </Grid>
           <Grid item xs={3}>
@@ -273,6 +248,7 @@ const ConsultantDashboard = () => {
               sx={{
                 cursor: "pointer",
                 transition: "transform 0.2s, box-shadow 0.2s",
+                border: "1px solid #e0e0e0",
                 "&:hover": {
                   transform: "translateY(-4px)",
                   boxShadow: 4,
@@ -314,7 +290,7 @@ const ConsultantDashboard = () => {
       <Grid container spacing={3}>
         {/* Patients Needing Attention */}
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2, height: "400px", overflow: "auto" }}>
+          <Paper sx={{ p: 2, height: "400px", overflow: "auto", border: "1px solid #e0e0e0" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
               <WarningOutlined color="error" />
               <Typography variant="h6">Patients Needing Attention</Typography>
@@ -384,14 +360,14 @@ const ConsultantDashboard = () => {
 
         {/* Recent Activity */}
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2, height: "400px" }}>
+          <Paper sx={{ p: 2, height: "400px", border: "1px solid #e0e0e0" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
               <PeopleOutline color="primary" />
               <Typography variant="h6">Recent Activity (7 Days)</Typography>
             </Box>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ border: "1px solid #e0e0e0" }}>
                   <CardContent>
                     <Typography variant="body2" color="textSecondary">
                       Ward Rounds
@@ -403,7 +379,7 @@ const ConsultantDashboard = () => {
                 </Card>
               </Grid>
               <Grid item xs={6}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ border: "1px solid #e0e0e0" }}>
                   <CardContent>
                     <Typography variant="body2" color="textSecondary">
                       Teaching Sessions
@@ -415,7 +391,7 @@ const ConsultantDashboard = () => {
                 </Card>
               </Grid>
               <Grid item xs={6}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ border: "1px solid #e0e0e0" }}>
                   <CardContent>
                     <Typography variant="body2" color="textSecondary">
                       Consultations Completed
@@ -427,75 +403,18 @@ const ConsultantDashboard = () => {
                 </Card>
               </Grid>
               <Grid item xs={6}>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ border: "1px solid #e0e0e0" }}>
                   <CardContent>
                     <Typography variant="body2" color="textSecondary">
                       Patients Discharged
                     </Typography>
                     <Typography variant="h4" color="info.main">
-                      {recentActivity.patientsDischarged}
+                      {recentActivity.patientsDischargedCount}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
             </Grid>
-
-            {/* Quick Actions */}
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Quick Actions
-              </Typography>
-              <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    onClick={() =>
-                      navigate("/consultant-dashboard/ward-rounds")
-                    }
-                  >
-                    New Ward Round
-                  </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    onClick={() =>
-                      navigate("/consultant-dashboard/discharge-plans")
-                    }
-                  >
-                    Discharge Plan
-                  </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    onClick={() =>
-                      navigate("/consultant-dashboard/teaching-notes")
-                    }
-                  >
-                    Teaching Note
-                  </Button>
-                </Grid>
-                <Grid item xs={6}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    onClick={() =>
-                      navigate("/consultant-dashboard/clinical-audits")
-                    }
-                  >
-                    New Audit
-                  </Button>
-                </Grid>
-              </Grid>
-            </Box>
           </Paper>
         </Grid>
       </Grid>

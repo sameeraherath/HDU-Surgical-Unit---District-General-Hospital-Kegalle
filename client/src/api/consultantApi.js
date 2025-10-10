@@ -8,7 +8,7 @@ import apiClient from "./apiClient";
 // Get dashboard overview statistics
 export const getDashboardStats = async () => {
   const response = await apiClient.get("/consultant/stats/overview");
-  return response.data;
+  return response.data.data;
 };
 
 // Get patients needing immediate attention
@@ -16,7 +16,7 @@ export const getPatientsNeedingAttention = async () => {
   const response = await apiClient.get(
     "/consultant/stats/patients-needing-attention"
   );
-  return response.data;
+  return response.data.data;
 };
 
 // Get recent activity summary
@@ -24,13 +24,13 @@ export const getRecentActivity = async (params = {}) => {
   const response = await apiClient.get("/consultant/stats/recent-activity", {
     params,
   });
-  return response.data;
+  return response.data.data;
 };
 
 // Get workload metrics
 export const getWorkloadMetrics = async () => {
   const response = await apiClient.get("/consultant/stats/workload");
-  return response.data;
+  return response.data.data;
 };
 
 // Get upcoming discharges
@@ -39,13 +39,13 @@ export const getUpcomingDischarges = async (params = {}) => {
     "/consultant/stats/upcoming-discharges",
     { params }
   );
-  return response.data;
+  return response.data.data;
 };
 
 // Refresh all dashboard data
 export const refreshAllData = async (params = {}) => {
   const response = await apiClient.get("/consultant/stats/refresh", { params });
-  return response.data;
+  return response.data.data;
 };
 
 export default {

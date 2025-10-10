@@ -35,7 +35,6 @@ import {
   Badge,
 } from "@mui/material";
 import {
-  Refresh as RefreshIcon,
   Assignment as AssignmentIcon,
   Person as PersonIcon,
   LocalHospital as LocalHospitalIcon,
@@ -53,14 +52,12 @@ import {
   updateTaskStatus,
   fetchPatientsList,
   fetchTaskStatistics,
-  refreshAllData,
   clearError,
 } from "../features/houseOfficer/houseOfficerSlice";
 
 const HouseOfficerDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -74,7 +71,6 @@ const HouseOfficerDashboard = () => {
     taskStatistics,
     loading,
     error,
-    lastRefreshed,
   } = useSelector((state) => state.houseOfficer);
 
   const { user } = useSelector((state) => state.auth);
@@ -90,16 +86,6 @@ const HouseOfficerDashboard = () => {
     dispatch(fetchTaskStatistics());
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await dispatch(refreshAllData()).unwrap();
-    } catch (err) {
-      console.error("Failed to refresh data:", err);
-    } finally {
-      setRefreshing(false);
-    }
-  };
 
   const handleTaskUpdate = async () => {
     if (!selectedTask || !taskStatus) return;
@@ -122,6 +108,7 @@ const HouseOfficerDashboard = () => {
       dispatch(fetchAssignedTasks());
     } catch (err) {
       console.error("Failed to update task:", err);
+      // Keep dialog open to allow retry
     }
   };
 
@@ -250,36 +237,14 @@ const HouseOfficerDashboard = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            House Officer Dashboard
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            Welcome, {user?.nameWithInitials || user?.username}
-          </Typography>
-        </Box>
-        <Box display="flex" gap={2}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            Refresh
-            </Button>
-          {lastRefreshed && (
-            <Typography variant="caption" color="textSecondary" alignSelf="center">
-              Last updated: {new Date(lastRefreshed).toLocaleTimeString()}
-            </Typography>
-          )}
-        </Box>
-          </Box>
+      <Box mb={3}>
+        <Typography variant="h4" gutterBottom>
+          House Officer Dashboard
+        </Typography>
+        <Typography variant="subtitle1" color="textSecondary">
+          Welcome, {user?.nameWithInitials || user?.username}
+        </Typography>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => dispatch(clearError())}>

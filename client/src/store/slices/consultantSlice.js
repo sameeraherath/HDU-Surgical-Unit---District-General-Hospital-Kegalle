@@ -126,7 +126,7 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchDashboardStats.fulfilled, (state, action) => {
         state.loading = false;
-        state.dashboardStats = action.payload.stats || action.payload;
+        state.dashboardStats = action.payload;
         state.lastRefreshed = new Date().toISOString();
       })
       .addCase(fetchDashboardStats.rejected, (state, action) => {
@@ -140,8 +140,7 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchPatientsNeedingAttention.fulfilled, (state, action) => {
         state.loading = false;
-        state.patientsNeedingAttention =
-          action.payload.patients || action.payload;
+        state.patientsNeedingAttention = action.payload;
       })
       .addCase(fetchPatientsNeedingAttention.rejected, (state, action) => {
         state.loading = false;
@@ -154,7 +153,7 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchRecentActivity.fulfilled, (state, action) => {
         state.loading = false;
-        state.recentActivity = action.payload.activity || action.payload;
+        state.recentActivity = action.payload;
       })
       .addCase(fetchRecentActivity.rejected, (state, action) => {
         state.loading = false;
@@ -167,7 +166,7 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchWorkloadMetrics.fulfilled, (state, action) => {
         state.loading = false;
-        state.workloadMetrics = action.payload.workload || action.payload;
+        state.workloadMetrics = action.payload;
       })
       .addCase(fetchWorkloadMetrics.rejected, (state, action) => {
         state.loading = false;
@@ -180,8 +179,7 @@ const consultantSlice = createSlice({
       })
       .addCase(fetchUpcomingDischarges.fulfilled, (state, action) => {
         state.loading = false;
-        state.upcomingDischarges =
-          action.payload.dischargePlans || action.payload;
+        state.upcomingDischarges = action.payload;
       })
       .addCase(fetchUpcomingDischarges.rejected, (state, action) => {
         state.loading = false;

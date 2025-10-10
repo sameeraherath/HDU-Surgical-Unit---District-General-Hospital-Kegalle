@@ -72,7 +72,8 @@ const NurseDashboard = () => {
       setError(null);
       dispatch(setAppBarTitle(`Nurse Dashboard - Beds`));
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message || "Failed to fetch beds");
+      console.error("Error fetching beds:", err);
     } finally {
       dispatch(setLoading(false));
       setIsRefreshing(false);
@@ -107,7 +108,7 @@ const NurseDashboard = () => {
           type: "error",
         })
       );
-      console.error(err);
+      console.error("Error deassigning bed:", err);
     }
   };
 
@@ -141,7 +142,7 @@ const NurseDashboard = () => {
     } catch (error) {
       dispatch(showToast({ message: "Error assigning bed.", type: "error" }));
       console.error("[NurseDashboard] Error assigning bed:", error);
-      throw error;
+      // Don't throw error to prevent unhandled promise rejection
     } finally {
       dispatch(setLoading(false));
     }
@@ -157,6 +158,7 @@ const NurseDashboard = () => {
   };
 
   const handleRefresh = () => {
+    setError(null);
     fetchBeds(true);
   };
 

@@ -62,10 +62,11 @@ const MedicalOfficerDashboard = () => {
         height: "100%",
         cursor: onClick ? "pointer" : "default",
         transition: "transform 0.2s",
+        border: "1px solid #e0e0e0",
         "&:hover": onClick
           ? {
               transform: "translateY(-4px)",
-              boxShadow: 3,
+              border: "1px solid #b0b0b0",
             }
           : {},
       }}
@@ -225,7 +226,7 @@ const MedicalOfficerDashboard = () => {
       <Grid container spacing={2}>
         {/* Patients Needing Attention */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ border: "1px solid #e0e0e0" }}>
             <CardContent>
               <Box
                 display="flex"
@@ -296,7 +297,7 @@ const MedicalOfficerDashboard = () => {
 
         {/* Task Summary */}
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card sx={{ border: "1px solid #e0e0e0" }}>
             <CardContent>
               <Box
                 display="flex"

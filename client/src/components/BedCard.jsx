@@ -21,14 +21,17 @@ import CriticalFactorsForm from "./CriticalFactorsForm";
 
 const StyledCard = styled(Card)(({ occupied }) => ({
   width: "100%",
-  height: "230px",
+  height: "280px",
   backgroundColor: occupied ? "#ffd1d1" : "#d1ffd1",
   cursor: "pointer",
-  borderRadius: "12px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  borderRadius: "16px",
+  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.12)",
   transition: "all 0.3s ease",
+  display: "flex",
+  flexDirection: "column",
   "&:hover": {
     transform: "scale(1.02)",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
   },
 }));
 
@@ -71,99 +74,88 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
   return (
     <>
       <StyledCard occupied={isOccupied.toString()}>
-        <CardContent>
-          <Box mb={2}>
+        <CardContent sx={{ 
+          padding: "20px", 
+          height: "100%", 
+          display: "flex", 
+          flexDirection: "column",
+          justifyContent: "space-between"
+        }}>
+          {/* Header Section */}
+          <Box sx={{ mb: 2 }}>
             <Typography
-              variant="h6"
+              variant="h5"
               color="textPrimary"
-              fontWeight="bold"
-              gutterBottom
+              fontWeight="700"
+              sx={{ fontSize: "1.4rem" }}
             >
-              Bed Number: {bed.bedNumber}
+              Bed {bed.bedNumber}
             </Typography>
-            <Chip
-              label={isOccupied ? "Occupied" : "Available"}
-              color={isOccupied ? "error" : "success"}
-              size="medium"
-              sx={{
-                fontWeight: "bold",
-                borderRadius: "16px",
-                paddingX: 2,
-                paddingY: 1,
-                display: "inline-flex",
-                alignItems: "center",
-                transition: "none",
-              }}
-              icon={
-                isOccupied ? (
-                  <CancelIcon fontSize="small" />
-                ) : (
-                  <CheckCircleIcon fontSize="small" />
-                )
-              }
-            />
           </Box>
 
+          {/* Content Section */}
           {isOccupied && bed.patientId ? (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="flex-start"
-              justifyContent="space-between"
-              height="100%"
-            >
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                marginBottom={1}
-              >
-                Patient ID: {bed.patientId}
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: 1,
-                  width: "100%",
-                }}
-              >
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+              {/* Patient Info */}
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  sx={{ 
+                    fontSize: "0.95rem",
+                    fontWeight: "500",
+                    backgroundColor: "rgba(0, 0, 0, 0.05)",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    textAlign: "center"
+                  }}
+                >
+                  Patient ID: {bed.patientId}
+                </Typography>
+              </Box>
+
+              {/* Action Buttons */}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                 <Button
                   variant="contained"
                   sx={{
                     textTransform: "none",
-                    fontSize: "14px",
-                    borderRadius: "30px",
+                    fontSize: "0.9rem",
+                    fontWeight: "600",
+                    borderRadius: "12px",
                     backgroundColor: "error.main",
                     color: "white",
-                    paddingX: 3,
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                    paddingY: 1.5,
+                    boxShadow: "0px 3px 8px rgba(0, 0, 0, 0.15)",
                     "&:hover": {
                       backgroundColor: "error.dark",
-                      transform: "scale(1.05)",
+                      transform: "translateY(-1px)",
+                      boxShadow: "0px 5px 12px rgba(0, 0, 0, 0.2)",
                     },
-                    width: "100%",
+                    transition: "all 0.2s ease",
                   }}
                   startIcon={<RemoveIcon />}
                   onClick={() => handleDeassignClick(bed)}
                 >
-                  Deassign
-                </Button>{" "}
+                  Deassign Patient
+                </Button>
                 <Button
                   variant="contained"
                   sx={{
                     textTransform: "none",
-                    fontSize: "14px",
-                    borderRadius: "30px",
+                    fontSize: "0.9rem",
+                    fontWeight: "600",
+                    borderRadius: "12px",
                     backgroundColor: "success.main",
                     color: "white",
-                    paddingX: 3,
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                    paddingY: 1.5,
+                    boxShadow: "0px 3px 8px rgba(0, 0, 0, 0.15)",
                     "&:hover": {
                       backgroundColor: "success.dark",
-                      transform: "scale(1.05)",
+                      transform: "translateY(-1px)",
+                      boxShadow: "0px 5px 12px rgba(0, 0, 0, 0.2)",
                     },
-                    width: "100%",
+                    transition: "all 0.2s ease",
                     animation: bed.criticalStatus
                       ? "pulse 1.5s infinite"
                       : "none",
@@ -187,40 +179,50 @@ const BedCard = ({ bed, assignBed, deassignBed }) => {
               </Box>
             </Box>
           ) : (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="flex-start"
-              justifyContent="space-between"
-              height="100%"
-            >
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                marginBottom={1}
-              >
-                No patient assigned
-              </Typography>
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 3 }}>
+              {/* Available Status */}
+              <Box sx={{ textAlign: "center" }}>
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  sx={{ 
+                    fontSize: "1rem",
+                    fontWeight: "500",
+                    backgroundColor: "rgba(0, 0, 0, 0.05)",
+                    padding: "12px 20px",
+                    borderRadius: "12px",
+                    border: "2px dashed rgba(0, 0, 0, 0.1)"
+                  }}
+                >
+                  No patient assigned
+                </Typography>
+              </Box>
+
+              {/* Assign Button */}
               <Button
                 variant="contained"
                 sx={{
                   textTransform: "none",
-                  marginTop: "auto",
-                  fontSize: "14px",
-                  borderRadius: "30px",
+                  fontSize: "1rem",
+                  fontWeight: "600",
+                  borderRadius: "12px",
                   backgroundColor: "success.main",
                   color: "white",
-                  paddingX: 3,
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.15)",
+                  paddingX: 4,
+                  paddingY: 2,
+                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
                   "&:hover": {
                     backgroundColor: "success.dark",
-                    transform: "scale(1.05)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.2)",
                   },
+                  transition: "all 0.2s ease",
+                  minWidth: "140px",
                 }}
                 startIcon={<HotelIcon />}
                 onClick={() => assignBed(bed)}
               >
-                Assign
+                Assign Patient
               </Button>
             </Box>
           )}

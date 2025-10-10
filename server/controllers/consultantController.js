@@ -1,14 +1,14 @@
 // server/controllers/consultantController.js
-const WardRound = require("../models/WardRound");
-const DischargePlan = require("../models/DischargePlan");
-const TeachingNote = require("../models/TeachingNote");
-const Consultation = require("../models/Consultation");
-const ClinicalAudit = require("../models/ClinicalAudit");
-const Task = require("../models/Task");
-const { Op } = require("sequelize");
+import WardRound from "../models/WardRound.js";
+import DischargePlan from "../models/DischargePlan.js";
+import TeachingNote from "../models/TeachingNote.js";
+import Consultation from "../models/Consultation.js";
+import ClinicalAudit from "../models/ClinicalAudit.js";
+import Task from "../models/Task.js";
+import { Op } from "sequelize";
 
 // Get consultant dashboard overview stats
-exports.getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
   try {
     const consultantId = req.user.id;
     const today = new Date().toISOString().split("T")[0];
@@ -111,7 +111,7 @@ exports.getDashboardStats = async (req, res) => {
 };
 
 // Get patients needing attention
-exports.getPatientsNeedingAttention = async (req, res) => {
+export const getPatientsNeedingAttention = async (req, res) => {
   try {
     const consultantId = req.user.id;
     const { limit = 10 } = req.query;
@@ -149,7 +149,9 @@ exports.getPatientsNeedingAttention = async (req, res) => {
 };
 
 // Get recent activity summary
-exports.getRecentActivity = async (req, res) => {
+
+// Get recent activity feed
+export const getRecentActivity = async (req, res) => {
   try {
     const consultantId = req.user.id;
     const { days = 7 } = req.query;
@@ -210,7 +212,7 @@ exports.getRecentActivity = async (req, res) => {
 };
 
 // Get workload metrics
-exports.getWorkloadMetrics = async (req, res) => {
+export const getWorkloadMetrics = async (req, res) => {
   try {
     const consultantId = req.user.id;
 
@@ -285,7 +287,7 @@ exports.getWorkloadMetrics = async (req, res) => {
 };
 
 // Get upcoming discharges
-exports.getUpcomingDischarges = async (req, res) => {
+export const getUpcomingDischarges = async (req, res) => {
   try {
     const { days = 7 } = req.query;
 
@@ -318,7 +320,7 @@ exports.getUpcomingDischarges = async (req, res) => {
 };
 
 // Refresh all dashboard data
-exports.refreshAllData = async (req, res) => {
+export const refreshAllData = async (req, res) => {
   try {
     // Call all stat functions and combine results
     const dashboardStats = await exports.getDashboardStats(req, {
@@ -352,4 +354,13 @@ exports.refreshAllData = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export default {
+  getDashboardStats,
+  getPatientsNeedingAttention,
+  getRecentActivity,
+  getWorkloadMetrics,
+  getUpcomingDischarges,
+  refreshAllData,
 };

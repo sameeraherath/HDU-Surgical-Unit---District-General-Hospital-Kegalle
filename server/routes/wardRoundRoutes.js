@@ -1,8 +1,9 @@
 // server/routes/wardRoundRoutes.js
-const express = require("express");
+import express from "express";
+import wardRoundController from "../controllers/wardRoundController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
 const router = express.Router();
-const wardRoundController = require("../controllers/wardRoundController");
-const { authenticateJWT } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateJWT);
@@ -34,4 +35,4 @@ router.post("/:id/review", wardRoundController.reviewWardRound);
 // Delete ward round
 router.delete("/:id", wardRoundController.deleteWardRound);
 
-module.exports = router;
+export default router;

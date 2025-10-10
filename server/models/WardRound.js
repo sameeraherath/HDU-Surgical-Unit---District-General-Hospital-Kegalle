@@ -1,6 +1,6 @@
 // server/models/WardRound.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
 
 const WardRound = sequelize.define(
   "WardRound",
@@ -119,4 +119,4 @@ const WardRound = sequelize.define(
   }
 );
 
-module.exports = WardRound;
+export default WardRound;

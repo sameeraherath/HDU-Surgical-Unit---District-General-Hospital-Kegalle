@@ -1,9 +1,9 @@
 // server/controllers/wardRoundController.js
-const WardRound = require("../models/WardRound");
-const { Op } = require("sequelize");
+import WardRound from "../models/WardRound.js";
+import { Op } from "sequelize";
 
 // Create a new ward round entry
-exports.createWardRound = async (req, res) => {
+export const createWardRound = async (req, res) => {
   try {
     const {
       patientId,
@@ -55,7 +55,7 @@ exports.createWardRound = async (req, res) => {
 };
 
 // Get all ward rounds (with filters)
-exports.getAllWardRounds = async (req, res) => {
+export const getAllWardRounds = async (req, res) => {
   try {
     const {
       page = 1,
@@ -112,7 +112,7 @@ exports.getAllWardRounds = async (req, res) => {
 };
 
 // Get ward rounds by patient
-exports.getWardRoundsByPatient = async (req, res) => {
+export const getWardRoundsByPatient = async (req, res) => {
   try {
     const { patientId } = req.params;
 
@@ -140,7 +140,7 @@ exports.getWardRoundsByPatient = async (req, res) => {
 };
 
 // Get today's ward rounds
-exports.getTodaysWardRounds = async (req, res) => {
+export const getTodaysWardRounds = async (req, res) => {
   try {
     const today = new Date().toISOString().split("T")[0];
 
@@ -168,7 +168,7 @@ exports.getTodaysWardRounds = async (req, res) => {
 };
 
 // Get single ward round by ID
-exports.getWardRoundById = async (req, res) => {
+export const getWardRoundById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -196,7 +196,7 @@ exports.getWardRoundById = async (req, res) => {
 };
 
 // Update ward round
-exports.updateWardRound = async (req, res) => {
+export const updateWardRound = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -239,7 +239,7 @@ exports.updateWardRound = async (req, res) => {
 };
 
 // Review ward round (senior consultant)
-exports.reviewWardRound = async (req, res) => {
+export const reviewWardRound = async (req, res) => {
   try {
     const { id } = req.params;
     const { reviewComments } = req.body;
@@ -275,7 +275,7 @@ exports.reviewWardRound = async (req, res) => {
 };
 
 // Delete ward round
-exports.deleteWardRound = async (req, res) => {
+export const deleteWardRound = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -313,7 +313,7 @@ exports.deleteWardRound = async (req, res) => {
 };
 
 // Get ward round summary statistics
-exports.getWardRoundStats = async (req, res) => {
+export const getWardRoundStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     const consultantId = req.user.id;
@@ -370,4 +370,16 @@ exports.getWardRoundStats = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export default {
+  createWardRound,
+  getAllWardRounds,
+  getWardRoundsByPatient,
+  getTodaysWardRounds,
+  getWardRoundById,
+  updateWardRound,
+  reviewWardRound,
+  deleteWardRound,
+  getWardRoundStats,
 };

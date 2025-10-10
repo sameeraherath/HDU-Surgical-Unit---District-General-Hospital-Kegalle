@@ -1,9 +1,9 @@
 // server/controllers/teachingNoteController.js
-const TeachingNote = require("../models/TeachingNote");
-const { Op } = require("sequelize");
+import TeachingNote from "../models/TeachingNote.js";
+import { Op } from "sequelize";
 
 // Create a new teaching note
-exports.createTeachingNote = async (req, res) => {
+export const createTeachingNote = async (req, res) => {
   try {
     const {
       patientId,
@@ -63,7 +63,7 @@ exports.createTeachingNote = async (req, res) => {
 };
 
 // Get all teaching notes (with filters)
-exports.getAllTeachingNotes = async (req, res) => {
+export const getAllTeachingNotes = async (req, res) => {
   try {
     const {
       page = 1,
@@ -125,7 +125,7 @@ exports.getAllTeachingNotes = async (req, res) => {
 };
 
 // Get teaching notes by consultant
-exports.getTeachingNotesByConsultant = async (req, res) => {
+export const getTeachingNotesByConsultant = async (req, res) => {
   try {
     const { consultantId } = req.params;
 
@@ -153,7 +153,7 @@ exports.getTeachingNotesByConsultant = async (req, res) => {
 };
 
 // Get teaching notes by patient
-exports.getTeachingNotesByPatient = async (req, res) => {
+export const getTeachingNotesByPatient = async (req, res) => {
   try {
     const { patientId } = req.params;
 
@@ -178,7 +178,7 @@ exports.getTeachingNotesByPatient = async (req, res) => {
 };
 
 // Get teaching note by ID
-exports.getTeachingNoteById = async (req, res) => {
+export const getTeachingNoteById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -206,7 +206,7 @@ exports.getTeachingNoteById = async (req, res) => {
 };
 
 // Update teaching note
-exports.updateTeachingNote = async (req, res) => {
+export const updateTeachingNote = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -246,7 +246,7 @@ exports.updateTeachingNote = async (req, res) => {
 };
 
 // Delete teaching note
-exports.deleteTeachingNote = async (req, res) => {
+export const deleteTeachingNote = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -284,7 +284,7 @@ exports.deleteTeachingNote = async (req, res) => {
 };
 
 // Get teaching statistics
-exports.getTeachingStats = async (req, res) => {
+export const getTeachingStats = async (req, res) => {
   try {
     const { startDate, endDate, consultantId } = req.query;
 
@@ -343,7 +343,7 @@ exports.getTeachingStats = async (req, res) => {
 };
 
 // Search teaching notes by topic or content
-exports.searchTeachingNotes = async (req, res) => {
+export const searchTeachingNotes = async (req, res) => {
   try {
     const { query, page = 1, limit = 20 } = req.query;
 
@@ -389,4 +389,16 @@ exports.searchTeachingNotes = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export default {
+  createTeachingNote,
+  getAllTeachingNotes,
+  getTeachingNotesByConsultant,
+  getTeachingNotesByPatient,
+  getTeachingNoteById,
+  updateTeachingNote,
+  deleteTeachingNote,
+  getTeachingStats,
+  searchTeachingNotes,
 };

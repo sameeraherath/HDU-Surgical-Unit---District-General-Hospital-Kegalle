@@ -13,6 +13,7 @@ import prescriptionsReducer from "../features/prescriptions/prescriptionSlice";
 import tasksReducer from "../features/tasks/taskSlice";
 import fluidBalanceReducer from "../features/fluidBalance/fluidBalanceSlice";
 import medicalOfficerReducer from "../features/medicalOfficer/medicalOfficerSlice";
+import houseOfficerReducer from "../features/houseOfficer/houseOfficerSlice";
 // Phase 3: Consultant Dashboard slices
 import wardRoundsReducer from "./slices/wardRoundSlice";
 import dischargePlansReducer from "./slices/dischargePlanSlice";
@@ -37,6 +38,7 @@ export const store = configureStore({
     tasks: tasksReducer,
     fluidBalance: fluidBalanceReducer,
     medicalOfficer: medicalOfficerReducer,
+    houseOfficer: houseOfficerReducer,
     // Phase 3: Consultant Dashboard
     wardRounds: wardRoundsReducer,
     dischargePlans: dischargePlansReducer,

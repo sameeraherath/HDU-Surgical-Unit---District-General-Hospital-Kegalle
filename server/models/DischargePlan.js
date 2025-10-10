@@ -1,6 +1,6 @@
 // server/models/DischargePlan.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
 
 const DischargePlan = sequelize.define(
   "DischargePlan",
@@ -171,4 +171,4 @@ const DischargePlan = sequelize.define(
   }
 );
 
-module.exports = DischargePlan;
+export default DischargePlan;

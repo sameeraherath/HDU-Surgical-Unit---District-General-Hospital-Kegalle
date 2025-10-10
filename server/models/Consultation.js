@@ -1,6 +1,6 @@
 // server/models/Consultation.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
 
 const Consultation = sequelize.define(
   "Consultation",
@@ -159,4 +159,4 @@ const Consultation = sequelize.define(
   }
 );
 
-module.exports = Consultation;
+export default Consultation;

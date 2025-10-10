@@ -6,7 +6,7 @@ import HouseOfficerDashboard from "../pages/HouseOfficerDashboard";
 import MedicalOfficerDashboard from "../pages/MedicalOfficerDashboard";
 import NurseDashboard from "../pages/NurseDashboard";
 import LandingPage from "../pages/LandingPage";
-import ConsultantDashboard from "../pages/ConsultantDashboard";
+import ConsultantDashboard from "../pages/consultant/ConsultantDashboard";
 import UserProfilePage from "../pages/UserProfilePage";
 import AuditLogPage from "../pages/AuditLogPage";
 import TaskManagementPage from "../pages/TaskManagementPage";
@@ -49,6 +49,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute role="House Officer">
               <HouseOfficerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/house-officer/patients/:patientId"
+          element={
+            <ProtectedRoute role="House Officer">
+              <PatientDetailPage />
             </ProtectedRoute>
           }
         />

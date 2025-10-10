@@ -1,8 +1,9 @@
 // server/routes/teachingNoteRoutes.js
-const express = require("express");
+import express from "express";
+import teachingNoteController from "../controllers/teachingNoteController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
 const router = express.Router();
-const teachingNoteController = require("../controllers/teachingNoteController");
-const { authenticateJWT } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateJWT);
@@ -40,4 +41,4 @@ router.put("/:id", teachingNoteController.updateTeachingNote);
 // Delete teaching note
 router.delete("/:id", teachingNoteController.deleteTeachingNote);
 
-module.exports = router;
+export default router;

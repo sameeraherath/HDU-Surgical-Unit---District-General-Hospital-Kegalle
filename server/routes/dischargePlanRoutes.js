@@ -1,8 +1,9 @@
 // server/routes/dischargePlanRoutes.js
-const express = require("express");
+import express from "express";
+import dischargePlanController from "../controllers/dischargePlanController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
 const router = express.Router();
-const dischargePlanController = require("../controllers/dischargePlanController");
-const { authenticateJWT } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateJWT);
@@ -49,4 +50,4 @@ router.patch(
   dischargePlanController.updateDischargeChecklist
 );
 
-module.exports = router;
+export default router;

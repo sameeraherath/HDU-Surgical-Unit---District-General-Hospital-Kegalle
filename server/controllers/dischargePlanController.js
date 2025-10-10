@@ -1,9 +1,9 @@
 // server/controllers/dischargePlanController.js
-const DischargePlan = require("../models/DischargePlan");
-const { Op } = require("sequelize");
+import DischargePlan from "../models/DischargePlan.js";
+import { Op } from "sequelize";
 
 // Create a new discharge plan
-exports.createDischargePlan = async (req, res) => {
+export const createDischargePlan = async (req, res) => {
   try {
     const {
       patientId,
@@ -87,7 +87,7 @@ exports.createDischargePlan = async (req, res) => {
 };
 
 // Get all discharge plans (with filters)
-exports.getAllDischargePlans = async (req, res) => {
+export const getAllDischargePlans = async (req, res) => {
   try {
     const { page = 1, limit = 20, status, consultantId } = req.query;
 
@@ -126,7 +126,7 @@ exports.getAllDischargePlans = async (req, res) => {
 };
 
 // Get discharge plan by patient ID
-exports.getDischargePlanByPatient = async (req, res) => {
+export const getDischargePlanByPatient = async (req, res) => {
   try {
     const { patientId } = req.params;
 
@@ -157,7 +157,7 @@ exports.getDischargePlanByPatient = async (req, res) => {
 };
 
 // Get pending discharge plans
-exports.getPendingDischargePlans = async (req, res) => {
+export const getPendingDischargePlans = async (req, res) => {
   try {
     const dischargePlans = await DischargePlan.findAll({
       where: {
@@ -182,7 +182,7 @@ exports.getPendingDischargePlans = async (req, res) => {
 };
 
 // Get discharge plan by ID
-exports.getDischargePlanById = async (req, res) => {
+export const getDischargePlanById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -210,7 +210,7 @@ exports.getDischargePlanById = async (req, res) => {
 };
 
 // Update discharge plan
-exports.updateDischargePlan = async (req, res) => {
+export const updateDischargePlan = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -258,7 +258,7 @@ exports.updateDischargePlan = async (req, res) => {
 };
 
 // Submit discharge plan for approval
-exports.submitForApproval = async (req, res) => {
+export const submitForApproval = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -298,7 +298,7 @@ exports.submitForApproval = async (req, res) => {
 };
 
 // Approve discharge plan
-exports.approveDischargePlan = async (req, res) => {
+export const approveDischargePlan = async (req, res) => {
   try {
     const { id } = req.params;
     const { approvalComments } = req.body;
@@ -342,7 +342,7 @@ exports.approveDischargePlan = async (req, res) => {
 };
 
 // Complete discharge (patient discharged)
-exports.completeDischargePlan = async (req, res) => {
+export const completeDischargePlan = async (req, res) => {
   try {
     const { id } = req.params;
     const { actualDischargeDate } = req.body;
@@ -384,7 +384,7 @@ exports.completeDischargePlan = async (req, res) => {
 };
 
 // Cancel discharge plan
-exports.cancelDischargePlan = async (req, res) => {
+export const cancelDischargePlan = async (req, res) => {
   try {
     const { id } = req.params;
     const { cancelledReason } = req.body;
@@ -433,7 +433,7 @@ exports.cancelDischargePlan = async (req, res) => {
 };
 
 // Update discharge checklist
-exports.updateDischargeChecklist = async (req, res) => {
+export const updateDischargeChecklist = async (req, res) => {
   try {
     const { id } = req.params;
     const { dischargeChecklist } = req.body;
@@ -470,7 +470,7 @@ exports.updateDischargeChecklist = async (req, res) => {
 };
 
 // Get discharge statistics
-exports.getDischargeStats = async (req, res) => {
+export const getDischargeStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
@@ -539,4 +539,19 @@ exports.getDischargeStats = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export default {
+  createDischargePlan,
+  getAllDischargePlans,
+  getDischargePlanByPatient,
+  getPendingDischargePlans,
+  getDischargePlanById,
+  updateDischargePlan,
+  submitForApproval,
+  approveDischargePlan,
+  completeDischargePlan,
+  cancelDischargePlan,
+  updateDischargeChecklist,
+  getDischargeStats,
 };

@@ -18,6 +18,7 @@ import prescriptionRoutes from "./routes/prescriptionRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import fluidBalanceRoutes from "./routes/fluidBalanceRoutes.js";
 import medicalOfficerRoutes from "./routes/medicalOfficerRoutes.js";
+import houseOfficerRoutes from "./routes/houseOfficerRoutes.js";
 // Phase 3: Consultant Dashboard routes
 import wardRoundRoutes from "./routes/wardRoundRoutes.js";
 import dischargePlanRoutes from "./routes/dischargePlanRoutes.js";
@@ -112,6 +113,9 @@ app.use("/api/medical-officer/prescriptions", prescriptionRoutes);
 app.use("/api/medical-officer/tasks", taskRoutes);
 app.use("/api/medical-officer/fluid-balance", fluidBalanceRoutes);
 app.use("/api/medical-officer", medicalOfficerRoutes);
+
+// House Officer Dashboard routes
+app.use("/api/house-officer", houseOfficerRoutes);
 
 // Phase 3: Consultant Dashboard routes
 app.use("/api/consultant/ward-rounds", wardRoundRoutes);

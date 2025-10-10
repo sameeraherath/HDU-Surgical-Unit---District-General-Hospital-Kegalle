@@ -74,19 +74,23 @@ const defineAssociations = () => {
   UserMySQLModel.hasMany(CriticalFactor, {
     foreignKey: "recordedBy",
     as: "recordedCriticalFactors",
+    constraints: false,
   });
   CriticalFactor.belongsTo(UserMySQLModel, {
     foreignKey: "recordedBy",
     as: "recorder",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(CriticalFactor, {
     foreignKey: "amendedBy",
     as: "amendedCriticalFactors",
+    constraints: false,
   });
   CriticalFactor.belongsTo(UserMySQLModel, {
     foreignKey: "amendedBy",
     as: "amender",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(PatientDocument, {
@@ -116,20 +120,24 @@ const defineAssociations = () => {
     foreignKey: "userId",
     as: "profile",
     onDelete: "CASCADE",
+    constraints: false,
   });
   UserProfile.belongsTo(UserMySQLModel, {
     foreignKey: "userId",
     as: "user",
+    constraints: false,
   });
 
   UserMySQLModel.hasOne(UserPreference, {
     foreignKey: "userId",
     as: "preferences",
     onDelete: "CASCADE",
+    constraints: false,
   });
   UserPreference.belongsTo(UserMySQLModel, {
     foreignKey: "userId",
     as: "user",
+    constraints: false,
   });
 
   // Notification associations
@@ -137,20 +145,24 @@ const defineAssociations = () => {
     foreignKey: "userId",
     as: "notifications",
     onDelete: "CASCADE",
+    constraints: false,
   });
   Notification.belongsTo(UserMySQLModel, {
     foreignKey: "userId",
     as: "user",
+    constraints: false,
   });
 
   UserMySQLModel.hasOne(NotificationSettings, {
     foreignKey: "userId",
     as: "notificationSettings",
     onDelete: "CASCADE",
+    constraints: false,
   });
   NotificationSettings.belongsTo(UserMySQLModel, {
     foreignKey: "userId",
     as: "user",
+    constraints: false,
   });
 
   Patient.hasOne(BedMySQL, { foreignKey: "patientId" });
@@ -170,15 +182,18 @@ const defineAssociations = () => {
   UserMySQLModel.hasMany(ProgressNote, {
     foreignKey: "userId",
     as: "progressNotes",
+    constraints: false,
   });
   ProgressNote.belongsTo(UserMySQLModel, {
     foreignKey: "userId",
     as: "author",
+    constraints: false,
   });
 
   ProgressNote.belongsTo(UserMySQLModel, {
     foreignKey: "reviewedBy",
     as: "reviewer",
+    constraints: false,
   });
 
   // Investigations
@@ -194,25 +209,30 @@ const defineAssociations = () => {
   UserMySQLModel.hasMany(Investigation, {
     foreignKey: "orderedBy",
     as: "orderedInvestigations",
+    constraints: false,
   });
   Investigation.belongsTo(UserMySQLModel, {
     foreignKey: "orderedBy",
-    as: "orderer",
+    as: "orderedByUser",
+    constraints: false,
   });
 
   Investigation.belongsTo(UserMySQLModel, {
     foreignKey: "specimenCollectedBy",
     as: "specimenCollector",
+    constraints: false,
   });
 
   Investigation.belongsTo(UserMySQLModel, {
     foreignKey: "reportedBy",
     as: "reporter",
+    constraints: false,
   });
 
   Investigation.belongsTo(UserMySQLModel, {
     foreignKey: "reviewedBy",
     as: "reviewer",
+    constraints: false,
   });
 
   // Investigation Results
@@ -237,6 +257,7 @@ const defineAssociations = () => {
   InvestigationResult.belongsTo(UserMySQLModel, {
     foreignKey: "verifiedBy",
     as: "verifier",
+    constraints: false,
   });
 
   // Prescriptions
@@ -252,25 +273,30 @@ const defineAssociations = () => {
   UserMySQLModel.hasMany(Prescription, {
     foreignKey: "prescribedBy",
     as: "prescriptions",
+    constraints: false,
   });
   Prescription.belongsTo(UserMySQLModel, {
     foreignKey: "prescribedBy",
-    as: "prescriber",
+    as: "prescribedByUser",
+    constraints: false,
   });
 
   Prescription.belongsTo(UserMySQLModel, {
     foreignKey: "discontinuedBy",
     as: "discontinuer",
+    constraints: false,
   });
 
   Prescription.belongsTo(UserMySQLModel, {
     foreignKey: "verifiedBy",
     as: "verifier",
+    constraints: false,
   });
 
   Prescription.belongsTo(UserMySQLModel, {
     foreignKey: "dispensedBy",
     as: "dispenser",
+    constraints: false,
   });
 
   // Tasks
@@ -286,29 +312,35 @@ const defineAssociations = () => {
   UserMySQLModel.hasMany(Task, {
     foreignKey: "assignedTo",
     as: "assignedTasks",
+    constraints: false,
   });
   Task.belongsTo(UserMySQLModel, {
     foreignKey: "assignedTo",
     as: "assignee",
+    constraints: false,
   });
 
   UserMySQLModel.hasMany(Task, {
     foreignKey: "assignedBy",
     as: "createdTasks",
+    constraints: false,
   });
   Task.belongsTo(UserMySQLModel, {
     foreignKey: "assignedBy",
     as: "assigner",
+    constraints: false,
   });
 
   Task.belongsTo(UserMySQLModel, {
     foreignKey: "completedBy",
     as: "completer",
+    constraints: false,
   });
 
   Task.belongsTo(UserMySQLModel, {
     foreignKey: "cancelledBy",
     as: "canceller",
+    constraints: false,
   });
 
   Task.belongsTo(Task, {
@@ -329,15 +361,18 @@ const defineAssociations = () => {
   UserMySQLModel.hasMany(FluidBalance, {
     foreignKey: "recordedBy",
     as: "fluidBalanceRecords",
+    constraints: false,
   });
   FluidBalance.belongsTo(UserMySQLModel, {
     foreignKey: "recordedBy",
     as: "recorder",
+    constraints: false,
   });
 
   FluidBalance.belongsTo(UserMySQLModel, {
     foreignKey: "verifiedBy",
     as: "verifier",
+    constraints: false,
   });
 };
 

@@ -1,9 +1,9 @@
 // server/controllers/clinicalAuditController.js
-const ClinicalAudit = require("../models/ClinicalAudit");
-const { Op } = require("sequelize");
+import ClinicalAudit from "../models/ClinicalAudit.js";
+import { Op } from "sequelize";
 
 // Create a new clinical audit
-exports.createClinicalAudit = async (req, res) => {
+export const createClinicalAudit = async (req, res) => {
   try {
     const {
       auditType,
@@ -47,7 +47,7 @@ exports.createClinicalAudit = async (req, res) => {
 };
 
 // Get all clinical audits (with filters)
-exports.getAllClinicalAudits = async (req, res) => {
+export const getAllClinicalAudits = async (req, res) => {
   try {
     const { page = 1, limit = 20, auditType, status, consultantId } = req.query;
 
@@ -87,7 +87,7 @@ exports.getAllClinicalAudits = async (req, res) => {
 };
 
 // Get clinical audits by consultant
-exports.getClinicalAuditsByConsultant = async (req, res) => {
+export const getClinicalAuditsByConsultant = async (req, res) => {
   try {
     const { consultantId } = req.params;
 
@@ -112,7 +112,7 @@ exports.getClinicalAuditsByConsultant = async (req, res) => {
 };
 
 // Get clinical audit by ID
-exports.getClinicalAuditById = async (req, res) => {
+export const getClinicalAuditById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -140,7 +140,7 @@ exports.getClinicalAuditById = async (req, res) => {
 };
 
 // Update clinical audit
-exports.updateClinicalAudit = async (req, res) => {
+export const updateClinicalAudit = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -180,7 +180,7 @@ exports.updateClinicalAudit = async (req, res) => {
 };
 
 // Update audit status
-exports.updateAuditStatus = async (req, res) => {
+export const updateAuditStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -212,7 +212,7 @@ exports.updateAuditStatus = async (req, res) => {
 };
 
 // Record audit presentation
-exports.recordPresentation = async (req, res) => {
+export const recordPresentation = async (req, res) => {
   try {
     const { id } = req.params;
     const { presentationVenue, attendees } = req.body;
@@ -249,7 +249,7 @@ exports.recordPresentation = async (req, res) => {
 };
 
 // Delete clinical audit
-exports.deleteClinicalAudit = async (req, res) => {
+export const deleteClinicalAudit = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -287,7 +287,7 @@ exports.deleteClinicalAudit = async (req, res) => {
 };
 
 // Get audit statistics
-exports.getAuditStats = async (req, res) => {
+export const getAuditStats = async (req, res) => {
   try {
     const { consultantId } = req.query;
 
@@ -374,4 +374,16 @@ exports.getAuditStats = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export default {
+  createClinicalAudit,
+  getAllClinicalAudits,
+  getClinicalAuditsByConsultant,
+  getClinicalAuditById,
+  updateClinicalAudit,
+  updateAuditStatus,
+  recordPresentation,
+  deleteClinicalAudit,
+  getAuditStats,
 };

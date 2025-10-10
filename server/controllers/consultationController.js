@@ -1,9 +1,9 @@
 // server/controllers/consultationController.js
-const Consultation = require("../models/Consultation");
-const { Op } = require("sequelize");
+import Consultation from "../models/Consultation.js";
+import { Op } from "sequelize";
 
 // Create a new consultation request
-exports.createConsultation = async (req, res) => {
+export const createConsultation = async (req, res) => {
   try {
     const {
       patientId,
@@ -44,7 +44,7 @@ exports.createConsultation = async (req, res) => {
 };
 
 // Get all consultations (with filters)
-exports.getAllConsultations = async (req, res) => {
+export const getAllConsultations = async (req, res) => {
   try {
     const {
       page = 1,
@@ -95,7 +95,7 @@ exports.getAllConsultations = async (req, res) => {
 };
 
 // Get pending consultations
-exports.getPendingConsultations = async (req, res) => {
+export const getPendingConsultations = async (req, res) => {
   try {
     const consultations = await Consultation.findAll({
       where: {
@@ -123,7 +123,8 @@ exports.getPendingConsultations = async (req, res) => {
 };
 
 // Get my consultations (assigned to me as consultant)
-exports.getMyConsultations = async (req, res) => {
+// Get my consultations (for consultant)
+export const getMyConsultations = async (req, res) => {
   try {
     const { status } = req.query;
 
@@ -157,7 +158,7 @@ exports.getMyConsultations = async (req, res) => {
 };
 
 // Get consultations by patient
-exports.getConsultationsByPatient = async (req, res) => {
+export const getConsultationsByPatient = async (req, res) => {
   try {
     const { patientId } = req.params;
 
@@ -182,7 +183,7 @@ exports.getConsultationsByPatient = async (req, res) => {
 };
 
 // Get consultation by ID
-exports.getConsultationById = async (req, res) => {
+export const getConsultationById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -210,7 +211,7 @@ exports.getConsultationById = async (req, res) => {
 };
 
 // Assign consultation to consultant
-exports.assignConsultation = async (req, res) => {
+export const assignConsultation = async (req, res) => {
   try {
     const { id } = req.params;
     const { consultantId } = req.body;
@@ -253,7 +254,7 @@ exports.assignConsultation = async (req, res) => {
 };
 
 // Update consultation status
-exports.updateConsultationStatus = async (req, res) => {
+export const updateConsultationStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -293,7 +294,7 @@ exports.updateConsultationStatus = async (req, res) => {
 };
 
 // Complete consultation (provide opinion)
-exports.completeConsultation = async (req, res) => {
+export const completeConsultation = async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -349,7 +350,7 @@ exports.completeConsultation = async (req, res) => {
 };
 
 // Cancel consultation
-exports.cancelConsultation = async (req, res) => {
+export const cancelConsultation = async (req, res) => {
   try {
     const { id } = req.params;
     const { cancelledReason } = req.body;
@@ -391,7 +392,7 @@ exports.cancelConsultation = async (req, res) => {
 };
 
 // Get consultation statistics
-exports.getConsultationStats = async (req, res) => {
+export const getConsultationStats = async (req, res) => {
   try {
     const { startDate, endDate, consultantId } = req.query;
 
@@ -472,4 +473,18 @@ exports.getConsultationStats = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export default {
+  createConsultation,
+  getAllConsultations,
+  getPendingConsultations,
+  getMyConsultations,
+  getConsultationsByPatient,
+  getConsultationById,
+  assignConsultation,
+  updateConsultationStatus,
+  completeConsultation,
+  cancelConsultation,
+  getConsultationStats,
 };

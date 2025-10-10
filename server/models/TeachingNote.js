@@ -1,6 +1,6 @@
 // server/models/TeachingNote.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
 
 const TeachingNote = sequelize.define(
   "TeachingNote",
@@ -139,4 +139,4 @@ const TeachingNote = sequelize.define(
   }
 );
 
-module.exports = TeachingNote;
+export default TeachingNote;

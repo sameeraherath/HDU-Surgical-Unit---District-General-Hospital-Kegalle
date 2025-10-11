@@ -52,21 +52,12 @@ const MedicalOfficerDashboard = () => {
   }, []);
 
 
-  const StatCard = ({ title, value, icon, color, onClick }) => (
+  const StatCard = ({ title, value, icon, color }) => (
     <Card
       sx={{
         height: "100%",
-        cursor: onClick ? "pointer" : "default",
-        transition: "transform 0.2s",
         border: "1px solid #e0e0e0",
-        "&:hover": onClick
-          ? {
-              transform: "translateY(-4px)",
-              border: "1px solid #b0b0b0",
-            }
-          : {},
       }}
-      onClick={onClick}
     >
       <CardContent>
         <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -155,7 +146,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.activePatientsCount}
             icon={<PersonIcon sx={{ fontSize: 40, color: "#1976d2" }} />}
             color="#1976d2"
-            onClick={() => navigate("/medical-officer/patients")}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -164,7 +154,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.todayTasks}
             icon={<TaskIcon sx={{ fontSize: 40, color: "#2e7d32" }} />}
             color="#2e7d32"
-            onClick={() => navigate("/medical-officer/tasks")}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -173,7 +162,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.overdueTasks}
             icon={<WarningIcon sx={{ fontSize: 40, color: "#ed6c02" }} />}
             color="#ed6c02"
-            onClick={() => navigate("/medical-officer/tasks?filter=overdue")}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -182,9 +170,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.pendingInvestigations}
             icon={<ScienceIcon sx={{ fontSize: 40, color: "#9c27b0" }} />}
             color="#9c27b0"
-            onClick={() =>
-              navigate("/medical-officer/investigations?filter=pending")
-            }
           />
         </Grid>
       </Grid>
@@ -197,9 +182,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.criticalInvestigations}
             icon={<WarningIcon sx={{ fontSize: 40, color: "#d32f2f" }} />}
             color="#d32f2f"
-            onClick={() =>
-              navigate("/medical-officer/investigations?filter=critical")
-            }
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -208,7 +190,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.activePrescriptions}
             icon={<MedicationIcon sx={{ fontSize: 40, color: "#0288d1" }} />}
             color="#0288d1"
-            onClick={() => navigate("/medical-officer/prescriptions")}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -217,7 +198,6 @@ const MedicalOfficerDashboard = () => {
             value={overviewData.todayNotes}
             icon={<AssignmentIcon sx={{ fontSize: 40, color: "#7b1fa2" }} />}
             color="#7b1fa2"
-            onClick={() => navigate("/medical-officer/progress-notes")}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>

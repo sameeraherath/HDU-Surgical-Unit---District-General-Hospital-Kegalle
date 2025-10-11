@@ -88,56 +88,48 @@ const ConsultantDashboard = () => {
       value: dashboardStats.todaysWardRounds,
       icon: <AssignmentOutlined fontSize="large" />,
       color: "#1976d2",
-      action: () => navigate("/consultant-dashboard/ward-rounds"),
     },
     {
       title: "Patients for Discharge",
       value: dashboardStats.patientsForDischarge,
       icon: <ExitToAppOutlined fontSize="large" />,
       color: "#2e7d32",
-      action: () => navigate("/consultant-dashboard/discharge-plans"),
     },
     {
       title: "Pending Consultations",
       value: dashboardStats.pendingConsultations,
       icon: <LocalHospitalOutlined fontSize="large" />,
       color: "#ed6c02",
-      action: () => navigate("/consultant-dashboard/consultations"),
     },
     {
       title: "Active Discharge Plans",
       value: dashboardStats.activeDischargePlans,
       icon: <AssignmentOutlined fontSize="large" />,
       color: "#0288d1",
-      action: () => navigate("/consultant-dashboard/discharge-plans"),
     },
     {
       title: "Teaching Sessions (Month)",
       value: dashboardStats.teachingSessionsThisMonth,
       icon: <SchoolOutlined fontSize="large" />,
       color: "#7b1fa2",
-      action: () => navigate("/consultant-dashboard/teaching-notes"),
     },
     {
       title: "Ongoing Audits",
       value: dashboardStats.ongoingAudits,
       icon: <AssessmentOutlined fontSize="large" />,
       color: "#c62828",
-      action: () => navigate("/consultant-dashboard/clinical-audits"),
     },
     {
       title: "Critical Patients",
       value: dashboardStats.criticalPatients,
       icon: <WarningOutlined fontSize="large" />,
       color: "#d32f2f",
-      action: () => navigate("/consultant-dashboard/ward-rounds"),
     },
     {
       title: "Pending Tasks",
       value: dashboardStats.pendingTasks,
       icon: <AssignmentOutlined fontSize="large" />,
       color: "#616161",
-      action: () => navigate("/consultant-dashboard/ward-rounds"),
     },
   ];
 
@@ -212,21 +204,21 @@ const ConsultantDashboard = () => {
               Active Patients
             </Typography>
             <Typography variant="h6">
-              {workloadMetrics.activePatientsCount}
+              {workloadMetrics.activePatientsCount || workloadMetrics.activePatients || 0}
             </Typography>
           </Grid>
           <Grid item xs={3}>
             <Typography variant="body2" color="textSecondary">
               Pending Tasks
             </Typography>
-            <Typography variant="h6">{workloadMetrics.pendingTasksCount}</Typography>
+            <Typography variant="h6">{workloadMetrics.pendingTasksCount || workloadMetrics.pendingTasks || 0}</Typography>
           </Grid>
           <Grid item xs={3}>
             <Typography variant="body2" color="textSecondary">
               Pending Consultations
             </Typography>
             <Typography variant="h6">
-              {workloadMetrics.pendingConsultationsCount}
+              {workloadMetrics.pendingConsultationsCount || workloadMetrics.pendingConsultations || 0}
             </Typography>
           </Grid>
           <Grid item xs={3}>
@@ -234,7 +226,7 @@ const ConsultantDashboard = () => {
               Pending Discharges
             </Typography>
             <Typography variant="h6">
-              {workloadMetrics.pendingDischarges}
+              {workloadMetrics.pendingDischarges || 0}
             </Typography>
           </Grid>
         </Grid>
@@ -246,15 +238,8 @@ const ConsultantDashboard = () => {
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card
               sx={{
-                cursor: "pointer",
-                transition: "transform 0.2s, box-shadow 0.2s",
                 border: "1px solid #e0e0e0",
-                "&:hover": {
-                  transform: "translateY(-4px)",
-                  boxShadow: 4,
-                },
               }}
-              onClick={card.action}
             >
               <CardContent>
                 <Box
@@ -409,7 +394,7 @@ const ConsultantDashboard = () => {
                       Patients Discharged
                     </Typography>
                     <Typography variant="h4" color="info.main">
-                      {recentActivity.patientsDischargedCount}
+                      {recentActivity.patientsDischargedCount || recentActivity.patientsDischarged || 0}
                     </Typography>
                   </CardContent>
                 </Card>
